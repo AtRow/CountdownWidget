@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Обратный отсчет</string>
+    <string name="preferences_activity_title">Настройки</string>
+    <string name="widget_label">Обратный отсчет</string>
+</resources>

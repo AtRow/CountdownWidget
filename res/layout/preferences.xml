@@ -10,5 +10,35 @@
         android:layout_height="wrap_content"
         android:text="Hello World, MyActivity"
         />
+
+    <EditText
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/editText"
+        android:hint="Type something"/>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent">
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/ok_button_text"
+            android:id="@+id/okButton"
+            android:layout_gravity="center_vertical|left"
+            android:singleLine="true"
+            android:onClick="onOk"/>
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/cancel_button_text"
+            android:id="@+id/cancelButton"
+            android:layout_gravity="center_vertical|right"
+            android:singleLine="true"
+            android:onClick="onCancel"/>
+    </LinearLayout>
 </LinearLayout>
 

@@ -3,7 +3,6 @@ package com.ovio.countdown.proxy;
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProviderInfo;
 import android.content.Context;
-import android.util.Log;
 import android.widget.RemoteViews;
 import com.ovio.countdown.R;
 import com.ovio.countdown.preferences.WidgetOptions;
@@ -35,29 +34,20 @@ public class WidgetProxyFactory {
 
         switch (info.initialLayout) {
             case R.layout.countdown_widget_layout_4x1 :
-                return getLargeWidgetProxy();
+                RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.countdown_widget_layout_4x1);
+                if (views == null) {
+                    return null;
+                } else {
+                    return getLargeWidgetProxy(views, options);
+                }
+
             default:
                 return null;
         }
     }
 
-
-
-
-    private RemoteViews getRemoteViews() {
-
-        int layout = appWidgetManager.getAppWidgetInfo(widgetId).initialLayout;
-
-        Log.d(TAG, "Loading remote views for widget [" + widgetId + "] with layout [" + layout + "]");
-
-        switch (layout) {
-            case R.layout.countdown_widget_layout_4x1 :
-                return new RemoteViews(context.getPackageName(), R.layout.countdown_widget_layout_4x1);
-
-            default:
-                Log.e(TAG, "Layout not found");
-                return null;
-        }
-
+    private WidgetProxy getLargeWidgetProxy(RemoteViews views, WidgetOptions options) {
+        return new LargeWidgetProxy(context, appWidgetManager, views, options);
     }
+
 }

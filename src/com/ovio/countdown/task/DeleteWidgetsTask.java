@@ -4,11 +4,13 @@ import android.content.Context;
 import android.os.AsyncTask;
 import com.ovio.countdown.WidgetPreferencesManager;
 
+import java.util.List;
+
 /**
  * Countdown
  * com.ovio.countdown.task
  */
-public class DeleteWidgetsTask extends AsyncTask<Integer, Void, Void> {
+public class DeleteWidgetsTask extends AsyncTask<List<Integer>, Void, Void> {
 
     private Context context;
 
@@ -17,15 +19,15 @@ public class DeleteWidgetsTask extends AsyncTask<Integer, Void, Void> {
     }
 
     @Override
-    protected Void doInBackground(Integer[] widgetIds) {
+    protected Void doInBackground(List<Integer>... widgetIds) {
 
         if (widgetIds.length != 1) {
-            throw new RuntimeException("Exactly 1 widget can be deleted at once, got: " + widgetIds.length);
+            throw new RuntimeException("Exactly 1 array of widgets can be handled: " + widgetIds.length);
         }
 
         WidgetPreferencesManager manager = new WidgetPreferencesManager(context);
 
-        manager.delete(widgetIds[0]);
+        manager.deleteAll(widgetIds[0]);
 
         return null;
     }

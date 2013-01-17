@@ -2,10 +2,13 @@ package com.ovio.countdown;
 
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
-import android.content.ComponentName;
 import android.content.Context;
-import android.content.Intent;
 import android.util.Log;
+import com.ovio.countdown.task.DeleteWidgetsTask;
+import com.ovio.countdown.task.UpdateWidgetTask;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Countdown
@@ -22,9 +25,30 @@ public class CountdownWidgetProvider extends AppWidgetProvider {
 
         Log.i(TAG, "onUpdate()");
 
-        startCountdownService(context, appWidgetIds);
+        UpdateWidgetTask task = new UpdateWidgetTask(context);
+        List<Integer> list = new ArrayList<Integer>(appWidgetIds.length);
+        for (int id: appWidgetIds) {
+            list.add(id);
+        }
+        task.execute(list);
     }
 
+    @Override
+    public void onDeleted(Context context, int[] appWidgetIds) {
+
+        Log.i(TAG, "onDelete()");
+
+        DeleteWidgetsTask task = new DeleteWidgetsTask(context);
+        List<Integer> list = new ArrayList<Integer>(appWidgetIds.length);
+        for (int id: appWidgetIds) {
+            list.add(id);
+        }
+        task.execute(list);
+
+        super.onDeleted(context, appWidgetIds);
+    }
+
+    /*  TODO: onReceive is out of scope for now
     @Override
     public void onReceive(Context context, Intent intent) {
         super.onReceive(context, intent);
@@ -35,7 +59,9 @@ public class CountdownWidgetProvider extends AppWidgetProvider {
             startCountdownService(context, null);
         }
     }
+*/
 
+/*
     private void startCountdownService(Context context, int[] appWidgetIds) {
         Intent updatingIntent = new Intent(context, CountdownService.class);
 
@@ -45,10 +71,13 @@ public class CountdownWidgetProvider extends AppWidgetProvider {
 
         context.startService(updatingIntent);
     }
+*/
 
+/*
     private int widgetsInstalled(Context context) {
         ComponentName thisWidget = new ComponentName(context, CountdownWidgetProvider.class);
         AppWidgetManager mgr = AppWidgetManager.getInstance(context);
         return mgr.getAppWidgetIds(thisWidget).length;
     }
+*/
 }

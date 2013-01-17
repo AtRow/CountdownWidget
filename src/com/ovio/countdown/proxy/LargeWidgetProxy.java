@@ -1,6 +1,9 @@
 package com.ovio.countdown.proxy;
 
+import android.appwidget.AppWidgetManager;
 import android.content.Context;
+import android.widget.RemoteViews;
+import com.ovio.countdown.preferences.WidgetOptions;
 
 /**
  * Countdown
@@ -8,8 +11,7 @@ import android.content.Context;
  */
 public class LargeWidgetProxy extends WidgetProxy {
 
-    public LargeWidgetProxy(Context context) {
-        super(context);
+    public LargeWidgetProxy(Context context, AppWidgetManager appWidgetManager, RemoteViews views, WidgetOptions options) {
+        super(context, appWidgetManager, views, options);
     }
-
 }

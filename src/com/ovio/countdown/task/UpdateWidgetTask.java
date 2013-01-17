@@ -1,20 +1,33 @@
 package com.ovio.countdown.task;
 
+import android.content.Context;
 import android.os.AsyncTask;
-import com.ovio.countdown.WidgetManager;
+import com.ovio.countdown.WidgetPreferencesManager;
+
+import java.util.List;
 
 /**
  * Countdown
  * com.ovio.countdown.task
  */
-public class UpdateWidgetTask extends AsyncTask<Integer, Void, Void> {
+public class UpdateWidgetTask extends AsyncTask<List<Integer>, Void, Void> {
+
+    private Context context;
+
+    public UpdateWidgetTask(Context context) {
+        this.context = context;
+    }
 
     @Override
-    protected Void doInBackground(Integer[] widgetIds) {
+    protected Void doInBackground(List<Integer>... widgetIds) {
 
-        WidgetManager manager = new WidgetManager();
+        if (widgetIds.length != 1) {
+            throw new RuntimeException("Exactly 1 array of widgets can be handled: " + widgetIds.length);
+        }
 
-        int[] validWidgetIds = manager.validate(widgetIds);
+        WidgetPreferencesManager manager = new WidgetPreferencesManager(context);
+
+        List<Integer> validWidgetIds = manager.validate(widgetIds[0]);
 
         for (int id: validWidgetIds) {
             manager.update(id);

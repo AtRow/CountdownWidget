@@ -4,8 +4,8 @@ import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
 import android.content.Context;
 import android.util.Log;
+import com.ovio.countdown.task.CleanupWidgetTask;
 import com.ovio.countdown.task.DeleteWidgetsTask;
-import com.ovio.countdown.task.UpdateWidgetTask;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,7 +25,7 @@ public class CountdownWidgetProvider extends AppWidgetProvider {
 
         Log.i(TAG, "onUpdate()");
 
-        UpdateWidgetTask task = new UpdateWidgetTask(context);
+        CleanupWidgetTask task = new CleanupWidgetTask(context);
         List<Integer> list = new ArrayList<Integer>(appWidgetIds.length);
         for (int id: appWidgetIds) {
             list.add(id);
@@ -63,10 +63,10 @@ public class CountdownWidgetProvider extends AppWidgetProvider {
 
 /*
     private void startCountdownService(Context context, int[] appWidgetIds) {
-        Intent updatingIntent = new Intent(context, CountdownService.class);
+        Intent updatingIntent = new Intent(context, WidgetService.class);
 
         if (appWidgetIds != null) {
-            updatingIntent.putExtra(CountdownService.WIDGET_IDS, appWidgetIds);
+            updatingIntent.putExtra(WidgetService.WIDGET_IDS, appWidgetIds);
         }
 
         context.startService(updatingIntent);

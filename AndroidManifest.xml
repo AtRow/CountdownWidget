@@ -31,15 +31,20 @@
             android:label="@string/widget_label">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE"/>
-                <action android:name="android.intent.action.USER_PRESENT"/>
+                <action android:name="android.appwidget.action.APPWIDGET_DELETED"/>
             </intent-filter>
             <meta-data
                 android:name="android.appwidget.provider"
                 android:resource="@xml/countdown_widget"
                 />
         </receiver>
-        <receiver android:name=".CountdownWidgetProvider"/>
 
-        <service android:name=".CountdownService"/>
+        <service android:name=".WidgetService">
+            <intent-filter>
+                <action android:name="com.ovio.countdown.WidgetService.START"/>
+                <action android:name="com.ovio.countdown.WidgetService.APPWIDGET_UPDATED"/>
+                <action android:name="com.ovio.countdown.WidgetService.APPWIDGET_DELETED"/>
+            </intent-filter>
+        </service>
     </application>
 </manifest> 

@@ -8,9 +8,10 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
-import com.ovio.countdown.preferences.DefaultPrefs;
+import com.ovio.countdown.preferences.DefaultOptions;
 import com.ovio.countdown.preferences.PreferencesManager;
 import com.ovio.countdown.preferences.WidgetOptions;
+import com.ovio.countdown.preferences.WidgetPreferencesManager;
 
 /**
  * Countdown
@@ -19,8 +20,6 @@ import com.ovio.countdown.preferences.WidgetOptions;
 public class WidgetPreferencesActivity extends Activity {
 
     private static final String TAG = "PREFS";
-
-    private static final String GLOBAL_PREFS = "global";
 
     private Context self = this;
 
@@ -34,6 +33,8 @@ public class WidgetPreferencesActivity extends Activity {
 
     private WidgetOptions widgetOptions;
 
+    DefaultOptions options;
+
     private EditText editText;
 
     @Override
@@ -45,6 +46,7 @@ public class WidgetPreferencesActivity extends Activity {
         appWidgetId = getAppWidgetId();
         resultIntent = getResultIntent();
         widgetOptions = new WidgetOptions();
+        options = new DefaultOptions();
 
         setResult(RESULT_CANCELED, resultIntent);
 
@@ -53,10 +55,11 @@ public class WidgetPreferencesActivity extends Activity {
 
         editText = (EditText) findViewById(R.id.editText);
 
-        prefManager = new PreferencesManager(self);
-        widgetManager = new WidgetPreferencesManager(self);
+        prefManager = PreferencesManager.getInstance(self);
+        widgetManager = WidgetPreferencesManager.getInstance(self);
 
         loadDefaultPreferences();
+        startWidgetService();
     }
 
     public void onOk(View view) {
@@ -65,7 +68,7 @@ public class WidgetPreferencesActivity extends Activity {
         saveDefaultPreferences();
         saveWidgetPreferences();
 
-        widgetManager.update(appWidgetId);
+        sendToWidgetService();
 
         setResult(RESULT_OK, resultIntent);
         finish();
@@ -76,6 +79,23 @@ public class WidgetPreferencesActivity extends Activity {
 
         finish();
     }
+
+    private void startWidgetService() {
+        Intent widgetServiceIntent = new Intent(WidgetService.START);
+        startService(widgetServiceIntent);
+    }
+
+    private void sendToWidgetService() {
+        Intent widgetServiceIntent = new Intent(WidgetService.UPDATED);
+
+
+        Bundle extras = new Bundle();
+        extras.putSerializable(WidgetService.OPTIONS, widgetOptions);
+
+        widgetServiceIntent.putExtras(extras);
+        startService(widgetServiceIntent);
+    }
+
 
 
     private Intent getResultIntent() {
@@ -114,17 +134,21 @@ public class WidgetPreferencesActivity extends Activity {
     private void saveDefaultPreferences() {
         Log.d(TAG, "Saving preferences");
 
-        DefaultPrefs prefs = new DefaultPrefs();
+        int cnt = options.savedWidgets.length;
 
-        prefs.enableTime = false;
+        int[] savedWidgets = new int[cnt + 1];
+        savedWidgets[cnt] = appWidgetId;
 
-        prefManager.saveDefaultPrefs(GLOBAL_PREFS, prefs);
+        options.savedWidgets = savedWidgets;
+        options.enableTime = false;
+
+        prefManager.saveDefaultPrefs(options);
     }
 
     private void loadDefaultPreferences() {
         Log.d(TAG, "Loading preferences");
 
-        DefaultPrefs prefs = prefManager.loadDefaultPrefs(GLOBAL_PREFS);
+        options = prefManager.loadDefaultPrefs();
 
         editText.setText("empty");
     }

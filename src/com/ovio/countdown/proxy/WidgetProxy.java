@@ -13,6 +13,12 @@ import com.ovio.countdown.preferences.WidgetOptions;
  */
 public abstract class WidgetProxy {
 
+    public long nextUpdateTimestamp;
+
+    public WidgetOptions options; //TODO
+
+
+
     private final static String TAG = "WidgetProxy";
 
     private final Context context;
@@ -20,8 +26,6 @@ public abstract class WidgetProxy {
     private final AppWidgetManager appWidgetManager;
 
     private final RemoteViews views;
-
-    private WidgetOptions options; //TODO
 
     private Time time;
 
@@ -38,21 +42,27 @@ public abstract class WidgetProxy {
         this.appWidgetManager = appWidgetManager;
         this.views = views;
         this.options = options;
+
+        time = new Time();
+        calculateNextUpdateTimestamp();
     }
 
     public void updateWidget() {
+        time.setToNow();
 
         views.setCharSequence(R.id.titleTextView, "setText", options.title);
-        views.setCharSequence(R.id.hiddenTextView, "setText", options.packSettings());
+        views.setCharSequence(R.id.counterTextView, "setText", Long.toString(options.timestamp - time.toMillis(false)));
+        views.setCharSequence(R.id.nextTsTextView, "setText", Long.toString(nextUpdateTimestamp - options.timestamp));
 
         appWidgetManager.updateAppWidget(options.widgetId, views);
+
+        calculateNextUpdateTimestamp();
     }
 
-    public WidgetOptions getOptions() {
-        return options;
+    private void calculateNextUpdateTimestamp() {
+        time.setToNow();
+        // 5 mins
+        nextUpdateTimestamp = time.toMillis(false) + (1000 * 60 * 5);
     }
 
-    public void setOptions(WidgetOptions options) {
-        this.options = options;
-    }
 }

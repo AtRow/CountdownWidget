@@ -15,17 +15,28 @@ public class WidgetProxyFactory {
 
     private static final String TAG = "WidgetProxyFactory";
 
+    private static WidgetProxyFactory instance;
+
     private Context context;
 
     private final AppWidgetManager appWidgetManager;
 
-    public WidgetProxyFactory(Context context) {
+    private WidgetProxyFactory(Context context) {
         this.context = context;
         appWidgetManager = AppWidgetManager.getInstance(context);
     }
 
+    public static synchronized WidgetProxyFactory getInstance(Context context) {
+        if (instance == null) {
+            instance = new WidgetProxyFactory(context);
+        }
+        return instance;
+    }
 
     public WidgetProxy getWidgetProxy(WidgetOptions options) {
+        if (options == null) {
+            return null;
+        }
         AppWidgetProviderInfo info = appWidgetManager.getAppWidgetInfo(options.widgetId);
 
         if (info == null || info.initialLayout == 0) {

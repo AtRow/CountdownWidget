@@ -4,7 +4,7 @@ package com.ovio.countdown.preferences;
  * Countdown
  * com.ovio.countdown.preferences
  */
-public class DefaultPrefs {
+public class DefaultOptions {
 
     public boolean upward;
 
@@ -15,5 +15,7 @@ public class DefaultPrefs {
     public boolean repeating;
 
     public long repeatingPeriod;
+
+    public int[] savedWidgets;
 
 }

@@ -12,7 +12,6 @@ import android.util.AttributeSet;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import com.ovio.countdown.R;
-import com.ovio.countdown.preferences.WidgetOptions;
 
 import java.util.TimeZone;
 
@@ -20,6 +19,7 @@ import java.util.TimeZone;
  * Countdown
  * com.ovio.countdown.view
  */
+@Deprecated
 public class CompoundCounterView extends LinearLayout {
 
     private TextView counter;
@@ -62,7 +62,7 @@ public class CompoundCounterView extends LinearLayout {
         super.onAttachedToWindow();
 
         counter = (TextView) findViewById(R.id.counterTextView);
-        hiddenView = (TextView) findViewById(R.id.hiddenTextView);
+        //hiddenView = (TextView) findViewById(R.id.hiddenTextView);
 
         hiddenView.addTextChangedListener(new TextWatcher() {
             @Override
@@ -209,9 +209,11 @@ public class CompoundCounterView extends LinearLayout {
     }
 
     private void updateSettings(String settingsData) {
+/*
         countSeconds = WidgetOptions.parseCountSeconds(settingsData);
         countUpward = WidgetOptions.parseUpward(settingsData);
         targetTimestamp = WidgetOptions.parseTimestamp(settingsData);
+*/
 
         onTick();
     }

@@ -15,11 +15,10 @@ import com.ovio.countdown.preferences.WidgetOptions;
  */
 public abstract class WidgetProxy {
 
-    public long nextUpdateTimestamp;
-
-    public WidgetOptions options; //TODO
+    public Time nextUpdateTime = new Time();
 
 
+    private WidgetOptions options; //TODO
 
     private final static String TAG = Logger.PREFIX + "proxy";
 
@@ -29,7 +28,7 @@ public abstract class WidgetProxy {
 
     private final RemoteViews views;
 
-    private Time time;
+    private Time time = new Time();
 
     private boolean needsUpdate;
 
@@ -47,40 +46,52 @@ public abstract class WidgetProxy {
         this.views = views;
         this.options = options;
 
-        time = new Time();
-        Logger.d(TAG, "Updated Time to: %s", time.format3339(false));
-
-        calculateNextUpdateTimestamp();
+        calculateNextUpdateTime();
     }
 
     public void updateWidget() {
         Logger.i(TAG, "Px[%s]: Updating widget", options.widgetId);
 
         time.setToNow();
+
         Logger.d(TAG, "Px[%s]: Updated Time to: %s", options.widgetId, time.format3339(false));
 
         views.setCharSequence(R.id.titleTextView, "setText", options.title);
-        views.setCharSequence(R.id.counterTextView, "setText", Long.toString(options.timestamp - time.toMillis(false)));
-        views.setCharSequence(R.id.nextTsTextView, "setText", Long.toString(nextUpdateTimestamp - options.timestamp));
+        views.setCharSequence(R.id.counterTextView, "setText", formatSeconds(options.timestamp - time.toMillis(false)));
+
+        String status = "T: " + time.hour + ":" + time.minute + ":" + time.second + ":"
+                + " Uts: " + formatSeconds(nextUpdateTime.toMillis(false) - time.toMillis(false));
+        views.setCharSequence(R.id.statusText, "setText", status);
 
         appWidgetManager.updateAppWidget(options.widgetId, views);
 
-        calculateNextUpdateTimestamp();
+        calculateNextUpdateTime();
     }
 
-    private void calculateNextUpdateTimestamp() {
-        time.setToNow();
-        Logger.d(TAG, "Px[%s]: Updated Time to: %s", options.widgetId, time.format3339(false));
+    public WidgetOptions getOptions() {
+        return options;
+    }
 
-        // 5 mins
-        nextUpdateTimestamp = time.toMillis(false) + (1000 * 60 * 5);
+    public void setOptions(WidgetOptions options) {
+        this.options = options;
+        calculateNextUpdateTime();
+    }
+
+    private String formatSeconds(long mills) {
+        long seconds = mills / 1000;
+        return Long.toString(seconds);
+    }
+
+    private void calculateNextUpdateTime() {
+        nextUpdateTime.setToNow();
+
+        // TODO
+        nextUpdateTime.minute += 1;
+        nextUpdateTime.normalize(false);
 
         if (Log.isLoggable(TAG, Log.INFO)) {
-            Time tt = new Time();
-            tt.set(nextUpdateTimestamp);
-
-            Logger.i(TAG, "Px[%s]: Updated nextUpdateTimestamp to %s, time: %s",
-                    options.widgetId, nextUpdateTimestamp, tt.format3339(false));
+            Logger.i(TAG, "Px[%s]: Updated nextUpdateTime to %s, time: %s",
+                    options.widgetId, nextUpdateTime.format3339(false), time.format3339(false));
         }
 
     }

@@ -156,7 +156,7 @@ public class WidgetService extends Service {
                 Logger.d(TAG, "Updating existing Proxy with id %s", id);
 
                 proxy = widgetProxies.get(id);
-                proxy.options = options;
+                proxy.setOptions(options);
             } else {
                 Logger.d(TAG, "Creating new Proxy with id %s", id);
 
@@ -169,6 +169,7 @@ public class WidgetService extends Service {
                         Util.getString(widgetProxies.keySet()));
             }
 
+            // TODO: Schedule
             proxy.updateWidget();
 
         } else {
@@ -230,17 +231,14 @@ public class WidgetService extends Service {
             Logger.i(TAG, "Updating widget %s", id);
 
             WidgetProxy proxy = widgetProxies.get(id);
-            Logger.i(TAG, "Widget title: '%s'", proxy.options.title);
+            Logger.i(TAG, "Widget title: '%s'", proxy.getOptions().title);
 
             if (Log.isLoggable(TAG, Log.INFO)) {
-                Time tt = new Time();
-                tt.set(proxy.nextUpdateTimestamp);
-
-                Logger.i(TAG, "Current time is [%s] and proxy.nextUpdate is [%s]", time.format3339(false), tt.format3339(false));
+                Logger.i(TAG, "Current time is [%s] and proxy.nextUpdate is [%s]", time.format3339(false), proxy.nextUpdateTime.format3339(false));
             }
 
-            if (time.toMillis(false) >= proxy.nextUpdateTimestamp) {
-                Logger.d(TAG, "Widget will be updated now");
+            if (Time.compare(time, proxy.nextUpdateTime) >= 0) {
+                Logger.i(TAG, "Widget will be updated now");
                 proxy.updateWidget();
             }
         }

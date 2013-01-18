@@ -2,10 +2,12 @@ package com.ovio.countdown;
 
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
+import android.content.ComponentName;
 import android.content.Context;
 import android.util.Log;
 import com.ovio.countdown.task.CleanupWidgetTask;
 import com.ovio.countdown.task.DeleteWidgetsTask;
+import com.ovio.countdown.util.Util;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,11 +28,9 @@ public class CountdownWidgetProvider extends AppWidgetProvider {
         Log.i(TAG, "onUpdate()");
 
         CleanupWidgetTask task = new CleanupWidgetTask(context);
-        List<Integer> list = new ArrayList<Integer>(appWidgetIds.length);
-        for (int id: appWidgetIds) {
-            list.add(id);
-        }
-        task.execute(list);
+        int[] installedAppWidgetIds = getInstalledWidgets(context, appWidgetManager);
+
+        task.execute(Util.toIntegerList(installedAppWidgetIds));
     }
 
     @Override
@@ -73,11 +73,10 @@ public class CountdownWidgetProvider extends AppWidgetProvider {
     }
 */
 
-/*
-    private int widgetsInstalled(Context context) {
+
+    private int[] getInstalledWidgets(Context context, AppWidgetManager appWidgetManager) {
         ComponentName thisWidget = new ComponentName(context, CountdownWidgetProvider.class);
-        AppWidgetManager mgr = AppWidgetManager.getInstance(context);
-        return mgr.getAppWidgetIds(thisWidget).length;
+        return appWidgetManager.getAppWidgetIds(thisWidget);
     }
-*/
+
 }

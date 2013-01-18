@@ -29,8 +29,6 @@ public class WidgetPreferencesActivity extends Activity {
 
     private int appWidgetId;
 
-    private Intent resultIntent;
-
     private PreferencesManager prefManager;
 
     private WidgetPreferencesManager widgetManager;
@@ -41,20 +39,21 @@ public class WidgetPreferencesActivity extends Activity {
 
     private EditText editText;
 
+    private boolean isOkPressed = false;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         Logger.i(TAG, "Created Widget Preferences Activity");
 
+        setContentView(R.layout.preferences);
+
         appWidgetId = getAppWidgetId();
-        resultIntent = getResultIntent();
         widgetOptions = new WidgetOptions();
         options = new DefaultOptions();
 
-        setResult(RESULT_CANCELED, resultIntent);
-
-        setContentView(R.layout.preferences);
+        setResultCanceled();
 
         editText = (EditText) findViewById(R.id.editText);
 
@@ -71,8 +70,11 @@ public class WidgetPreferencesActivity extends Activity {
 
         // There's a bug somewhere, see
         // http://stackoverflow.com/questions/4393144/widget-not-deleted-when-passing-result-canceled-as-result-for-configuration-acti
-        Logger.i(TAG, "Stopped, forcing removal of a widget %s", appWidgetId);
-        forceRemoveWidget(appWidgetId);
+        Logger.i(TAG, "Stopped");
+        if (!isOkPressed) {
+            Logger.i(TAG, "Ok wasn't pressed, forcing removal of a widget %s", appWidgetId);
+            forceRemoveWidget(appWidgetId);
+        }
         finish();
     }
 
@@ -84,7 +86,7 @@ public class WidgetPreferencesActivity extends Activity {
 
         sendToWidgetService();
 
-        setResult(RESULT_OK, resultIntent);
+        setResultOk();
 
         Logger.i(TAG, "Finished Widget Preferences Activity with RESULT_OK");
         finish();
@@ -122,6 +124,16 @@ public class WidgetPreferencesActivity extends Activity {
         return new Intent().putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
     }
 
+    private void setResultOk() {
+        setResult(RESULT_OK, getResultIntent());
+        isOkPressed = true;
+    }
+
+    private void setResultCanceled() {
+        setResult(RESULT_CANCELED, getResultIntent());
+        isOkPressed = false;
+    }
+
     private int getAppWidgetId() {
         Logger.d(TAG, "Getting new appWidgetId");
 
@@ -157,7 +169,7 @@ public class WidgetPreferencesActivity extends Activity {
 
         widgetOptions.widgetId = appWidgetId;
         widgetOptions.title = editText.getText().toString();
-        widgetOptions.timestamp = System.currentTimeMillis() + (1000 * 10 * 60);
+        widgetOptions.timestamp = System.currentTimeMillis() + (1000 * 10 * 60 * 60);
         widgetOptions.upward = true;
         widgetOptions.enableSeconds = false;
         widgetOptions.repeatingPeriod = 0L;

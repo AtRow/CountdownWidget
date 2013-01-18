@@ -3,8 +3,10 @@ package com.ovio.countdown.proxy;
 import android.appwidget.AppWidgetManager;
 import android.content.Context;
 import android.text.format.Time;
+import android.util.Log;
 import android.widget.RemoteViews;
 import com.ovio.countdown.R;
+import com.ovio.countdown.log.Logger;
 import com.ovio.countdown.preferences.WidgetOptions;
 
 /**
@@ -19,7 +21,7 @@ public abstract class WidgetProxy {
 
 
 
-    private final static String TAG = "WidgetProxy";
+    private final static String TAG = Logger.PREFIX + "WidgetPx";
 
     private final Context context;
 
@@ -38,17 +40,24 @@ public abstract class WidgetProxy {
     private boolean isSubscribed;
 
     public WidgetProxy(Context context, AppWidgetManager appWidgetManager, RemoteViews views, WidgetOptions options) {
+        Logger.d(TAG, "Instantiated WidgetProxy with options %s", options);
+
         this.context = context;
         this.appWidgetManager = appWidgetManager;
         this.views = views;
         this.options = options;
 
         time = new Time();
+        Logger.d(TAG, "Updated Time to: %s", time.format2445());
+
         calculateNextUpdateTimestamp();
     }
 
     public void updateWidget() {
+        Logger.i(TAG, "Px[%s]: Updating widget", options.widgetId);
+
         time.setToNow();
+        Logger.d(TAG, "Px[%s]: Updated Time to: %s, options.widgetId", time.format2445());
 
         views.setCharSequence(R.id.titleTextView, "setText", options.title);
         views.setCharSequence(R.id.counterTextView, "setText", Long.toString(options.timestamp - time.toMillis(false)));
@@ -61,8 +70,19 @@ public abstract class WidgetProxy {
 
     private void calculateNextUpdateTimestamp() {
         time.setToNow();
+        Logger.d(TAG, "Px[%s]: Updated Time to: %s", options.widgetId, time.format2445());
+
         // 5 mins
         nextUpdateTimestamp = time.toMillis(false) + (1000 * 60 * 5);
+
+        if (Log.isLoggable(TAG, Log.INFO)) {
+            Time tt = new Time();
+            tt.set(nextUpdateTimestamp);
+
+            Logger.i(TAG, "Px[%s]: Updated nextUpdateTimestamp to %s, time: %s",
+                    options.widgetId, nextUpdateTimestamp, tt.format2445());
+        }
+
     }
 
 }

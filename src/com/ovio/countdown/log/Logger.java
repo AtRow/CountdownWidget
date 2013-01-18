@@ -11,6 +11,8 @@ import java.util.Locale;
  */
 public final class Logger {
 
+    public static final String PREFIX = "CW_";
+
     public static void v(String tag, String msg, Object... params) {
         if (Log.isLoggable(tag, Log.VERBOSE)) Log.v(tag, getLocation() + getMessage(msg, params));
     }

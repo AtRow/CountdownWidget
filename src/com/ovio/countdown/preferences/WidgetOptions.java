@@ -24,4 +24,16 @@ public class WidgetOptions implements Serializable {
 
     public String calendarEventUrl;
 
+    @Override
+    public String toString() {
+        return "WidgetOptions{" +
+                "widgetId=" + widgetId +
+                ", title='" + title + '\'' +
+                ", timestamp=" + timestamp +
+                ", upward=" + upward +
+                ", enableSeconds=" + enableSeconds +
+                ", repeatingPeriod=" + repeatingPeriod +
+                ", calendarEventUrl='" + calendarEventUrl + '\'' +
+                '}';
+    }
 }

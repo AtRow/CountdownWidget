@@ -1,6 +1,7 @@
 package com.ovio.countdown.util;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -34,8 +35,9 @@ public class Util {
     public static int[] toIntArray(List<Integer> list){
         int[] array = new int[list.size()];
 
-        for (int i = 0; i < array.length; i++)
+        for (int i = 0; i < array.length; i++) {
             array[i] = list.get(i);
+        }
         return array;
     }
 
@@ -48,4 +50,44 @@ public class Util {
         return list;
     }
 
+    public static String getString(Collection<?> objects) {
+        if (objects == null) {
+            return "NULL";
+        }
+
+        StringBuilder sb = new StringBuilder();
+        sb.append('[');
+
+        int i = 0;
+
+        for (Object o: objects) {
+            sb.append(o);
+            if (i < objects.size() - 1) {
+                sb.append(", ");
+            }
+            i++;
+        }
+
+        sb.append(']');
+        return sb.toString();
+    }
+
+    public static String getString(int[] array) {
+        if (array == null) {
+            return "NULL";
+        }
+
+        StringBuilder sb = new StringBuilder();
+        sb.append('[');
+
+        for (int i = 0; i < array.length; i++) {
+            sb.append(array[i]);
+            if (i < array.length - 1) {
+                sb.append(", ");
+            }
+        }
+
+        sb.append(']');
+        return sb.toString();
+    }
 }

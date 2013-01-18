@@ -5,9 +5,9 @@ import android.appwidget.AppWidgetManager;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
+import com.ovio.countdown.log.Logger;
 import com.ovio.countdown.preferences.DefaultOptions;
 import com.ovio.countdown.preferences.PreferencesManager;
 import com.ovio.countdown.preferences.WidgetOptions;
@@ -19,7 +19,7 @@ import com.ovio.countdown.preferences.WidgetPreferencesManager;
  */
 public class WidgetPreferencesActivity extends Activity {
 
-    private static final String TAG = "PREFS";
+    private static final String TAG = Logger.PREFIX + "PrefsAct";
 
     private Context self = this;
 
@@ -41,7 +41,7 @@ public class WidgetPreferencesActivity extends Activity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        Log.d(TAG, "Starting WidgetPreferencesActivity");
+        Logger.i(TAG, "Created Widget Preferences Activity");
 
         appWidgetId = getAppWidgetId();
         resultIntent = getResultIntent();
@@ -50,7 +50,6 @@ public class WidgetPreferencesActivity extends Activity {
 
         setResult(RESULT_CANCELED, resultIntent);
 
-        Log.d(TAG, "Applying layout");
         setContentView(R.layout.preferences);
 
         editText = (EditText) findViewById(R.id.editText);
@@ -63,7 +62,7 @@ public class WidgetPreferencesActivity extends Activity {
     }
 
     public void onOk(View view) {
-        Log.d(TAG, "OK button clicked");
+        Logger.d(TAG, "OK button clicked");
 
         saveDefaultPreferences();
         saveWidgetPreferences();
@@ -71,53 +70,62 @@ public class WidgetPreferencesActivity extends Activity {
         sendToWidgetService();
 
         setResult(RESULT_OK, resultIntent);
+
+        Logger.i(TAG, "Finished Widget Preferences Activity with RESULT_OK");
         finish();
     }
 
     public void onCancel(View view) {
-        Log.d(TAG, "Cancel button clicked");
+        Logger.d(TAG, "Cancel button clicked");
 
+        Logger.i(TAG, "Finished Widget Preferences Activity with RESULT_CANCELED");
         finish();
     }
 
     private void startWidgetService() {
+        Logger.i(TAG, "Sending START intent to Service");
+
         Intent widgetServiceIntent = new Intent(WidgetService.START);
         startService(widgetServiceIntent);
     }
 
     private void sendToWidgetService() {
-        Intent widgetServiceIntent = new Intent(WidgetService.UPDATED);
+        Logger.i(TAG, "Sending UPDATED intent to Service");
 
+        Intent widgetServiceIntent = new Intent(WidgetService.UPDATED);
 
         Bundle extras = new Bundle();
         extras.putSerializable(WidgetService.OPTIONS, widgetOptions);
 
         widgetServiceIntent.putExtras(extras);
+        Logger.d(TAG, "Intent Extras: %s", widgetOptions);
+
         startService(widgetServiceIntent);
     }
-
-
 
     private Intent getResultIntent() {
         return new Intent().putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
     }
 
     private int getAppWidgetId() {
+        Logger.d(TAG, "Getting new appWidgetId");
+
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
             int id = extras.getInt(AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID);
 
-            Log.d(TAG, "Got AppWidgetId = " + id);
+            Logger.i(TAG, "Got AppWidgetId: %s", id);
             return id;
 
         } else {
-            // TODO: what to do?
+            Logger.e(TAG, "Can't find appWidgetId in a starting Intent's extras; Extras == null!");
             finish();
             return AppWidgetManager.INVALID_APPWIDGET_ID;
         }
     }
 
     private void saveWidgetPreferences() {
+        Logger.i(TAG, "Saving Widget Options");
 
         //TODO
 
@@ -128,11 +136,15 @@ public class WidgetPreferencesActivity extends Activity {
         widgetOptions.enableSeconds = false;
         widgetOptions.repeatingPeriod = 0L;
 
+        Logger.d(TAG, "Widget Options: %s", widgetOptions);
+
         widgetManager.add(widgetOptions);
+
+        Logger.d(TAG, "Finished saving Widget Options");
     }
 
     private void saveDefaultPreferences() {
-        Log.d(TAG, "Saving preferences");
+        Logger.i(TAG, "Saving Global Options");
 
         int cnt = options.savedWidgets.length;
 
@@ -142,13 +154,19 @@ public class WidgetPreferencesActivity extends Activity {
         options.savedWidgets = savedWidgets;
         options.enableTime = false;
 
+        Logger.d(TAG, "Global Options: %s", options);
+
         prefManager.saveDefaultPrefs(options);
+
+        Logger.d(TAG, "Finished saving Global Options");
     }
 
     private void loadDefaultPreferences() {
-        Log.d(TAG, "Loading preferences");
+        Logger.i(TAG, "Loading Global Options");
 
         options = prefManager.loadDefaultPrefs();
+
+        Logger.d(TAG, "Global Options: %s", options);
 
         editText.setText("empty");
     }

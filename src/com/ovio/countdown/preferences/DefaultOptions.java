@@ -18,4 +18,15 @@ public class DefaultOptions {
 
     public int[] savedWidgets;
 
+    @Override
+    public String toString() {
+        return "DefaultOptions{" +
+                "upward=" + upward +
+                ", enableSeconds=" + enableSeconds +
+                ", enableTime=" + enableTime +
+                ", repeating=" + repeating +
+                ", repeatingPeriod=" + repeatingPeriod +
+                ", savedWidgets=" + savedWidgets +
+                '}';
+    }
 }

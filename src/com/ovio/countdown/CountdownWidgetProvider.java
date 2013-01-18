@@ -4,7 +4,7 @@ import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
 import android.content.ComponentName;
 import android.content.Context;
-import android.util.Log;
+import com.ovio.countdown.log.Logger;
 import com.ovio.countdown.task.CleanupWidgetTask;
 import com.ovio.countdown.task.DeleteWidgetsTask;
 import com.ovio.countdown.util.Util;
@@ -18,25 +18,25 @@ import java.util.List;
  */
 public class CountdownWidgetProvider extends AppWidgetProvider {
 
-    private static final String TAG = "WIDGET";
-
-    private String text;
+    private static final String TAG = Logger.PREFIX + "Provider";
 
     @Override
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
-
-        Log.i(TAG, "onUpdate()");
+        Logger.i(TAG, "Performing Update for widgets: %s", Util.getString(appWidgetIds));
 
         CleanupWidgetTask task = new CleanupWidgetTask(context);
         int[] installedAppWidgetIds = getInstalledWidgets(context, appWidgetManager);
 
+        Logger.i(TAG, "Current valid widgets: %s", Util.getString(installedAppWidgetIds));
+
         task.execute(Util.toIntegerList(installedAppWidgetIds));
+
+        Logger.d(TAG, "Finished Update");
     }
 
     @Override
     public void onDeleted(Context context, int[] appWidgetIds) {
-
-        Log.i(TAG, "onDelete()");
+        Logger.i(TAG, "Performing Delete for widgets: %s", Util.getString(appWidgetIds));
 
         DeleteWidgetsTask task = new DeleteWidgetsTask(context);
         List<Integer> list = new ArrayList<Integer>(appWidgetIds.length);
@@ -45,34 +45,9 @@ public class CountdownWidgetProvider extends AppWidgetProvider {
         }
         task.execute(list);
 
+        Logger.d(TAG, "Finished Delete");
         super.onDeleted(context, appWidgetIds);
     }
-
-    /*  TODO: onReceive is out of scope for now
-    @Override
-    public void onReceive(Context context, Intent intent) {
-        super.onReceive(context, intent);
-
-        Log.i(TAG, "onReceive()");
-
-        if (widgetsInstalled(context) != 0 && intent.getAction().equals(Intent.ACTION_USER_PRESENT)) {
-            startCountdownService(context, null);
-        }
-    }
-*/
-
-/*
-    private void startCountdownService(Context context, int[] appWidgetIds) {
-        Intent updatingIntent = new Intent(context, WidgetService.class);
-
-        if (appWidgetIds != null) {
-            updatingIntent.putExtra(WidgetService.WIDGET_IDS, appWidgetIds);
-        }
-
-        context.startService(updatingIntent);
-    }
-*/
-
 
     private int[] getInstalledWidgets(Context context, AppWidgetManager appWidgetManager) {
         ComponentName thisWidget = new ComponentName(context, CountdownWidgetProvider.class);

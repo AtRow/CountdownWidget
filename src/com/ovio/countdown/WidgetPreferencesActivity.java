@@ -1,6 +1,7 @@
 package com.ovio.countdown;
 
 import android.app.Activity;
+import android.appwidget.AppWidgetHost;
 import android.appwidget.AppWidgetManager;
 import android.content.Context;
 import android.content.Intent;
@@ -64,6 +65,17 @@ public class WidgetPreferencesActivity extends Activity {
         startWidgetService();
     }
 
+    @Override
+    protected void onStop() {
+        super.onStop();
+
+        // There's a bug somewhere, see
+        // http://stackoverflow.com/questions/4393144/widget-not-deleted-when-passing-result-canceled-as-result-for-configuration-acti
+        Logger.i(TAG, "Stopped, forcing removal of a widget %s", appWidgetId);
+        forceRemoveWidget(appWidgetId);
+        finish();
+    }
+
     public void onOk(View view) {
         Logger.d(TAG, "OK button clicked");
 
@@ -118,6 +130,12 @@ public class WidgetPreferencesActivity extends Activity {
             int id = extras.getInt(AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID);
 
             Logger.i(TAG, "Got AppWidgetId: %s", id);
+
+            if (id == AppWidgetManager.INVALID_APPWIDGET_ID) {
+                Logger.e(TAG, "No widget id specified in starting Intent. Exiting.");
+                finish();
+            }
+
             return id;
 
         } else {
@@ -125,6 +143,11 @@ public class WidgetPreferencesActivity extends Activity {
             finish();
             return AppWidgetManager.INVALID_APPWIDGET_ID;
         }
+    }
+
+    private void forceRemoveWidget(int appWidgetId) {
+        AppWidgetHost host = new AppWidgetHost(self, 1);
+        host.deleteAppWidgetId(appWidgetId);
     }
 
     private void saveWidgetPreferences() {

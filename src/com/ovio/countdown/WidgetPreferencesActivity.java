@@ -12,6 +12,9 @@ import com.ovio.countdown.preferences.DefaultOptions;
 import com.ovio.countdown.preferences.PreferencesManager;
 import com.ovio.countdown.preferences.WidgetOptions;
 import com.ovio.countdown.preferences.WidgetPreferencesManager;
+import com.ovio.countdown.util.Util;
+
+import java.util.List;
 
 /**
  * Countdown
@@ -19,7 +22,7 @@ import com.ovio.countdown.preferences.WidgetPreferencesManager;
  */
 public class WidgetPreferencesActivity extends Activity {
 
-    private static final String TAG = Logger.PREFIX + "PrefsAct";
+    private static final String TAG = Logger.PREFIX + "PrefsActivity";
 
     private Context self = this;
 
@@ -146,10 +149,9 @@ public class WidgetPreferencesActivity extends Activity {
     private void saveDefaultPreferences() {
         Logger.i(TAG, "Saving Global Options");
 
-        int cnt = options.savedWidgets.length;
-
-        int[] savedWidgets = new int[cnt + 1];
-        savedWidgets[cnt] = appWidgetId;
+        List<Integer> list = Util.toIntegerList(options.savedWidgets);
+        list.add(appWidgetId);
+        int[] savedWidgets = Util.toIntArray(list);
 
         options.savedWidgets = savedWidgets;
         options.enableTime = false;

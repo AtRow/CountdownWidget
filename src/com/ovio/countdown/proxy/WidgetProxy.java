@@ -21,7 +21,7 @@ public abstract class WidgetProxy {
 
 
 
-    private final static String TAG = Logger.PREFIX + "WidgetPx";
+    private final static String TAG = Logger.PREFIX + "proxy";
 
     private final Context context;
 
@@ -48,7 +48,7 @@ public abstract class WidgetProxy {
         this.options = options;
 
         time = new Time();
-        Logger.d(TAG, "Updated Time to: %s", time.format2445());
+        Logger.d(TAG, "Updated Time to: %s", time.format3339(false));
 
         calculateNextUpdateTimestamp();
     }
@@ -57,7 +57,7 @@ public abstract class WidgetProxy {
         Logger.i(TAG, "Px[%s]: Updating widget", options.widgetId);
 
         time.setToNow();
-        Logger.d(TAG, "Px[%s]: Updated Time to: %s, options.widgetId", time.format2445());
+        Logger.d(TAG, "Px[%s]: Updated Time to: %s", options.widgetId, time.format3339(false));
 
         views.setCharSequence(R.id.titleTextView, "setText", options.title);
         views.setCharSequence(R.id.counterTextView, "setText", Long.toString(options.timestamp - time.toMillis(false)));
@@ -70,7 +70,7 @@ public abstract class WidgetProxy {
 
     private void calculateNextUpdateTimestamp() {
         time.setToNow();
-        Logger.d(TAG, "Px[%s]: Updated Time to: %s", options.widgetId, time.format2445());
+        Logger.d(TAG, "Px[%s]: Updated Time to: %s", options.widgetId, time.format3339(false));
 
         // 5 mins
         nextUpdateTimestamp = time.toMillis(false) + (1000 * 60 * 5);
@@ -80,7 +80,7 @@ public abstract class WidgetProxy {
             tt.set(nextUpdateTimestamp);
 
             Logger.i(TAG, "Px[%s]: Updated nextUpdateTimestamp to %s, time: %s",
-                    options.widgetId, nextUpdateTimestamp, tt.format2445());
+                    options.widgetId, nextUpdateTimestamp, tt.format3339(false));
         }
 
     }

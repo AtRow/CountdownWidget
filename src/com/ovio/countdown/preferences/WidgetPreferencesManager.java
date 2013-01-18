@@ -13,7 +13,7 @@ import java.util.List;
  */
 public class WidgetPreferencesManager {
 
-    private static final String TAG = Logger.PREFIX + "WPrefM";
+    private static final String TAG = Logger.PREFIX + "preferences";
 
     private static final String PREFIX = "widget_";
 
@@ -55,6 +55,8 @@ public class WidgetPreferencesManager {
 
         defaultOptions.savedWidgets = Util.toIntArray(validWidgetIds);
         prefManager.saveDefaultPrefs(defaultOptions);
+
+        Logger.d(TAG, "New content is: %s", Util.getString(defaultOptions.savedWidgets));
 
         Logger.d(TAG, "Finished cleanup");
         return deletedIds;

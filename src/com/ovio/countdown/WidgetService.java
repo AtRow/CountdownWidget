@@ -33,7 +33,7 @@ public class WidgetService extends Service {
     public static final String OPTIONS = "options";
     public static final String WIDGET_IDS = "widget_ids";
 
-    private static final String TAG = Logger.PREFIX + "SERVICE";
+    private static final String TAG = Logger.PREFIX + "Service";
 
     private Context self = this;
 
@@ -96,7 +96,7 @@ public class WidgetService extends Service {
                     widgetProxies.put(ids[i], proxy);
                 }
             } else {
-                Logger.w(TAG, "Got null Options for previously saved Widget");
+                Logger.i(TAG, "Got null Options, probably the Widget is new");
             }
         }
 
@@ -150,8 +150,19 @@ public class WidgetService extends Service {
 
         if (options != null) {
             int id = options.widgetId;
-            WidgetProxy proxy = widgetProxyFactory.getWidgetProxy(options);
-            widgetProxies.put(id, proxy);
+
+            WidgetProxy proxy;
+            if (widgetProxies.containsKey(id)) {
+                Logger.d(TAG, "Updating existing Proxy with id %s", id);
+
+                proxy = widgetProxies.get(id);
+                proxy.options = options;
+            } else {
+                Logger.d(TAG, "Creating new Proxy with id %s", id);
+
+                proxy = widgetProxyFactory.getWidgetProxy(options);
+                widgetProxies.put(id, proxy);
+            }
 
             if (Log.isLoggable(TAG, Log.DEBUG)) {
                 Logger.d(TAG, "Current active Widgets in widgetProxies Map: %s",
@@ -213,7 +224,7 @@ public class WidgetService extends Service {
         Logger.d(TAG, "Updating Widget Proxies");
 
         time.setToNow();
-        Logger.d(TAG, "Updated Time to: %s", time.format2445());
+        Logger.d(TAG, "Updated Time to: %s", time.format3339(false));
 
         for (Integer id: widgetProxies.keySet()) {
             Logger.i(TAG, "Updating widget %s", id);
@@ -225,7 +236,7 @@ public class WidgetService extends Service {
                 Time tt = new Time();
                 tt.set(proxy.nextUpdateTimestamp);
 
-                Logger.i(TAG, "Current time is [%s] and proxy.nextUpdate is [%s]", time.format2445(), tt.format2445());
+                Logger.i(TAG, "Current time is [%s] and proxy.nextUpdate is [%s]", time.format3339(false), tt.format3339(false));
             }
 
             if (time.toMillis(false) >= proxy.nextUpdateTimestamp) {

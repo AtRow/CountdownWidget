@@ -12,7 +12,7 @@ import com.ovio.countdown.util.Util;
  */
 public final class PreferencesManager {
 
-    private static final String GLOBAL = Logger.PREFIX + "GlobPrefs";
+    private static final String GLOBAL = Logger.PREFIX + "preferences";
 
     private static final String TAG = "PrefM";
 

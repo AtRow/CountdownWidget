@@ -12,7 +12,7 @@ import com.ovio.countdown.preferences.WidgetOptions;
  */
 public class LargeWidgetProxy extends WidgetProxy {
 
-    private static final String TAG = Logger.PREFIX + "LWidgetPx";
+    private static final String TAG = Logger.PREFIX + "proxy";
 
     public LargeWidgetProxy(Context context, AppWidgetManager appWidgetManager, RemoteViews views, WidgetOptions options) {
         super(context, appWidgetManager, views, options);

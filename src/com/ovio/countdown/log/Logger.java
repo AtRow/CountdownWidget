@@ -13,6 +13,8 @@ public final class Logger {
 
     public static final String PREFIX = "CW_";
 
+    public static final String TAG = PREFIX + "Log";
+
     public static void v(String tag, String msg, Object... params) {
         if (Log.isLoggable(tag, Log.VERBOSE)) Log.v(tag, getLocation() + getMessage(msg, params));
     }
@@ -59,7 +61,12 @@ public final class Logger {
 
 
     private static String getMessage(String msg, Object... params) {
-        return String.format(Locale.US, msg, params);
+        try {
+            return String.format(Locale.US, msg, params);
+        } catch (RuntimeException e) {
+            Log.e(TAG, "Failed to format log message", e);
+            return "Failed to format [" + msg + "]";
+        }
     }
 
     private static String getLocation() {

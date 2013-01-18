@@ -17,7 +17,7 @@ import java.util.List;
  */
 public class CleanupWidgetTask extends AsyncTask<List<Integer>, Void, Void> {
 
-    private static final String TAG = Logger.PREFIX + "CleanTsk";
+    private static final String TAG = Logger.PREFIX + "task";
 
     private Context context;
 
@@ -39,14 +39,16 @@ public class CleanupWidgetTask extends AsyncTask<List<Integer>, Void, Void> {
 
         List<Integer> deletedIds = manager.cleanup(validWidgetIds[0]);
 
-        Logger.i(TAG, "Sending DELETED intent to Service");
+        if (!deletedIds.isEmpty()) {
+            Logger.i(TAG, "Sending DELETED intent to Service");
 
-        Intent widgetServiceIntent = new Intent(WidgetService.DELETED);
-        Bundle extras = new Bundle();
-        extras.putIntArray(WidgetService.WIDGET_IDS, Util.toIntArray(deletedIds));
+            Intent widgetServiceIntent = new Intent(WidgetService.DELETED);
+            Bundle extras = new Bundle();
+            extras.putIntArray(WidgetService.WIDGET_IDS, Util.toIntArray(deletedIds));
 
-        widgetServiceIntent.putExtras(extras);
-        context.startService(widgetServiceIntent);
+            widgetServiceIntent.putExtras(extras);
+            context.startService(widgetServiceIntent);
+        }
 
         Logger.d(TAG, "Finished CleanupWidgetTask");
         return null;

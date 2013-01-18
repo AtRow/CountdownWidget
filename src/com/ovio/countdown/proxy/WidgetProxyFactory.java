@@ -14,7 +14,7 @@ import com.ovio.countdown.preferences.WidgetOptions;
  */
 public class WidgetProxyFactory {
 
-    private static final String TAG = Logger.PREFIX + "WidgetPxFact";
+    private static final String TAG = Logger.PREFIX + "proxy";
 
     private static WidgetProxyFactory instance;
 

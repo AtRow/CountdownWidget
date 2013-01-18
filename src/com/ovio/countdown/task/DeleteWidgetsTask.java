@@ -17,7 +17,7 @@ import java.util.List;
  */
 public class DeleteWidgetsTask extends AsyncTask<List<Integer>, Void, Void> {
 
-    private static final String TAG = Logger.PREFIX + "DelTsk";
+    private static final String TAG = Logger.PREFIX + "task";
 
     private Context context;
 
@@ -35,18 +35,22 @@ public class DeleteWidgetsTask extends AsyncTask<List<Integer>, Void, Void> {
             Logger.e(TAG, e, "Wrong task argument");
         }
 
+        List<Integer> widgetsList = widgetIds[0];
+
         WidgetPreferencesManager manager = WidgetPreferencesManager.getInstance(context);
 
-        manager.deleteAll(widgetIds[0]);
+        manager.deleteAll(widgetsList);
 
-        Logger.i(TAG, "Sending DELETED intent to Service");
+        if (!widgetsList.isEmpty()) {
+            Logger.i(TAG, "Sending DELETED intent to Service");
 
-        Intent widgetServiceIntent = new Intent(WidgetService.DELETED);
-        Bundle extras = new Bundle();
-        extras.putIntArray(WidgetService.WIDGET_IDS, Util.toIntArray(widgetIds[0]));
+            Intent widgetServiceIntent = new Intent(WidgetService.DELETED);
+            Bundle extras = new Bundle();
+            extras.putIntArray(WidgetService.WIDGET_IDS, Util.toIntArray(widgetsList));
 
-        widgetServiceIntent.putExtras(extras);
-        context.startService(widgetServiceIntent);
+            widgetServiceIntent.putExtras(extras);
+            context.startService(widgetServiceIntent);
+        }
 
         Logger.d(TAG, "Finished DeleteWidgetsTask");
         return null;

@@ -1,5 +1,7 @@
 package com.ovio.countdown.preferences;
 
+import java.util.Arrays;
+
 /**
  * Countdown
  * com.ovio.countdown.preferences
@@ -26,7 +28,7 @@ public class DefaultOptions {
                 ", enableTime=" + enableTime +
                 ", repeating=" + repeating +
                 ", repeatingPeriod=" + repeatingPeriod +
-                ", savedWidgets=" + savedWidgets +
+                ", savedWidgets=" + Arrays.toString(savedWidgets) +
                 '}';
     }
 }

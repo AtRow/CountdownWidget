@@ -39,7 +39,7 @@ public class WidgetPreferencesActivity extends Activity {
 
     private EditText editText;
 
-    private boolean isOkPressed = false;
+    private boolean isOkPressed;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -49,6 +49,7 @@ public class WidgetPreferencesActivity extends Activity {
 
         setContentView(R.layout.preferences);
 
+        isOkPressed = false;
         appWidgetId = getAppWidgetId();
         widgetOptions = new WidgetOptions();
         options = new DefaultOptions();

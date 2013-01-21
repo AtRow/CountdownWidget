@@ -75,7 +75,10 @@ public abstract class WidgetProxy {
     }
 
     public synchronized void updateWidgetSecondsOnly() {
-        //TODO
+        Logger.d(TAG, "Px[%s]: Updating widget Seconds only", options.widgetId);
+
+        views.setCharSequence(R.id.counterTextView, "setText", formatSeconds(options.timestamp - System.currentTimeMillis()));
+        appWidgetManager.updateAppWidget(options.widgetId, views);
     }
 
     public WidgetOptions getOptions() {
@@ -96,12 +99,13 @@ public abstract class WidgetProxy {
         nextUpdateTime.setToNow();
 
         // TODO
-        nextUpdateTime.second += 15;
+        nextUpdateTime.minute += 1;
         nextUpdateTime.normalize(false);
 
         //TODO
         if (true) {
             isAlive = true;
+            isCountingSeconds = true;
         }
 
         if (Log.isLoggable(TAG, Log.INFO)) {

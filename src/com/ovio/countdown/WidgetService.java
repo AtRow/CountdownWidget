@@ -43,6 +43,8 @@ public class WidgetService extends Service {
 
     private Thread secondCounterThread;
 
+    private SecondCounterRunnable secondCounterRunnable;
+
     //private int[] appWidgetIds;
 
     private Map<Integer, WidgetProxy> widgetProxies;
@@ -241,33 +243,39 @@ public class WidgetService extends Service {
 
         for (WidgetProxy proxy: proxies) {
             if (proxy.isCountingSeconds) {
-                //startSecondCounterThread();
+                Logger.d(TAG, "Proxy %s is counting seconds, starting Second counter", proxy.getOptions().widgetId);
+                startSecondCounterThread();
                 break;
             }
             stopSecondCounterThread();
         }
 
-        if ((nextUpdate != -1) &&
-                (System.currentTimeMillis() - nextUpdate) < MAX_ACTIVE_WAIT_MILLS ) {
+        // If no update needed or too long to wait for update
+        if (nextUpdate == -1) {
+            Logger.i(TAG, "No update needed, Forcing Service shutdown");
+            shutdownService();
+        } else if ((nextUpdate - System.currentTimeMillis()) > MAX_ACTIVE_WAIT_MILLS ) {
+            Logger.i(TAG, "To long to wait: %s ms, Forcing Service shutdown", System.currentTimeMillis() - nextUpdate);
             shutdownService();
         }
-
-        Logger.e(TAG, "Forcing Service shutdown");
-        shutdownService();
 
         return;
     }
 
-/* TODO
+
     private void startSecondCounterThread() {
-        if (counterThread != null && counterThread.isAlive()) {
-            counterThread.interrupt();
+        if (secondCounterThread == null) {
+            secondCounterRunnable = new SecondCounterRunnable();
+            secondCounterThread = new Thread(secondCounterRunnable);
+        }
+        if (!secondCounterThread.isAlive()) {
+            secondCounterThread.start();
         }
     }
 
-*/
     private void stopSecondCounterThread() {
         if (secondCounterThread != null && secondCounterThread.isAlive()) {
+            secondCounterRunnable.stop();
             secondCounterThread.interrupt();
         }
     }
@@ -282,15 +290,14 @@ public class WidgetService extends Service {
         time.setToNow();
         Logger.d(TAG, "Updated Time to: %s", time.format(Util.TF));
 
-        for (Integer id: widgetProxies.keySet()) {
-            Logger.i(TAG, "Updating widget %s", id);
-
-            WidgetProxy proxy = widgetProxies.get(id);
+        for (WidgetProxy proxy: widgetProxies.values()) {
+            WidgetOptions options = proxy.getOptions();
+            Logger.i(TAG, "Updating widget %s", options.widgetId);
 
             //TODO: Log
             if (proxy.isAlive) {
 
-                Logger.i(TAG, "Widget title: '%s'", proxy.getOptions().title);
+                Logger.i(TAG, "Widget title: '%s'", options.title);
 
                 if (Log.isLoggable(TAG, Log.INFO)) {
                     Logger.i(TAG, "Current time is [%s] and proxy.nextUpdate is [%s]", time.format(Util.TF), proxy.nextUpdateTime.format(Util.TF));
@@ -301,6 +308,60 @@ public class WidgetService extends Service {
                     proxy.updateWidget();
                 }
             }
+        }
+    }
+
+    protected class SecondCounterRunnable implements Runnable {
+
+        private boolean stopRequested = false;
+
+        @Override
+        public void run() {
+            Logger.i(TAG, "Started SecondCounterRunnable thread");
+
+            while (!stopRequested) {
+                try {
+
+                    updateWidgetSeconds();
+
+                    if (Log.isLoggable(TAG, Log.DEBUG)) {
+                        long now = System.currentTimeMillis();
+                        long nextSecond = (now / 1000 + 1) * 1000;
+                        long timeToSleep = nextSecond - now;
+
+                        Logger.d(TAG, "Now    is: %s", now);
+                        Logger.d(TAG, "Next S is: %s", nextSecond);
+                        Logger.d(TAG, "To  Sleep: %s", timeToSleep);
+
+                        Thread.sleep(timeToSleep);
+
+                    } else {
+                        Thread.sleep(((System.currentTimeMillis() / 1000 + 1) * 1000) - System.currentTimeMillis());
+                    }
+
+                } catch (InterruptedException e) {
+                    Logger.i(TAG, "Interrupted SecondCounterRunnable thread, stopping");
+                    stopRequested = true;
+                }
+            }
+            Logger.i(TAG, "Finished SecondCounterRunnable thread");
+        }
+
+        private void updateWidgetSeconds() {
+            for (WidgetProxy proxy: widgetProxies.values()) {
+
+                if (Log.isLoggable(TAG, Log.DEBUG)) {
+                    Logger.d(TAG, "Walking trough widget %s to update seconds only", proxy.getOptions().widgetId);
+                }
+
+                if (proxy.isAlive && proxy.isCountingSeconds) {
+                    proxy.updateWidgetSecondsOnly();
+                }
+            }
+        }
+
+        public void stop() {
+            stopRequested = true;
         }
     }
 

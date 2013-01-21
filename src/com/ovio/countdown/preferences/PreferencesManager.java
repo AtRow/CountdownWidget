@@ -18,7 +18,7 @@ public final class PreferencesManager {
 
     private static PreferencesManager instance;
 
-    private Context context;
+    private final Context context;
 
     private PreferencesManager(Context context) {
         Logger.d(TAG, "Instantiated PreferencesManager");

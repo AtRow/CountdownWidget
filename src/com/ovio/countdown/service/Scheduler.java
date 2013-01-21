@@ -21,9 +21,9 @@ public final class Scheduler {
 
     private static Scheduler instance;
 
-    private AlarmManager alarmManager;
+    private final AlarmManager alarmManager;
 
-    private PendingIntent updatingPendingIntent;
+    private final PendingIntent updatingPendingIntent;
 
     private Scheduler(Context context) {
         Logger.d(TAG, "Instantiated Scheduler");

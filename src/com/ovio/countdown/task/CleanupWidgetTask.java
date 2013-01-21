@@ -20,7 +20,7 @@ public class CleanupWidgetTask extends AsyncTask<List<Integer>, Void, Void> {
 
     private static final String TAG = Logger.PREFIX + "task";
 
-    private Context context;
+    private final Context context;
 
     public CleanupWidgetTask(Context context) {
         Logger.d(TAG, "Instantiated CleanupWidgetTask");

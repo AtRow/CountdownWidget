@@ -13,7 +13,7 @@ public final class Logger {
 
     public static final String PREFIX = "CW_";
 
-    public static boolean DEBUG = true;
+    public static final boolean DEBUG = true;
 
     private static final String TAG = PREFIX + "Log";
 
@@ -88,7 +88,6 @@ public final class Logger {
                 }
                 else if (trace.getClassName().startsWith(className)) {
                     found = true;
-                    continue;
                 }
             }
             catch (ClassNotFoundException e) {

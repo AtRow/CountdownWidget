@@ -30,8 +30,6 @@ public abstract class WidgetProxy {
 
     private final RemoteViews views;
 
-    private Time time = new Time();
-
     public WidgetProxy(Context context, AppWidgetManager appWidgetManager, RemoteViews views, WidgetOptions options) {
         Logger.d(TAG, "Instantiated WidgetProxy with options %s", options);
 
@@ -45,15 +43,14 @@ public abstract class WidgetProxy {
     public synchronized void updateWidget() {
         Logger.i(TAG, "Px[%s]: Updating widget", options.widgetId);
 
-        time.setToNow();
-
-        Logger.d(TAG, "Px[%s]: Updated Time to: %s", options.widgetId, time.format(Util.TF));
-
         views.setCharSequence(R.id.titleTextView, "setText", options.title);
-        views.setCharSequence(R.id.counterTextView, "setText", formatSeconds(options.timestamp - time.toMillis(false)));
 
-        String status = "Last update: " + time.format(Util.TF);
-        views.setCharSequence(R.id.statusText, "setText", status);
+        long now = System.currentTimeMillis();
+
+        String seconds = formatSeconds(options.timestamp - now);
+        Logger.d(TAG, "Px[%s]: Set remaining to: %s", seconds);
+
+        views.setCharSequence(R.id.counterTextView, "setText", seconds);
 
         appWidgetManager.updateAppWidget(options.widgetId, views);
 
@@ -77,6 +74,9 @@ public abstract class WidgetProxy {
     }
 
     private String formatSeconds(long mills) {
+        if (mills <= 0) {
+            return "0";
+        }
         long seconds = mills / 1000;
         return Long.toString(seconds);
     }

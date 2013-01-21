@@ -15,9 +15,7 @@ public class SecondCounter {
 
     private Thread secondCounterThread;
 
-    private SecondCounterRunnable secondCounterRunnable;
-
-    private Collection<WidgetProxy> widgetProxies;
+    private final Collection<WidgetProxy> widgetProxies;
 
 
     public SecondCounter(Collection<WidgetProxy> widgetProxies) {
@@ -26,8 +24,7 @@ public class SecondCounter {
 
     public void start() {
         if (secondCounterThread == null) {
-            secondCounterRunnable = new SecondCounterRunnable();
-            secondCounterThread = new Thread(secondCounterRunnable);
+            secondCounterThread = new Thread(new SecondCounterRunnable());
         }
         if (!secondCounterThread.isAlive()) {
             secondCounterThread.start();

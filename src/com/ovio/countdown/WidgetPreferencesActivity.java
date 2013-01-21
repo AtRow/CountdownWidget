@@ -26,7 +26,7 @@ public class WidgetPreferencesActivity extends Activity {
 
     private static final String TAG = Logger.PREFIX + "PrefsActivity";
 
-    private Context self = this;
+    private final Context self = this;
 
     private Integer appWidgetId;
 
@@ -36,7 +36,7 @@ public class WidgetPreferencesActivity extends Activity {
 
     private WidgetOptions widgetOptions;
 
-    DefaultOptions options;
+    private DefaultOptions options;
 
     private EditText editText;
 

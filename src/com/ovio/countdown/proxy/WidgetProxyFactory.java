@@ -18,7 +18,7 @@ public class WidgetProxyFactory {
 
     private static WidgetProxyFactory instance;
 
-    private Context context;
+    private final Context context;
 
     private final AppWidgetManager appWidgetManager;
 
@@ -56,13 +56,7 @@ public class WidgetProxyFactory {
         switch (info.initialLayout) {
             case R.layout.countdown_widget_layout_4x1 :
                 RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.countdown_widget_layout_4x1);
-                if (views == null) {
-                    Logger.e(TAG, "Couldn't get RemoteViews for layout R.layout.countdown_widget_layout_4x1");
-                    return null;
-                } else {
-                    Logger.d(TAG, "Widget is Large");
-                    return getLargeWidgetProxy(views, options);
-                }
+                return getLargeWidgetProxy(views, options);
 
             default:
                 Logger.e(TAG, "Couldn't find layout resource for widget's initialLayout: %s", info.initialLayout);

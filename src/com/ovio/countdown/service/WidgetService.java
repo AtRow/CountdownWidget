@@ -31,6 +31,8 @@ public class WidgetService extends Service {
     public static final String DELETED = "com.ovio.countdown.service.WidgetService.WIDGET_DELETED";
     public static final String ALARM = "com.ovio.countdown.service.WidgetService.ALARM";
 
+    public static final String PERMISSION = "com.ovio.countdown.service.WidgetService.PERMISSION";
+
     public static final String OPTIONS = "options";
     public static final String WIDGET_IDS = "widget_ids";
 

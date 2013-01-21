@@ -22,7 +22,7 @@ public class Util {
     }
 
     public static int[] unpackIntArray(String str) {
-        if (str == null || str == "") {
+        if (str == null || str.equals("")) {
             return new int[0];
         }
         String[] chunks = str.split(";");

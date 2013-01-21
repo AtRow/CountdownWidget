@@ -20,7 +20,7 @@ public class DeleteWidgetsTask extends AsyncTask<List<Integer>, Void, Void> {
 
     private static final String TAG = Logger.PREFIX + "task";
 
-    private Context context;
+    private final Context context;
 
     public DeleteWidgetsTask(Context context) {
         Logger.d(TAG, "Instantiated DeleteWidgetsTask");

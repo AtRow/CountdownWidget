@@ -1,11 +1,10 @@
-package com.ovio.countdown;
+package com.ovio.countdown.service;
 
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.text.format.Time;
-import android.util.Log;
 import com.ovio.countdown.log.Logger;
 import com.ovio.countdown.proxy.WidgetProxy;
 import com.ovio.countdown.util.Util;
@@ -26,14 +25,9 @@ public final class Scheduler {
 
     private PendingIntent updatingPendingIntent;
 
-    private Time time = new Time();
-
-    private Context context;
-
     private Scheduler(Context context) {
         Logger.d(TAG, "Instantiated Scheduler");
 
-        this.context = context;
         alarmManager = (AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
 
         Intent intent = new Intent(WidgetService.ALARM);
@@ -53,15 +47,12 @@ public final class Scheduler {
 
         long nearestUpdateTimestamp = -1;
 
-        alarmManager.cancel(updatingPendingIntent);
-
         // Get minimum
         long min = Long.MAX_VALUE;
         for (WidgetProxy proxy: widgetProxies) {
             if (proxy.isAlive) {
-                long mills = proxy.nextUpdateTime.toMillis(false);
-                if (mills < min) {
-                    min = mills;
+                if (proxy.nextUpdateTimestamp < min) {
+                    min = proxy.nextUpdateTimestamp;
                 }
             }
         }
@@ -70,12 +61,17 @@ public final class Scheduler {
 
             nearestUpdateTimestamp = min;
 
-            if (Log.isLoggable(TAG, Log.INFO)) {
+            if (Logger.DEBUG) {
+                Time time = new Time();
                 time.set(nearestUpdateTimestamp);
                 Logger.i(TAG, "Next update at: %s", time.format(Util.TF));
             }
 
             alarmManager.set(AlarmManager.RTC, nearestUpdateTimestamp, updatingPendingIntent);
+
+        } else {
+            alarmManager.cancel(updatingPendingIntent);
+            Logger.i(TAG, "Unscheduled all update alarms");
         }
 
         Logger.d(TAG, "Finished Scheduling");

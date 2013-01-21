@@ -3,7 +3,6 @@ package com.ovio.countdown.proxy;
 import android.appwidget.AppWidgetManager;
 import android.content.Context;
 import android.text.format.Time;
-import android.util.Log;
 import android.widget.RemoteViews;
 import com.ovio.countdown.R;
 import com.ovio.countdown.log.Logger;
@@ -16,20 +15,16 @@ import com.ovio.countdown.util.Util;
  */
 public abstract class WidgetProxy {
 
-    //TODO: replace with long timestamp
-    public Time nextUpdateTime = new Time();
+    public long nextUpdateTimestamp;
 
     public boolean isCountingSeconds = false;
 
     public boolean isAlive = false;
 
 
-
-    private WidgetOptions options; //TODO
+    private WidgetOptions options;
 
     private final static String TAG = Logger.PREFIX + "proxy";
-
-    private final Context context;
 
     private final AppWidgetManager appWidgetManager;
 
@@ -37,18 +32,9 @@ public abstract class WidgetProxy {
 
     private Time time = new Time();
 
-    private boolean needsUpdate;
-
-    private int highestMeasure;
-
-    private int lowestMeasure;
-
-    private boolean isSubscribed;
-
     public WidgetProxy(Context context, AppWidgetManager appWidgetManager, RemoteViews views, WidgetOptions options) {
         Logger.d(TAG, "Instantiated WidgetProxy with options %s", options);
 
-        this.context = context;
         this.appWidgetManager = appWidgetManager;
         this.views = views;
         this.options = options;
@@ -96,11 +82,11 @@ public abstract class WidgetProxy {
     }
 
     private void calculateNextUpdateTime() {
-        nextUpdateTime.setToNow();
+
+        nextUpdateTimestamp = System.currentTimeMillis();
 
         // TODO
-        nextUpdateTime.minute += 1;
-        nextUpdateTime.normalize(false);
+        nextUpdateTimestamp += 1000 * 60; // 1 min
 
         //TODO
         if (true) {
@@ -108,9 +94,10 @@ public abstract class WidgetProxy {
             isCountingSeconds = true;
         }
 
-        if (Log.isLoggable(TAG, Log.INFO)) {
-            Logger.i(TAG, "Px[%s]: Updated nextUpdateTime to %s, time: %s",
-                    options.widgetId, nextUpdateTime.format(Util.TF), time.format(Util.TF));
+        if (Logger.DEBUG) {
+            Time time = new Time();
+            time.set(nextUpdateTimestamp);
+            Logger.i(TAG, "Px[%s]: Updated nextUpdateTime to %s", options.widgetId, time.format(Util.TF));
         }
 
     }

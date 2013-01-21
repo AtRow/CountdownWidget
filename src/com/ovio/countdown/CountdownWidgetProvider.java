@@ -6,6 +6,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import com.ovio.countdown.log.Logger;
+import com.ovio.countdown.service.WidgetService;
 import com.ovio.countdown.task.CleanupWidgetTask;
 import com.ovio.countdown.task.DeleteWidgetsTask;
 import com.ovio.countdown.util.Util;
@@ -27,7 +28,6 @@ public class CountdownWidgetProvider extends AppWidgetProvider {
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
         this.context = context;
 
-        // TODO: leave only start service. CleanupWidgetTask should be started from Service itself.
         startWidgetService();
 
         Logger.i(TAG, "Performing Update for widgets: %s", Util.getString(appWidgetIds));
@@ -39,7 +39,7 @@ public class CountdownWidgetProvider extends AppWidgetProvider {
 
         task.execute(Util.toIntegerList(installedAppWidgetIds));
 
-        Logger.d(TAG, "Finished Update");
+        Logger.d(TAG, "Finished onUpdate");
     }
 
     @Override
@@ -55,7 +55,7 @@ public class CountdownWidgetProvider extends AppWidgetProvider {
         }
         task.execute(list);
 
-        Logger.d(TAG, "Finished Delete");
+        Logger.d(TAG, "Finished onDeleted");
         super.onDeleted(context, appWidgetIds);
     }
 

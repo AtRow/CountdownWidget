@@ -4,7 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import com.ovio.countdown.WidgetService;
+import com.ovio.countdown.service.WidgetService;
 import com.ovio.countdown.log.Logger;
 import com.ovio.countdown.preferences.WidgetPreferencesManager;
 import com.ovio.countdown.util.Util;

@@ -13,22 +13,24 @@ public final class Logger {
 
     public static final String PREFIX = "CW_";
 
-    public static final String TAG = PREFIX + "Log";
+    public static boolean DEBUG = true;
+
+    private static final String TAG = PREFIX + "Log";
 
     public static void v(String tag, String msg, Object... params) {
-        if (Log.isLoggable(tag, Log.VERBOSE)) Log.v(tag, getLocation() + getMessage(msg, params));
+        if (DEBUG && Log.isLoggable(tag, Log.VERBOSE)) Log.v(tag, getLocation() + getMessage(msg, params));
     }
 
     public static void v(String tag, Throwable tr, String msg, Object... params) {         
-        if (Log.isLoggable(tag, Log.VERBOSE)) Log.v(tag, getLocation() + getMessage(msg, params), tr);
+        if (DEBUG && Log.isLoggable(tag, Log.VERBOSE)) Log.v(tag, getLocation() + getMessage(msg, params), tr);
     }
 
     public static void d(String tag, String msg, Object... params) {         
-        if (Log.isLoggable(tag, Log.DEBUG)) Log.d(tag, getLocation() + getMessage(msg, params));
+        if (DEBUG && Log.isLoggable(tag, Log.DEBUG)) Log.d(tag, getLocation() + getMessage(msg, params));
     }
 
     public static void d(String tag, Throwable tr, String msg, Object... params) {         
-        if (Log.isLoggable(tag, Log.DEBUG)) Log.d(tag, getLocation() + getMessage(msg, params), tr);
+        if (DEBUG && Log.isLoggable(tag, Log.DEBUG)) Log.d(tag, getLocation() + getMessage(msg, params), tr);
     }
 
     public static void i(String tag, String msg, Object... params) {         

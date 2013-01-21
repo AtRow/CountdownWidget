@@ -13,6 +13,7 @@ import com.ovio.countdown.preferences.DefaultOptions;
 import com.ovio.countdown.preferences.PreferencesManager;
 import com.ovio.countdown.preferences.WidgetOptions;
 import com.ovio.countdown.preferences.WidgetPreferencesManager;
+import com.ovio.countdown.service.WidgetService;
 import com.ovio.countdown.util.Util;
 
 import java.util.List;
@@ -27,7 +28,7 @@ public class WidgetPreferencesActivity extends Activity {
 
     private Context self = this;
 
-    private int appWidgetId;
+    private Integer appWidgetId;
 
     private PreferencesManager prefManager;
 
@@ -56,11 +57,10 @@ public class WidgetPreferencesActivity extends Activity {
 
         setResultCanceled();
 
-        editText = (EditText) findViewById(R.id.editText);
-
         prefManager = PreferencesManager.getInstance(self);
         widgetManager = WidgetPreferencesManager.getInstance(self);
 
+        obtainFormElements();
         loadDefaultPreferences();
         startWidgetService();
     }
@@ -73,8 +73,8 @@ public class WidgetPreferencesActivity extends Activity {
         // http://stackoverflow.com/questions/4393144/widget-not-deleted-when-passing-result-canceled-as-result-for-configuration-acti
         Logger.i(TAG, "Stopped");
         if (!isOkPressed) {
-            Logger.i(TAG, "Ok wasn't pressed, forcing removal of a widget %s", appWidgetId);
-            forceRemoveWidget(appWidgetId);
+            Logger.i(TAG, "Ok wasn't pressed, forcing removal of a widget %s", getAppWidgetId());
+            forceRemoveWidget(getAppWidgetId());
         }
         finish();
     }
@@ -122,7 +122,7 @@ public class WidgetPreferencesActivity extends Activity {
     }
 
     private Intent getResultIntent() {
-        return new Intent().putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
+        return new Intent().putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, getAppWidgetId());
     }
 
     private void setResultOk() {
@@ -135,27 +135,33 @@ public class WidgetPreferencesActivity extends Activity {
         isOkPressed = false;
     }
 
+    private void obtainFormElements() {
+        editText = (EditText) findViewById(R.id.editText);
+    }
+
     private int getAppWidgetId() {
-        Logger.d(TAG, "Getting new appWidgetId");
 
-        Bundle extras = getIntent().getExtras();
-        if (extras != null) {
-            int id = extras.getInt(AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID);
+        if (appWidgetId == null) {
+            Logger.d(TAG, "Getting new appWidgetId");
 
-            Logger.i(TAG, "Got AppWidgetId: %s", id);
+            Bundle extras = getIntent().getExtras();
+            if (extras != null) {
+                appWidgetId  = extras.getInt(AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID);
 
-            if (id == AppWidgetManager.INVALID_APPWIDGET_ID) {
-                Logger.e(TAG, "No widget id specified in starting Intent. Exiting.");
+                Logger.i(TAG, "Got AppWidgetId: %s", appWidgetId );
+
+                if (appWidgetId == AppWidgetManager.INVALID_APPWIDGET_ID) {
+                    Logger.e(TAG, "Invalid widget id specified in starting Intent. Exiting.");
+                    finish();
+                }
+
+            } else {
+                Logger.e(TAG, "Can't find appWidgetId in a starting Intent's extras; Extras == null!");
                 finish();
+                appWidgetId = AppWidgetManager.INVALID_APPWIDGET_ID;
             }
-
-            return id;
-
-        } else {
-            Logger.e(TAG, "Can't find appWidgetId in a starting Intent's extras; Extras == null!");
-            finish();
-            return AppWidgetManager.INVALID_APPWIDGET_ID;
         }
+        return appWidgetId;
     }
 
     private void forceRemoveWidget(int appWidgetId) {
@@ -168,7 +174,7 @@ public class WidgetPreferencesActivity extends Activity {
 
         //TODO
 
-        widgetOptions.widgetId = appWidgetId;
+        widgetOptions.widgetId = getAppWidgetId();
         widgetOptions.title = editText.getText().toString();
         widgetOptions.timestamp = System.currentTimeMillis() + (1000 * 10 * 60 * 60);
         widgetOptions.upward = true;
@@ -186,10 +192,9 @@ public class WidgetPreferencesActivity extends Activity {
         Logger.i(TAG, "Saving Global Options");
 
         List<Integer> list = Util.toIntegerList(options.savedWidgets);
-        list.add(appWidgetId);
-        int[] savedWidgets = Util.toIntArray(list);
+        list.add(getAppWidgetId());
 
-        options.savedWidgets = savedWidgets;
+        options.savedWidgets = Util.toIntArray(list);
         options.enableTime = false;
 
         Logger.d(TAG, "Global Options: %s", options);

@@ -4,11 +4,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import com.ovio.countdown.WidgetService;
+import com.ovio.countdown.service.WidgetService;
 import com.ovio.countdown.log.Logger;
 import com.ovio.countdown.preferences.WidgetPreferencesManager;
 import com.ovio.countdown.util.Util;
 
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -42,6 +43,9 @@ public class DeleteWidgetsTask extends AsyncTask<List<Integer>, Void, Void> {
         manager.deleteAll(widgetsList);
 
         if (!widgetsList.isEmpty()) {
+            int[] deletedArray = Util.toIntArray(widgetsList);
+
+            Logger.i(TAG, "Widgets to be deleted: %s", Arrays.toString(deletedArray));
             Logger.i(TAG, "Sending DELETED intent to Service");
 
             Intent widgetServiceIntent = new Intent(WidgetService.DELETED);

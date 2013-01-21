@@ -1,4 +1,4 @@
-package com.ovio.countdown;
+package com.ovio.countdown.service;
 
 import android.app.Service;
 import android.content.Context;
@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.text.format.Time;
-import android.util.Log;
 import android.widget.Toast;
 import com.ovio.countdown.log.Logger;
 import com.ovio.countdown.preferences.PreferencesManager;
@@ -17,6 +16,7 @@ import com.ovio.countdown.proxy.WidgetProxyFactory;
 import com.ovio.countdown.util.Util;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -26,10 +26,10 @@ import java.util.TreeMap;
  */
 public class WidgetService extends Service {
 
-    public static final String START = "com.ovio.countdown.WidgetService.START";
-    public static final String UPDATED = "com.ovio.countdown.WidgetService.WIDGET_UPDATED";
-    public static final String DELETED = "com.ovio.countdown.WidgetService.WIDGET_DELETED";
-    public static final String ALARM = "com.ovio.countdown.WidgetService.ALARM";
+    public static final String START = "com.ovio.countdown.service.WidgetService.START";
+    public static final String UPDATED = "com.ovio.countdown.service.WidgetService.WIDGET_UPDATED";
+    public static final String DELETED = "com.ovio.countdown.service.WidgetService.WIDGET_DELETED";
+    public static final String ALARM = "com.ovio.countdown.service.WidgetService.ALARM";
 
     public static final String OPTIONS = "options";
     public static final String WIDGET_IDS = "widget_ids";
@@ -37,19 +37,11 @@ public class WidgetService extends Service {
     private static final String TAG = Logger.PREFIX + "Service";
     private static final long MAX_ACTIVE_WAIT_MILLS = 1000 * 60 * 10; // 10 min
 
+    private Map<Integer, WidgetProxy> widgetProxies = new TreeMap<Integer, WidgetProxy>();
+
     private Scheduler scheduler;
 
-    private Time time = new Time();
-
-    private Thread secondCounterThread;
-
-    private SecondCounterRunnable secondCounterRunnable;
-
-    //private int[] appWidgetIds;
-
-    private Map<Integer, WidgetProxy> widgetProxies;
-
-    private boolean started = false;
+    private SecondCounter secondCounter;
 
     private PreferencesManager preferencesManager;
 
@@ -79,6 +71,7 @@ public class WidgetService extends Service {
         widgetProxyFactory = WidgetProxyFactory.getInstance(context);
         preferencesManager = PreferencesManager.getInstance(context);
         scheduler = Scheduler.getInstance(context);
+        secondCounter = new SecondCounter(Collections.unmodifiableCollection(widgetProxies.values()));
 
         // TODO: remove
         Toast.makeText(this, "Service created", Toast.LENGTH_LONG).show();
@@ -87,7 +80,6 @@ public class WidgetService extends Service {
 
         Logger.i(TAG, "Loaded valid widgets: %s", Util.getString(ids));
 
-        widgetProxies = new TreeMap<Integer, WidgetProxy>();
         for (int i = 0; i < ids.length; i++) {
 
             WidgetOptions options = widgetPreferencesManager.load(ids[i]);
@@ -110,7 +102,7 @@ public class WidgetService extends Service {
     public void onDestroy() {
         Logger.i(TAG, "Stopping WidgetService");
 
-        stopSecondCounterThread();
+        secondCounter.stop();
 
         widgetPreferencesManager = null;
         widgetProxyFactory = null;
@@ -145,14 +137,6 @@ public class WidgetService extends Service {
         return Service.START_STICKY;
     }
 
-    private void onAlarmIntent(Intent intent) {
-        Logger.i(TAG, "Received ALARM Intent");
-
-        updateWidgets();
-        scheduleUpdate();
-
-    }
-
     private void onStartIntent(Intent intent) {
         // Do nothing
         Logger.i(TAG, "Received START Intent");
@@ -179,7 +163,7 @@ public class WidgetService extends Service {
                 widgetProxies.put(id, proxy);
             }
 
-            if (Log.isLoggable(TAG, Log.DEBUG)) {
+            if (Logger.DEBUG) {
                 Logger.d(TAG, "Current active Widgets in widgetProxies Map: %s",
                         Util.getString(widgetProxies.keySet()));
             }
@@ -205,6 +189,14 @@ public class WidgetService extends Service {
         } else {
             Logger.e(TAG, "Got null Ids for DELETED intent, no WidgetProxies will be deleted");
         }
+    }
+
+    private void onAlarmIntent(Intent intent) {
+        Logger.i(TAG, "Received ALARM Intent");
+
+        updateWidgets();
+        scheduleUpdate();
+
     }
 
     private WidgetOptions getUpdateWidgetOptions(Intent updateIntent) {
@@ -244,10 +236,10 @@ public class WidgetService extends Service {
         for (WidgetProxy proxy: proxies) {
             if (proxy.isCountingSeconds) {
                 Logger.d(TAG, "Proxy %s is counting seconds, starting Second counter", proxy.getOptions().widgetId);
-                startSecondCounterThread();
+                secondCounter.start();
                 break;
             }
-            stopSecondCounterThread();
+            secondCounter.stop();
         }
 
         // If no update needed or too long to wait for update
@@ -259,25 +251,6 @@ public class WidgetService extends Service {
             shutdownService();
         }
 
-        return;
-    }
-
-
-    private void startSecondCounterThread() {
-        if (secondCounterThread == null) {
-            secondCounterRunnable = new SecondCounterRunnable();
-            secondCounterThread = new Thread(secondCounterRunnable);
-        }
-        if (!secondCounterThread.isAlive()) {
-            secondCounterThread.start();
-        }
-    }
-
-    private void stopSecondCounterThread() {
-        if (secondCounterThread != null && secondCounterThread.isAlive()) {
-            secondCounterRunnable.stop();
-            secondCounterThread.interrupt();
-        }
     }
 
     private void shutdownService() {
@@ -287,81 +260,27 @@ public class WidgetService extends Service {
     private void updateWidgets() {
         Logger.d(TAG, "Updating Widget Proxies");
 
-        time.setToNow();
-        Logger.d(TAG, "Updated Time to: %s", time.format(Util.TF));
-
         for (WidgetProxy proxy: widgetProxies.values()) {
             WidgetOptions options = proxy.getOptions();
             Logger.i(TAG, "Updating widget %s", options.widgetId);
 
-            //TODO: Log
             if (proxy.isAlive) {
+                Logger.d(TAG, "Widget is alive, title: '%s'", options.title);
 
-                Logger.i(TAG, "Widget title: '%s'", options.title);
+                if (Logger.DEBUG) {
+                    Time time = new Time();
+                    time.setToNow();
+                    Time updTime = new Time();
+                    updTime.set(proxy.nextUpdateTimestamp);
 
-                if (Log.isLoggable(TAG, Log.INFO)) {
-                    Logger.i(TAG, "Current time is [%s] and proxy.nextUpdate is [%s]", time.format(Util.TF), proxy.nextUpdateTime.format(Util.TF));
+                    Logger.i(TAG, "Current time is [%s] and proxy.nextUpdate is [%s]", time.format(Util.TF), updTime.format(Util.TF));
                 }
 
-                if (Time.compare(time, proxy.nextUpdateTime) >= 0) {
+                if (System.currentTimeMillis() >= proxy.nextUpdateTimestamp) {
                     Logger.i(TAG, "Widget will be updated now");
                     proxy.updateWidget();
                 }
             }
-        }
-    }
-
-    protected class SecondCounterRunnable implements Runnable {
-
-        private boolean stopRequested = false;
-
-        @Override
-        public void run() {
-            Logger.i(TAG, "Started SecondCounterRunnable thread");
-
-            while (!stopRequested) {
-                try {
-
-                    updateWidgetSeconds();
-
-                    if (Log.isLoggable(TAG, Log.DEBUG)) {
-                        long now = System.currentTimeMillis();
-                        long nextSecond = (now / 1000 + 1) * 1000;
-                        long timeToSleep = nextSecond - now;
-
-                        Logger.d(TAG, "Now    is: %s", now);
-                        Logger.d(TAG, "Next S is: %s", nextSecond);
-                        Logger.d(TAG, "To  Sleep: %s", timeToSleep);
-
-                        Thread.sleep(timeToSleep);
-
-                    } else {
-                        Thread.sleep(((System.currentTimeMillis() / 1000 + 1) * 1000) - System.currentTimeMillis());
-                    }
-
-                } catch (InterruptedException e) {
-                    Logger.i(TAG, "Interrupted SecondCounterRunnable thread, stopping");
-                    stopRequested = true;
-                }
-            }
-            Logger.i(TAG, "Finished SecondCounterRunnable thread");
-        }
-
-        private void updateWidgetSeconds() {
-            for (WidgetProxy proxy: widgetProxies.values()) {
-
-                if (Log.isLoggable(TAG, Log.DEBUG)) {
-                    Logger.d(TAG, "Walking trough widget %s to update seconds only", proxy.getOptions().widgetId);
-                }
-
-                if (proxy.isAlive && proxy.isCountingSeconds) {
-                    proxy.updateWidgetSecondsOnly();
-                }
-            }
-        }
-
-        public void stop() {
-            stopRequested = true;
         }
     }
 

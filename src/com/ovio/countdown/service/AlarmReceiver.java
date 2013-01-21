@@ -1,4 +1,4 @@
-package com.ovio.countdown;
+package com.ovio.countdown.service;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;

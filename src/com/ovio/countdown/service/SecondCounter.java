@@ -50,20 +50,8 @@ public class SecondCounter {
 
                     updateWidgetSeconds();
 
-                    if (Logger.DEBUG) {
-                        long now = System.currentTimeMillis();
-                        long nextSecond = (now / 1000 + 1) * 1000;
-                        long timeToSleep = nextSecond - now;
-
-                        Logger.d(TAG, "Now    is: %s", now);
-                        Logger.d(TAG, "Next S is: %s", nextSecond);
-                        Logger.d(TAG, "To  Sleep: %s", timeToSleep);
-
-                        Thread.sleep(timeToSleep);
-
-                    } else {
-                        Thread.sleep(((System.currentTimeMillis() / 1000 + 1) * 1000) - System.currentTimeMillis());
-                    }
+                    long nextSecond = (System.currentTimeMillis() / 1000 + 1) * 1000;
+                    Thread.sleep(nextSecond - System.currentTimeMillis() + 10);
 
                 } catch (InterruptedException e) {
                     Logger.i(TAG, "Interrupted SecondCounterRunnable thread, stopping");

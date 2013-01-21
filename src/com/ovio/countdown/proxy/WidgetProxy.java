@@ -19,7 +19,7 @@ public abstract class WidgetProxy {
 
     public boolean isCountingSeconds = false;
 
-    public boolean isAlive = false;
+    public boolean isAlive = true;
 
 
     private WidgetOptions options;
@@ -48,7 +48,7 @@ public abstract class WidgetProxy {
         long now = System.currentTimeMillis();
 
         String seconds = formatSeconds(options.timestamp - now);
-        Logger.d(TAG, "Px[%s]: Set remaining to: %s", seconds);
+        Logger.d(TAG, "Px[%s]: Set remaining to: %s", options.widgetId, seconds);
 
         views.setCharSequence(R.id.counterTextView, "setText", seconds);
 
@@ -77,7 +77,7 @@ public abstract class WidgetProxy {
         if (mills <= 0) {
             return "0";
         }
-        long seconds = mills / 1000;
+        long seconds = Math.round(mills / 1000d);
         return Long.toString(seconds);
     }
 
@@ -89,9 +89,18 @@ public abstract class WidgetProxy {
         nextUpdateTimestamp += 1000 * 60; // 1 min
 
         //TODO
-        if (true) {
+        if (options.timestamp > System.currentTimeMillis()) {
             isAlive = true;
+            Logger.d(TAG, "Px[%s]: Target time is not yet reached, widget is alive", options.widgetId);
+        } else {
+            isAlive = false;
+            Logger.d(TAG, "Px[%s]: Target time is already reached, widget is dead", options.widgetId);
+        }
+
+        if (options.enableSeconds) {
             isCountingSeconds = true;
+        } else {
+            isCountingSeconds = false;
         }
 
         if (Logger.DEBUG) {

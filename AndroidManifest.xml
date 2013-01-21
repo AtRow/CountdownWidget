@@ -13,6 +13,7 @@
     <!-- TODO <uses-permission android:name="com.ovio.countdown.service.WidgetService.PERMISSION"/> -->
 
     <application
+        android:debuggable="true"
         android:icon="@drawable/icon"
         android:label="@string/app_name">
         <activity
@@ -59,7 +60,6 @@
         <service android:name=".service.WidgetService">
                  <!-- TODO: android:permission="com.ovio.countdown.service.WidgetService.PERMISSION" -->
             <intent-filter>
-                <action android:name="com.ovio.countdown.service.WidgetService.START"/>
                 <action android:name="com.ovio.countdown.service.WidgetService.ALARM"/>
                 <action android:name="com.ovio.countdown.service.WidgetService.WIDGET_UPDATED"/>
                 <action android:name="com.ovio.countdown.service.WidgetService.WIDGET_DELETED"/>

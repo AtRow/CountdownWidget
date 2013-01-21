@@ -3,7 +3,8 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
               android:orientation="vertical"
               android:layout_width="fill_parent"
-              android:layout_height="fill_parent">
+              android:layout_height="fill_parent"
+              android:background="#6ec1ff">
 
             <TextView
                 android:layout_width="wrap_content"
@@ -12,7 +13,7 @@
                 android:layout_gravity="center_horizontal|top"
                 android:visibility="visible"
                 android:text="Empty"
-                android:textColor="#ff0000"/>
+                android:textColor="#ffffff"/>
 
     <TextView
         android:layout_width="wrap_content"
@@ -22,13 +23,6 @@
         android:layout_gravity="center"
         style="@style/TextWidgetTime"
         android:layout_margin="10dp"
-        android:textColor="#ff0000"/>
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/statusText"
-        android:layout_gravity="center"
-        android:textColor="#ff0000"/>
+        android:textColor="#ffffff"/>
 
 </LinearLayout>

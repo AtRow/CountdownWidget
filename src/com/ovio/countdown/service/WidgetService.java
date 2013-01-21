@@ -26,7 +26,6 @@ import java.util.TreeMap;
  */
 public class WidgetService extends Service {
 
-    public static final String START = "com.ovio.countdown.service.WidgetService.START";
     public static final String UPDATED = "com.ovio.countdown.service.WidgetService.WIDGET_UPDATED";
     public static final String DELETED = "com.ovio.countdown.service.WidgetService.WIDGET_DELETED";
     public static final String ALARM = "com.ovio.countdown.service.WidgetService.ALARM";
@@ -37,7 +36,7 @@ public class WidgetService extends Service {
     public static final String WIDGET_IDS = "widget_ids";
 
     private static final String TAG = Logger.PREFIX + "Service";
-    private static final long MAX_ACTIVE_WAIT_MILLS = 1000 * 60 * 10; // 10 min
+    private static final long MAX_ACTIVE_WAIT_MILLS = 1000 * 60 * 2; // 2 min
 
     private Map<Integer, WidgetProxy> widgetProxies = new TreeMap<Integer, WidgetProxy>();
 
@@ -96,7 +95,7 @@ public class WidgetService extends Service {
                 Logger.i(TAG, "Got null Options, probably the Widget is new");
             }
         }
-        scheduleUpdate();
+        //scheduleUpdate();
 
     }
 
@@ -119,10 +118,14 @@ public class WidgetService extends Service {
         String action = intent.getAction();
         Logger.d(TAG, "Received new Intent %s", action);
 
+/*
         if (action.equals(START)) {
             onStartIntent(intent);
 
-        } else if (action.equals(UPDATED)) {
+        } else
+*/
+
+        if (action.equals(UPDATED)) {
             onUpdatedIntent(intent);
 
         } else if (action.equals(DELETED)) {
@@ -135,14 +138,16 @@ public class WidgetService extends Service {
             Logger.e(TAG, "Received UNEXPECTED Intent with Action: %s", action);
         }
 
-        Logger.i(TAG, "Leaving Service in STICKY mode");
-        return Service.START_STICKY;
+        Logger.i(TAG, "Leaving Service in START_REDELIVER_INTENT mode");
+        return Service.START_REDELIVER_INTENT;
     }
 
+/*
     private void onStartIntent(Intent intent) {
         // Do nothing
         Logger.i(TAG, "Received START Intent");
     }
+*/
 
     private void onUpdatedIntent(Intent intent) {
         Logger.i(TAG, "Received UPDATED Intent");

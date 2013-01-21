@@ -4,5 +4,5 @@
     <string name="preferences_activity_title">Настройки</string>
     <string name="widget_label">Обратный отсчет</string>
     <string name="ok_button_text">OK</string>
-    <string name="cancel_button_text">Отмена</string>
+    <string name="cancel_button_text">Отмена</string><string name="title_prompt">Event title</string><string name="Date">date_prompt</string><string name="date_prompt">Date</string><string name="time_prompt">Time</string><string name="time_enable_prompt">Set time</string><string name="count_seconds_prompt">Count seconds</string>
 </resources>

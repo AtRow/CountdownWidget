@@ -6,8 +6,12 @@ import android.appwidget.AppWidgetManager;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.format.Time;
 import android.view.View;
+import android.widget.CheckBox;
+import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.TimePicker;
 import com.ovio.countdown.log.Logger;
 import com.ovio.countdown.preferences.DefaultOptions;
 import com.ovio.countdown.preferences.PreferencesManager;
@@ -38,7 +42,15 @@ public class WidgetPreferencesActivity extends Activity {
 
     private DefaultOptions options;
 
-    private EditText editText;
+    private EditText titleEditText;
+
+    // UI
+
+    private DatePicker datePicker;
+
+    private TimePicker timePicker;
+
+    private CheckBox secondsCheckBox;
 
     private boolean isOkPressed;
 
@@ -62,7 +74,6 @@ public class WidgetPreferencesActivity extends Activity {
 
         obtainFormElements();
         loadDefaultPreferences();
-        startWidgetService();
     }
 
     @Override
@@ -100,12 +111,14 @@ public class WidgetPreferencesActivity extends Activity {
         finish();
     }
 
+/*
     private void startWidgetService() {
         Logger.i(TAG, "Sending START intent to Service");
 
         Intent widgetServiceIntent = new Intent(WidgetService.START);
         startService(widgetServiceIntent);
     }
+*/
 
     private void sendToWidgetService() {
         Logger.i(TAG, "Sending UPDATED intent to Service");
@@ -136,7 +149,10 @@ public class WidgetPreferencesActivity extends Activity {
     }
 
     private void obtainFormElements() {
-        editText = (EditText) findViewById(R.id.editText);
+        titleEditText = (EditText) findViewById(R.id.titleEditText);
+        datePicker = (DatePicker) findViewById(R.id.datePicker);
+        timePicker = (TimePicker) findViewById(R.id.timePicker);
+        secondsCheckBox = (CheckBox) findViewById(R.id.secondsCheckBox);
     }
 
     private int getAppWidgetId() {
@@ -175,10 +191,21 @@ public class WidgetPreferencesActivity extends Activity {
         //TODO
 
         widgetOptions.widgetId = getAppWidgetId();
-        widgetOptions.title = editText.getText().toString();
-        widgetOptions.timestamp = System.currentTimeMillis() + (1000 * 10 * 60 * 60);
+        widgetOptions.title = titleEditText.getText().toString();
+
+        Time time = new Time();
+        time.year = datePicker.getYear();
+        time.month = datePicker.getMonth();
+        time.monthDay = datePicker.getDayOfMonth();
+        time.hour = timePicker.getCurrentHour();
+        time.minute = timePicker.getCurrentMinute();
+
+        widgetOptions.timestamp = time.toMillis(false);
+
         widgetOptions.upward = true;
-        widgetOptions.enableSeconds = false;
+
+        widgetOptions.enableSeconds = secondsCheckBox.isChecked();
+
         widgetOptions.repeatingPeriod = 0L;
 
         Logger.d(TAG, "Widget Options: %s", widgetOptions);
@@ -195,7 +222,7 @@ public class WidgetPreferencesActivity extends Activity {
         list.add(getAppWidgetId());
 
         options.savedWidgets = Util.toIntArray(list);
-        options.enableTime = false;
+        options.enableSeconds = secondsCheckBox.isChecked();
 
         Logger.d(TAG, "Global Options: %s", options);
 
@@ -211,7 +238,7 @@ public class WidgetPreferencesActivity extends Activity {
 
         Logger.d(TAG, "Global Options: %s", options);
 
-        editText.setText("empty");
+        secondsCheckBox.setChecked(options.enableSeconds);
     }
 
 }

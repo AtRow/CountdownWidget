@@ -4,7 +4,6 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.IBinder;
 import android.text.format.Time;
 import android.util.Log;
@@ -17,6 +16,7 @@ import com.ovio.countdown.proxy.WidgetProxy;
 import com.ovio.countdown.proxy.WidgetProxyFactory;
 import com.ovio.countdown.util.Util;
 
+import java.util.Collection;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -27,21 +27,21 @@ import java.util.TreeMap;
 public class WidgetService extends Service {
 
     public static final String START = "com.ovio.countdown.WidgetService.START";
-    public static final String UPDATED = "com.ovio.countdown.WidgetService.APPWIDGET_UPDATED";
-    public static final String DELETED = "com.ovio.countdown.WidgetService.APPWIDGET_DELETED";
+    public static final String UPDATED = "com.ovio.countdown.WidgetService.WIDGET_UPDATED";
+    public static final String DELETED = "com.ovio.countdown.WidgetService.WIDGET_DELETED";
+    public static final String ALARM = "com.ovio.countdown.WidgetService.ALARM";
 
     public static final String OPTIONS = "options";
     public static final String WIDGET_IDS = "widget_ids";
 
     private static final String TAG = Logger.PREFIX + "Service";
+    private static final long MAX_ACTIVE_WAIT_MILLS = 1000 * 60 * 10; // 10 min
 
-    private Context self = this;
+    private Scheduler scheduler;
 
     private Time time = new Time();
 
-    private Handler handler;
-
-    private Thread counterThread;
+    private Thread secondCounterThread;
 
     //private int[] appWidgetIds;
 
@@ -76,6 +76,7 @@ public class WidgetService extends Service {
         widgetPreferencesManager = WidgetPreferencesManager.getInstance(context);
         widgetProxyFactory = WidgetProxyFactory.getInstance(context);
         preferencesManager = PreferencesManager.getInstance(context);
+        scheduler = Scheduler.getInstance(context);
 
         // TODO: remove
         Toast.makeText(this, "Service created", Toast.LENGTH_LONG).show();
@@ -99,6 +100,7 @@ public class WidgetService extends Service {
                 Logger.i(TAG, "Got null Options, probably the Widget is new");
             }
         }
+        scheduleUpdate();
 
     }
 
@@ -106,7 +108,8 @@ public class WidgetService extends Service {
     public void onDestroy() {
         Logger.i(TAG, "Stopping WidgetService");
 
-        handler = null;
+        stopSecondCounterThread();
+
         widgetPreferencesManager = null;
         widgetProxyFactory = null;
         preferencesManager = null;
@@ -117,25 +120,35 @@ public class WidgetService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        Logger.d(TAG, "Received new Intent");
+        String action = intent.getAction();
+        Logger.d(TAG, "Received new Intent %s", action);
 
-        if (intent.getAction().equals(START)) {
+        if (action.equals(START)) {
             onStartIntent(intent);
 
-        } else if (intent.getAction().equals(UPDATED)) {
+        } else if (action.equals(UPDATED)) {
             onUpdatedIntent(intent);
 
-        } else if (intent.getAction().equals(DELETED)) {
+        } else if (action.equals(DELETED)) {
             onDeletedIntent(intent);
 
-        } else {
-            Logger.e(TAG, "Received UNEXPECTED Intent with Action: %s", intent.getAction());
-        }
+        } else if (action.equals(ALARM)) {
+            onAlarmIntent(intent);
 
-        updateWidgets();
+        } else {
+            Logger.e(TAG, "Received UNEXPECTED Intent with Action: %s", action);
+        }
 
         Logger.i(TAG, "Leaving Service in STICKY mode");
         return Service.START_STICKY;
+    }
+
+    private void onAlarmIntent(Intent intent) {
+        Logger.i(TAG, "Received ALARM Intent");
+
+        updateWidgets();
+        scheduleUpdate();
+
     }
 
     private void onStartIntent(Intent intent) {
@@ -169,8 +182,7 @@ public class WidgetService extends Service {
                         Util.getString(widgetProxies.keySet()));
             }
 
-            // TODO: Schedule
-            proxy.updateWidget();
+            scheduleUpdate();
 
         } else {
             Logger.e(TAG, "Got null Options for UPDATE intent, no WidgetProxies will be created");
@@ -186,6 +198,7 @@ public class WidgetService extends Service {
             for (int i = 0; i < ids.length; i++) {
                 widgetProxies.remove(ids[i]);
             }
+            scheduleUpdate();
 
         } else {
             Logger.e(TAG, "Got null Ids for DELETED intent, no WidgetProxies will be deleted");
@@ -221,25 +234,72 @@ public class WidgetService extends Service {
         return options;
     }
 
+    private void scheduleUpdate() {
+        Collection<WidgetProxy> proxies = widgetProxies.values();
+
+        long nextUpdate = scheduler.scheduleUpdate(proxies);
+
+        for (WidgetProxy proxy: proxies) {
+            if (proxy.isCountingSeconds) {
+                //startSecondCounterThread();
+                break;
+            }
+            stopSecondCounterThread();
+        }
+
+        if ((nextUpdate != -1) &&
+                (System.currentTimeMillis() - nextUpdate) < MAX_ACTIVE_WAIT_MILLS ) {
+            shutdownService();
+        }
+
+        Logger.e(TAG, "Forcing Service shutdown");
+        shutdownService();
+
+        return;
+    }
+
+/* TODO
+    private void startSecondCounterThread() {
+        if (counterThread != null && counterThread.isAlive()) {
+            counterThread.interrupt();
+        }
+    }
+
+*/
+    private void stopSecondCounterThread() {
+        if (secondCounterThread != null && secondCounterThread.isAlive()) {
+            secondCounterThread.interrupt();
+        }
+    }
+
+    private void shutdownService() {
+        stopSelf();
+    }
+
     private void updateWidgets() {
         Logger.d(TAG, "Updating Widget Proxies");
 
         time.setToNow();
-        Logger.d(TAG, "Updated Time to: %s", time.format3339(false));
+        Logger.d(TAG, "Updated Time to: %s", time.format(Util.TF));
 
         for (Integer id: widgetProxies.keySet()) {
             Logger.i(TAG, "Updating widget %s", id);
 
             WidgetProxy proxy = widgetProxies.get(id);
-            Logger.i(TAG, "Widget title: '%s'", proxy.getOptions().title);
 
-            if (Log.isLoggable(TAG, Log.INFO)) {
-                Logger.i(TAG, "Current time is [%s] and proxy.nextUpdate is [%s]", time.format3339(false), proxy.nextUpdateTime.format3339(false));
-            }
+            //TODO: Log
+            if (proxy.isAlive) {
 
-            if (Time.compare(time, proxy.nextUpdateTime) >= 0) {
-                Logger.i(TAG, "Widget will be updated now");
-                proxy.updateWidget();
+                Logger.i(TAG, "Widget title: '%s'", proxy.getOptions().title);
+
+                if (Log.isLoggable(TAG, Log.INFO)) {
+                    Logger.i(TAG, "Current time is [%s] and proxy.nextUpdate is [%s]", time.format(Util.TF), proxy.nextUpdateTime.format(Util.TF));
+                }
+
+                if (Time.compare(time, proxy.nextUpdateTime) >= 0) {
+                    Logger.i(TAG, "Widget will be updated now");
+                    proxy.updateWidget();
+                }
             }
         }
     }

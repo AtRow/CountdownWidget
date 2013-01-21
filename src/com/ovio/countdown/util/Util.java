@@ -10,6 +10,8 @@ import java.util.List;
  */
 public class Util {
 
+    public static final String TF = "%Y.%m.%d %H:%M:%S";
+
     public static String packIntArray(int[] array) {
         StringBuilder sb = new StringBuilder();
 

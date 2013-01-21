@@ -40,12 +40,25 @@
                 />
         </receiver>
 
+        <receiver
+            android:name=".AlarmReceiver"
+            android:label="@string/widget_label">
+            <intent-filter>
+                <action android:name="com.ovio.countdown.WidgetService.ALARM"/>
+                <action android:name="android.intent.action.TIME_SET"/>
+                <action android:name="android.intent.action.DATE_CHANGED"/>
+                <action android:name="android.intent.action.TIMEZONE_CHANGED"/>
+            </intent-filter>
+        </receiver>
+
         <service android:name=".WidgetService">
             <intent-filter>
                 <action android:name="com.ovio.countdown.WidgetService.START"/>
-                <action android:name="com.ovio.countdown.WidgetService.APPWIDGET_UPDATED"/>
-                <action android:name="com.ovio.countdown.WidgetService.APPWIDGET_DELETED"/>
+                <action android:name="com.ovio.countdown.WidgetService.ALARM"/>
+                <action android:name="com.ovio.countdown.WidgetService.WIDGET_UPDATED"/>
+                <action android:name="com.ovio.countdown.WidgetService.WIDGET_DELETED"/>
             </intent-filter>
         </service>
+
     </application>
 </manifest> 

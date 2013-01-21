@@ -4,6 +4,7 @@ import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.Intent;
 import com.ovio.countdown.log.Logger;
 import com.ovio.countdown.task.CleanupWidgetTask;
 import com.ovio.countdown.task.DeleteWidgetsTask;
@@ -20,8 +21,15 @@ public class CountdownWidgetProvider extends AppWidgetProvider {
 
     private static final String TAG = Logger.PREFIX + "Provider";
 
+    private Context context;
+
     @Override
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
+        this.context = context;
+
+        // TODO: leave only start service. CleanupWidgetTask should be started from Service itself.
+        startWidgetService();
+
         Logger.i(TAG, "Performing Update for widgets: %s", Util.getString(appWidgetIds));
 
         CleanupWidgetTask task = new CleanupWidgetTask(context);
@@ -36,6 +44,8 @@ public class CountdownWidgetProvider extends AppWidgetProvider {
 
     @Override
     public void onDeleted(Context context, int[] appWidgetIds) {
+        this.context = context;
+
         Logger.i(TAG, "Performing Delete for widgets: %s", Util.getString(appWidgetIds));
 
         DeleteWidgetsTask task = new DeleteWidgetsTask(context);
@@ -52,6 +62,14 @@ public class CountdownWidgetProvider extends AppWidgetProvider {
     private int[] getInstalledWidgets(Context context, AppWidgetManager appWidgetManager) {
         ComponentName thisWidget = new ComponentName(context, CountdownWidgetProvider.class);
         return appWidgetManager.getAppWidgetIds(thisWidget);
+    }
+
+
+    private void startWidgetService() {
+        Logger.i(TAG, "Sending START intent to Service");
+
+        Intent widgetServiceIntent = new Intent(WidgetService.START);
+        context.startService(widgetServiceIntent);
     }
 
 }

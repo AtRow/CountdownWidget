@@ -1,5 +1,7 @@
 package com.ovio.countdown.service;
 
+import android.content.Context;
+import android.os.PowerManager;
 import android.util.Log;
 import com.ovio.countdown.log.Logger;
 import com.ovio.countdown.proxy.WidgetProxy;
@@ -20,16 +22,18 @@ public class SecondCounter {
 
     private final Collection<WidgetProxy> widgetProxies;
 
+    private final PowerManager powerManager;
 
-    public SecondCounter(Collection<WidgetProxy> widgetProxies) {
+
+    public SecondCounter(Context context, Collection<WidgetProxy> widgetProxies) {
+
+        powerManager = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
         this.widgetProxies = widgetProxies;
     }
 
     public void start() {
-        if (secondCounterThread == null) {
+        if (secondCounterThread == null || !secondCounterThread.isAlive()) {
             secondCounterThread = new Thread(new SecondCounterRunnable());
-        }
-        if (!secondCounterThread.isAlive()) {
             secondCounterThread.start();
         }
     }
@@ -52,23 +56,24 @@ public class SecondCounter {
             long toSleep;
             long now = System.currentTimeMillis();
 
-            while (!stopRequested) {
+            while (!stopRequested && powerManager.isScreenOn()) {
                 try {
 
                     updateWidgetSeconds();
 
                     if ((System.currentTimeMillis() - now) > 2 * SEC) {
-                        Log.e(TAG, "Lagging, sleeping 5 secs");
+                        Log.w(TAG, "Lagging, sleeping 5 secs");
                         Thread.currentThread().sleep(5 * SEC);
                         System.gc();
                     }
 
                     now = System.currentTimeMillis();
                     nextSecond = (now / SEC + 1) * SEC + 10;
-
                     toSleep = nextSecond - now;
 
-                    Log.w(TAG, "n: " + now + " ns: " + nextSecond + " ts: " + toSleep);
+                    if (Logger.DEBUG) {
+                        Log.w(TAG, "n: " + now + " ns: " + nextSecond + " ts: " + toSleep);
+                    }
 
                     if (toSleep > 0) {
                         Thread.currentThread().sleep(toSleep);

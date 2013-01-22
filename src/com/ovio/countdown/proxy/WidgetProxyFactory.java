@@ -55,8 +55,7 @@ public class WidgetProxyFactory {
 
         switch (info.initialLayout) {
             case R.layout.countdown_widget_layout_4x1 :
-                RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.countdown_widget_layout_4x1);
-                return getLargeWidgetProxy(views, options);
+                return getLargeWidgetProxy(context, options);
 
             default:
                 Logger.e(TAG, "Couldn't find layout resource for widget's initialLayout: %s", info.initialLayout);
@@ -64,9 +63,9 @@ public class WidgetProxyFactory {
         }
     }
 
-    private WidgetProxy getLargeWidgetProxy(RemoteViews views, WidgetOptions options) {
+    private WidgetProxy getLargeWidgetProxy(Context context, WidgetOptions options) {
         Logger.d(TAG, "Creating Large widget");
-        return new LargeWidgetProxy(context, appWidgetManager, views, options);
+        return new LargeWidgetProxy(context, options);
     }
 
 }

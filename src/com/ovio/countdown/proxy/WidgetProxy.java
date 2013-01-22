@@ -3,7 +3,6 @@ package com.ovio.countdown.proxy;
 import android.appwidget.AppWidgetManager;
 import android.content.Context;
 import android.text.format.Time;
-import android.util.Log;
 import android.widget.RemoteViews;
 import com.ovio.countdown.R;
 import com.ovio.countdown.log.Logger;
@@ -27,31 +26,35 @@ public abstract class WidgetProxy {
 
     private final static String TAG = Logger.PREFIX + "proxy";
 
-    private final AppWidgetManager appWidgetManager;
+    private Context context;
 
-    private final RemoteViews views;
+    private int layout;
 
-    public WidgetProxy(Context context, AppWidgetManager appWidgetManager, RemoteViews views, WidgetOptions options) {
+    public WidgetProxy(Context context, int layout, WidgetOptions options) {
         Logger.d(TAG, "Instantiated WidgetProxy with options %s", options);
 
-        this.appWidgetManager = appWidgetManager;
-        this.views = views;
-        this.options = options;
+        this.context = context;
+        this.layout = layout;
 
+        this.options = options;
         updateWidget();
     }
 
     public synchronized void updateWidget() {
         Logger.i(TAG, "Px[%s]: Updating widget", options.widgetId);
 
-        views.setCharSequence(R.id.titleTextView, "setText", options.title);
+        // I don't know why, but instantiating new RemoteViews works A LOT FASTER then reusing existing!
+        AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
+        RemoteViews views = new RemoteViews(context.getPackageName(), layout);
+
+        views.setTextViewText(R.id.titleTextView, options.title);
 
         long now = System.currentTimeMillis();
 
         String seconds = formatSeconds(options.timestamp - now);
         Logger.d(TAG, "Px[%s]: Set remaining to: %s", options.widgetId, seconds);
 
-        views.setCharSequence(R.id.counterTextView, "setText", seconds);
+        views.setTextViewText(R.id.counterTextView, seconds);
 
         appWidgetManager.updateAppWidget(options.widgetId, views);
 
@@ -61,12 +64,16 @@ public abstract class WidgetProxy {
     public synchronized void updateWidgetSecondsOnly(long second) {
         Logger.d(TAG, "Px[%s]: Updating widget Seconds only", options.widgetId);
 
-        long before = System.currentTimeMillis();
+        //long before = System.currentTimeMillis();
+
+        // I don't know why, but instantiating new RemoteViews works A LOT FASTER then reusing existing!
+        AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
+        RemoteViews views = new RemoteViews(context.getPackageName(), layout);
 
         views.setTextViewText(R.id.counterTextView, formatSeconds(options.timestamp - second));
         appWidgetManager.updateAppWidget(options.widgetId, views);
 
-        Log.w(TAG, "U: " + options.widgetId + " : " + (System.currentTimeMillis() - before));
+        //Log.w(TAG, "U: " + options.widgetId + " : " + (System.currentTimeMillis() - before));
     }
 
     public WidgetOptions getOptions() {

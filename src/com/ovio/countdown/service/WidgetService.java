@@ -73,7 +73,7 @@ public class WidgetService extends Service {
         widgetProxyFactory = WidgetProxyFactory.getInstance(context);
         preferencesManager = PreferencesManager.getInstance(context);
         scheduler = Scheduler.getInstance(context);
-        secondCounter = new SecondCounter(Collections.unmodifiableCollection(widgetProxies.values()));
+        secondCounter = new SecondCounter(context, Collections.unmodifiableCollection(widgetProxies.values()));
 
         // TODO: remove
         Toast.makeText(this, "Service created", Toast.LENGTH_LONG).show();

@@ -21,43 +21,43 @@ public final class Logger {
         if (DEBUG && Log.isLoggable(tag, Log.VERBOSE)) Log.v(tag, getLocation() + getMessage(msg, params));
     }
 
-    public static void v(String tag, Throwable tr, String msg, Object... params) {         
+    public static void v(String tag, Throwable tr, String msg, Object... params) {
         if (DEBUG && Log.isLoggable(tag, Log.VERBOSE)) Log.v(tag, getLocation() + getMessage(msg, params), tr);
     }
 
-    public static void d(String tag, String msg, Object... params) {         
+    public static void d(String tag, String msg, Object... params) {
         if (DEBUG && Log.isLoggable(tag, Log.DEBUG)) Log.d(tag, getLocation() + getMessage(msg, params));
     }
 
-    public static void d(String tag, Throwable tr, String msg, Object... params) {         
+    public static void d(String tag, Throwable tr, String msg, Object... params) {
         if (DEBUG && Log.isLoggable(tag, Log.DEBUG)) Log.d(tag, getLocation() + getMessage(msg, params), tr);
     }
 
-    public static void i(String tag, String msg, Object... params) {         
+    public static void i(String tag, String msg, Object... params) {
         if (Log.isLoggable(tag, Log.INFO)) Log.i(tag, getLocation() + getMessage(msg, params));
     }
 
-    public static void i(String tag, Throwable tr, String msg, Object... params) {         
+    public static void i(String tag, Throwable tr, String msg, Object... params) {
         if (Log.isLoggable(tag, Log.INFO)) Log.i(tag, getLocation() + getMessage(msg, params), tr);
     }
 
-    public static void w(String tag, String msg, Object... params) {         
+    public static void w(String tag, String msg, Object... params) {
         if (Log.isLoggable(tag, Log.WARN)) Log.w(tag, getLocation() + getMessage(msg, params));
     }
 
-    public static void w(String tag, Throwable tr, String msg, Object... params) {         
+    public static void w(String tag, Throwable tr, String msg, Object... params) {
         if (Log.isLoggable(tag, Log.WARN)) Log.w(tag, getLocation() + getMessage(msg, params), tr);
     }
 
-    public static void w(String tag, Throwable tr) {         
+    public static void w(String tag, Throwable tr) {
         if (Log.isLoggable(tag, Log.WARN)) Log.w(tag, tr);
     }
 
-    public static void e(String tag, String msg, Object... params) {         
+    public static void e(String tag, String msg, Object... params) {
         if (Log.isLoggable(tag, Log.ERROR)) Log.e(tag, getLocation() + getMessage(msg, params));
     }
 
-    public static void e(String tag, Throwable tr, String msg, Object... params) {         
+    public static void e(String tag, Throwable tr, String msg, Object... params) {
         if (Log.isLoggable(tag, Log.ERROR)) Log.e(tag, getLocation() + getMessage(msg, params), tr);
     }
 

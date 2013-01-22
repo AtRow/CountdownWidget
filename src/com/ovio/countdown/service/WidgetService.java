@@ -26,9 +26,10 @@ import java.util.TreeMap;
  */
 public class WidgetService extends Service {
 
+    public static final String START = "com.ovio.countdown.service.WidgetService.START";
+    public static final String ALARM = "com.ovio.countdown.service.WidgetService.ALARM";
     public static final String UPDATED = "com.ovio.countdown.service.WidgetService.WIDGET_UPDATED";
     public static final String DELETED = "com.ovio.countdown.service.WidgetService.WIDGET_DELETED";
-    public static final String ALARM = "com.ovio.countdown.service.WidgetService.ALARM";
 
     public static final String PERMISSION = "com.ovio.countdown.service.WidgetService.PERMISSION";
 
@@ -118,14 +119,10 @@ public class WidgetService extends Service {
         String action = intent.getAction();
         Logger.d(TAG, "Received new Intent %s", action);
 
-/*
         if (action.equals(START)) {
             onStartIntent(intent);
 
-        } else
-*/
-
-        if (action.equals(UPDATED)) {
+        } else if (action.equals(UPDATED)) {
             onUpdatedIntent(intent);
 
         } else if (action.equals(DELETED)) {
@@ -142,12 +139,11 @@ public class WidgetService extends Service {
         return Service.START_REDELIVER_INTENT;
     }
 
-/*
     private void onStartIntent(Intent intent) {
-        // Do nothing
         Logger.i(TAG, "Received START Intent");
+
+        scheduleUpdate();
     }
-*/
 
     private void onUpdatedIntent(Intent intent) {
         Logger.i(TAG, "Received UPDATED Intent");
@@ -167,7 +163,9 @@ public class WidgetService extends Service {
                 Logger.d(TAG, "Creating new Proxy with id %s", id);
 
                 proxy = widgetProxyFactory.getWidgetProxy(options);
-                widgetProxies.put(id, proxy);
+                if (proxy != null) {
+                    widgetProxies.put(id, proxy);
+                }
             }
 
             if (Logger.DEBUG) {

@@ -3,6 +3,7 @@ package com.ovio.countdown.proxy;
 import android.appwidget.AppWidgetManager;
 import android.content.Context;
 import android.text.format.Time;
+import android.util.Log;
 import android.widget.RemoteViews;
 import com.ovio.countdown.R;
 import com.ovio.countdown.log.Logger;
@@ -57,11 +58,15 @@ public abstract class WidgetProxy {
         calculateNextUpdateTime();
     }
 
-    public synchronized void updateWidgetSecondsOnly() {
+    public synchronized void updateWidgetSecondsOnly(long second) {
         Logger.d(TAG, "Px[%s]: Updating widget Seconds only", options.widgetId);
 
-        views.setCharSequence(R.id.counterTextView, "setText", formatSeconds(options.timestamp - System.currentTimeMillis()));
+        long before = System.currentTimeMillis();
+
+        views.setTextViewText(R.id.counterTextView, formatSeconds(options.timestamp - second));
         appWidgetManager.updateAppWidget(options.widgetId, views);
+
+        Log.w(TAG, "U: " + options.widgetId + " : " + (System.currentTimeMillis() - before));
     }
 
     public WidgetOptions getOptions() {
@@ -77,7 +82,7 @@ public abstract class WidgetProxy {
         if (mills <= 0) {
             return "0";
         }
-        long seconds = Math.round(mills / 1000d);
+        long seconds = mills / 1000;
         return Long.toString(seconds);
     }
 

@@ -1,5 +1,6 @@
 package com.ovio.countdown.service;
 
+import android.util.Log;
 import com.ovio.countdown.log.Logger;
 import com.ovio.countdown.proxy.WidgetProxy;
 
@@ -12,6 +13,8 @@ import java.util.Collection;
 public class SecondCounter {
 
     private static final String TAG = Logger.PREFIX + "SecCounter";
+
+    private static final long SEC = 1000L;
 
     private Thread secondCounterThread;
 
@@ -45,13 +48,31 @@ public class SecondCounter {
         public void run() {
             Logger.i(TAG, "Started SecondCounterRunnable thread");
 
+            long nextSecond;
+            long toSleep;
+            long now = System.currentTimeMillis();
+
             while (!stopRequested) {
                 try {
 
                     updateWidgetSeconds();
 
-                    long nextSecond = (System.currentTimeMillis() / 1000 + 1) * 1000;
-                    Thread.sleep(nextSecond - System.currentTimeMillis() + 10);
+                    if ((System.currentTimeMillis() - now) > 2 * SEC) {
+                        Log.e(TAG, "Lagging, sleeping 5 secs");
+                        Thread.currentThread().sleep(5 * SEC);
+                        System.gc();
+                    }
+
+                    now = System.currentTimeMillis();
+                    nextSecond = (now / SEC + 1) * SEC + 10;
+
+                    toSleep = nextSecond - now;
+
+                    Log.w(TAG, "n: " + now + " ns: " + nextSecond + " ts: " + toSleep);
+
+                    if (toSleep > 0) {
+                        Thread.currentThread().sleep(toSleep);
+                    }
 
                 } catch (InterruptedException e) {
                     Logger.i(TAG, "Interrupted SecondCounterRunnable thread, stopping");
@@ -66,6 +87,8 @@ public class SecondCounter {
                 Logger.d(TAG, "Starting updating widget Seconds");
             }
 
+            long second = (System.currentTimeMillis() / SEC) * SEC;
+
             for (WidgetProxy proxy: widgetProxies) {
 
                 if (Logger.DEBUG) {
@@ -73,7 +96,7 @@ public class SecondCounter {
                 }
 
                 if (proxy.isAlive && proxy.isCountingSeconds) {
-                    proxy.updateWidgetSecondsOnly();
+                    proxy.updateWidgetSecondsOnly(second);
                 }
             }
         }

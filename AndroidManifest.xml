@@ -60,6 +60,7 @@
         <service android:name=".service.WidgetService">
                  <!-- TODO: android:permission="com.ovio.countdown.service.WidgetService.PERMISSION" -->
             <intent-filter>
+                <action android:name="com.ovio.countdown.service.WidgetService.START"/>
                 <action android:name="com.ovio.countdown.service.WidgetService.ALARM"/>
                 <action android:name="com.ovio.countdown.service.WidgetService.WIDGET_UPDATED"/>
                 <action android:name="com.ovio.countdown.service.WidgetService.WIDGET_DELETED"/>

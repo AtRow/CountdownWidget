@@ -9,6 +9,8 @@ import com.ovio.countdown.log.Logger;
 import com.ovio.countdown.preferences.WidgetOptions;
 import com.ovio.countdown.util.Util;
 
+import java.util.TimeZone;
+
 /**
  * Countdown
  * com.ovio.countdown
@@ -51,14 +53,53 @@ public abstract class WidgetProxy {
 
         long now = System.currentTimeMillis();
 
-        String seconds = formatSeconds(options.timestamp - now);
-        Logger.d(TAG, "Px[%s]: Set remaining to: %s", options.widgetId, seconds);
+        String time = getTimeString(options.timestamp);
 
-        views.setTextViewText(R.id.counterTextView, seconds);
+        //String seconds = formatSeconds(options.timestamp - now);
+        Logger.d(TAG, "Px[%s]: Set remaining to: %s", options.widgetId, time);
+
+        views.setTextViewText(R.id.counterTextView, time);
 
         appWidgetManager.updateAppWidget(options.widgetId, views);
 
         calculateNextUpdateTime();
+    }
+
+    protected String getTimeString(long targetMills) {
+
+        // TODO cache time, update only seconds
+
+        long nowMills = System.currentTimeMillis();
+
+        TimeZone tz = TimeZone.getTimeZone(Time.getCurrentTimezone());
+
+        /*DateTime now = DateTime.now(tz);
+        DateTime target = DateTime.forInstant(targetMills, tz);
+
+        now.minus()
+
+        int result = 0;
+        if(now.isSameDayAs(target)){
+            // do nothing
+        }
+        else if (now.lt(target)){
+            result = now.numDaysFrom(target);
+        }
+        else if (now.gt(target)){
+            DateTime christmasNextYear = DateTime.forDateOnly(now.getYear() + 1, 12, 25);
+            result = now.numDaysFrom(christmasNextYear);
+        }
+
+        StringBuilder sb = new StringBuilder();
+
+        sb.append(years).append(" Y ")
+                .append(months).append(" M ")
+                .append(days).append(" D ")
+                .append(hours).append(":")
+                .append(mins).append(":")
+                .append(secs);*/
+
+        return null;
     }
 
     public synchronized void updateWidgetSecondsOnly(long second) {
@@ -67,11 +108,11 @@ public abstract class WidgetProxy {
         //long before = System.currentTimeMillis();
 
         // I don't know why, but instantiating new RemoteViews works A LOT FASTER then reusing existing!
-        AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
-        RemoteViews views = new RemoteViews(context.getPackageName(), layout);
-
-        views.setTextViewText(R.id.counterTextView, formatSeconds(options.timestamp - second));
-        appWidgetManager.updateAppWidget(options.widgetId, views);
+//        AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
+//        RemoteViews views = new RemoteViews(context.getPackageName(), layout);
+//
+//        views.setTextViewText(R.id.counterTextView, formatSeconds(options.timestamp - second));
+//        appWidgetManager.updateAppWidget(options.widgetId, views);
 
         //Log.w(TAG, "U: " + options.widgetId + " : " + (System.currentTimeMillis() - before));
     }

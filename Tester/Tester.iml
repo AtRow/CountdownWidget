@@ -36,9 +36,18 @@
       <sourceFolder url="file://$MODULE_DIR$/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/gen" isTestSource="false" />
     </content>
+    <orderEntry type="module" module-name="Countdown" />
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="module" module-name="Countdown" scope="PROVIDED" />
+    <orderEntry type="module-library">
+      <library name="joda-time-2.1">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/libs/joda-time-2.1.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
   </component>
 </module>
 

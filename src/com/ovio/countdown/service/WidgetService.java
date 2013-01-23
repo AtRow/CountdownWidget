@@ -252,7 +252,7 @@ public class WidgetService extends Service {
             Logger.i(TAG, "No update needed, Forcing Service shutdown");
             shutdownService();
         } else if ((nextUpdate - System.currentTimeMillis()) > MAX_ACTIVE_WAIT_MILLS ) {
-            Logger.i(TAG, "To long to wait: %s ms, Forcing Service shutdown", System.currentTimeMillis() - nextUpdate);
+            Logger.i(TAG, "To long to wait: %s ms, Forcing Service shutdown", nextUpdate - System.currentTimeMillis());
             shutdownService();
         }
 

@@ -5,11 +5,10 @@ import android.content.Context;
 import android.text.format.Time;
 import android.widget.RemoteViews;
 import com.ovio.countdown.R;
+import com.ovio.countdown.date.TimeDifference;
 import com.ovio.countdown.log.Logger;
 import com.ovio.countdown.preferences.WidgetOptions;
 import com.ovio.countdown.util.Util;
-
-import java.util.TimeZone;
 
 /**
  * Countdown
@@ -24,7 +23,12 @@ public abstract class WidgetProxy {
     public boolean isAlive = true;
 
 
-    private WidgetOptions options;
+    protected WidgetOptions options;
+
+    protected int maxCountingVal;
+
+    protected int minCountingVal;
+
 
     private final static String TAG = Logger.PREFIX + "proxy";
 
@@ -50,71 +54,23 @@ public abstract class WidgetProxy {
         RemoteViews views = new RemoteViews(context.getPackageName(), layout);
 
         views.setTextViewText(R.id.titleTextView, options.title);
-
-        long now = System.currentTimeMillis();
-
-        String time = getTimeString(options.timestamp);
-
-        //String seconds = formatSeconds(options.timestamp - now);
-        Logger.d(TAG, "Px[%s]: Set remaining to: %s", options.widgetId, time);
-
-        views.setTextViewText(R.id.counterTextView, time);
+        updateTimeViews(views, options.timestamp);
 
         appWidgetManager.updateAppWidget(options.widgetId, views);
 
         calculateNextUpdateTime();
     }
 
-    protected String getTimeString(long targetMills) {
-
-        // TODO cache time, update only seconds
-
-        long nowMills = System.currentTimeMillis();
-
-        TimeZone tz = TimeZone.getTimeZone(Time.getCurrentTimezone());
-
-        /*DateTime now = DateTime.now(tz);
-        DateTime target = DateTime.forInstant(targetMills, tz);
-
-        now.minus()
-
-        int result = 0;
-        if(now.isSameDayAs(target)){
-            // do nothing
-        }
-        else if (now.lt(target)){
-            result = now.numDaysFrom(target);
-        }
-        else if (now.gt(target)){
-            DateTime christmasNextYear = DateTime.forDateOnly(now.getYear() + 1, 12, 25);
-            result = now.numDaysFrom(christmasNextYear);
-        }
-
-        StringBuilder sb = new StringBuilder();
-
-        sb.append(years).append(" Y ")
-                .append(months).append(" M ")
-                .append(days).append(" D ")
-                .append(hours).append(":")
-                .append(mins).append(":")
-                .append(secs);*/
-
-        return null;
-    }
-
-    public synchronized void updateWidgetSecondsOnly(long second) {
-        Logger.d(TAG, "Px[%s]: Updating widget Seconds only", options.widgetId);
-
-        //long before = System.currentTimeMillis();
+    public synchronized void updateWidgetTimeOnly() {
+        Logger.d(TAG, "Px[%s]: Updating widget Time only", options.widgetId);
 
         // I don't know why, but instantiating new RemoteViews works A LOT FASTER then reusing existing!
-//        AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
-//        RemoteViews views = new RemoteViews(context.getPackageName(), layout);
-//
-//        views.setTextViewText(R.id.counterTextView, formatSeconds(options.timestamp - second));
-//        appWidgetManager.updateAppWidget(options.widgetId, views);
+        AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
+        RemoteViews views = new RemoteViews(context.getPackageName(), layout);
 
-        //Log.w(TAG, "U: " + options.widgetId + " : " + (System.currentTimeMillis() - before));
+        updateTimeViews(views, options.timestamp);
+        appWidgetManager.updateAppWidget(options.widgetId, views);
+
     }
 
     public WidgetOptions getOptions() {
@@ -126,22 +82,46 @@ public abstract class WidgetProxy {
         updateWidget();
     }
 
-    private String formatSeconds(long mills) {
-        if (mills <= 0) {
-            return "0";
-        }
-        long seconds = mills / 1000;
-        return Long.toString(seconds);
+
+    private void updateTimeViews(RemoteViews views, long timestamp) {
+        TimeDifference diff = TimeDifference.between(System.currentTimeMillis(), timestamp);
+
+        maxCountingVal = getMaxCountingVal(diff);
+        minCountingVal = getMinCountingVal(maxCountingVal);
+
+        String text = getTimeText(diff);
+
+        views.setTextViewText(R.id.counterTextView, text);
     }
+
+    protected abstract String getTimeText(TimeDifference diff);
+
+    protected abstract int getMaxCountingVal(TimeDifference diff);
+
+    protected abstract int getMinCountingVal(int maxCountingVal);
+
 
     private void calculateNextUpdateTime() {
 
         nextUpdateTimestamp = System.currentTimeMillis();
 
-        // TODO
-        nextUpdateTimestamp += 1000 * 60; // 1 min
+        switch (minCountingVal) {
+
+            case Time.SECOND:
+            case Time.MINUTE:
+                nextUpdateTimestamp = (nextUpdateTimestamp / (1000 * 60) + 1) * (1000 * 60); // next minute, rounded
+                break;
+
+            case Time.HOUR:
+                nextUpdateTimestamp = (nextUpdateTimestamp / (1000 * 60 * 60) + 1) * (1000 * 60 * 60); // next hour, rounded
+                break;
+
+            default:
+                nextUpdateTimestamp = (nextUpdateTimestamp / (1000 * 60 * 60 * 24) + 1) * (1000 * 60 * 60 * 24); // next day, rounded
+        }
 
         //TODO
+/*
         if (options.timestamp > System.currentTimeMillis()) {
             isAlive = true;
             Logger.d(TAG, "Px[%s]: Target time is not yet reached, widget is alive", options.widgetId);
@@ -149,8 +129,9 @@ public abstract class WidgetProxy {
             isAlive = false;
             Logger.d(TAG, "Px[%s]: Target time is already reached, widget is dead", options.widgetId);
         }
+*/
 
-        if (options.enableSeconds) {
+        if (minCountingVal == Time.SECOND) {
             isCountingSeconds = true;
         } else {
             isCountingSeconds = false;

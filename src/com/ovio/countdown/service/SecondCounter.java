@@ -32,7 +32,7 @@ public class SecondCounter {
     }
 
     public void start() {
-        if (secondCounterThread == null || !secondCounterThread.isAlive()) {
+        if (powerManager.isScreenOn() && (secondCounterThread == null || !secondCounterThread.isAlive())) {
             secondCounterThread = new Thread(new SecondCounterRunnable());
             secondCounterThread.start();
         }
@@ -63,7 +63,7 @@ public class SecondCounter {
 
                     if ((System.currentTimeMillis() - now) > 2 * SEC) {
                         Log.w(TAG, "Lagging, sleeping 5 secs");
-                        Thread.currentThread().sleep(5 * SEC);
+                        Thread.sleep(5 * SEC);
                         System.gc();
                     }
 
@@ -76,7 +76,7 @@ public class SecondCounter {
                     }
 
                     if (toSleep > 0) {
-                        Thread.currentThread().sleep(toSleep);
+                        Thread.sleep(toSleep);
                     }
 
                 } catch (InterruptedException e) {
@@ -92,8 +92,6 @@ public class SecondCounter {
                 Logger.d(TAG, "Starting updating widget Seconds");
             }
 
-            long second = (System.currentTimeMillis() / SEC) * SEC;
-
             for (WidgetProxy proxy: widgetProxies) {
 
                 if (Logger.DEBUG) {
@@ -101,7 +99,7 @@ public class SecondCounter {
                 }
 
                 if (proxy.isAlive && proxy.isCountingSeconds) {
-                    proxy.updateWidgetSecondsOnly(second);
+                    proxy.updateWidgetTimeOnly();
                 }
             }
         }

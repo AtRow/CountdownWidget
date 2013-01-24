@@ -1,5 +1,7 @@
 package com.ovio.countdown.preferences;
 
+import android.appwidget.AppWidgetManager;
+
 import java.io.Serializable;
 
 /**
@@ -8,7 +10,7 @@ import java.io.Serializable;
  */
 public class WidgetOptions implements Serializable {
 
-    public int widgetId;
+    public int widgetId = AppWidgetManager.INVALID_APPWIDGET_ID;
 
     public String title;
 

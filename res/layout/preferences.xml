@@ -19,7 +19,9 @@
                 android:layout_height="wrap_content"
                 android:id="@+id/titleEditText"
                 android:hint="@string/title_prompt"
-                android:singleLine="true"/>
+                android:singleLine="true"
+                android:capitalize="sentences"
+                />
 
             <TextView
                 android:layout_width="wrap_content"

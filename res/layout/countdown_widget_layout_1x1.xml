@@ -4,7 +4,8 @@
               android:orientation="vertical"
               android:layout_width="65dp"
               android:layout_height="65dp"
-              android:background="#6ec1ff">
+              android:background="#6ec1ff"
+              android:id="@+id/widgetLayout">
 
             <TextView
                 android:layout_width="wrap_content"

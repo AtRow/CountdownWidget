@@ -6,12 +6,10 @@ import android.appwidget.AppWidgetManager;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.format.DateFormat;
 import android.text.format.Time;
 import android.view.View;
-import android.widget.CheckBox;
-import android.widget.DatePicker;
-import android.widget.EditText;
-import android.widget.TimePicker;
+import android.widget.*;
 import com.ovio.countdown.log.Logger;
 import com.ovio.countdown.preferences.DefaultOptions;
 import com.ovio.countdown.preferences.PreferencesManager;
@@ -42,9 +40,9 @@ public class WidgetPreferencesActivity extends Activity {
 
     private DefaultOptions options;
 
-    private EditText titleEditText;
-
     // UI
+
+    private EditText titleEditText;
 
     private DatePicker datePicker;
 
@@ -62,18 +60,20 @@ public class WidgetPreferencesActivity extends Activity {
 
         setContentView(R.layout.preferences);
 
-        isOkPressed = false;
-        appWidgetId = getAppWidgetId();
-        widgetOptions = new WidgetOptions();
-        options = new DefaultOptions();
-
         setResultCanceled();
 
         prefManager = PreferencesManager.getInstance(self);
         widgetManager = WidgetPreferencesManager.getInstance(self);
 
         obtainFormElements();
-        loadDefaultPreferences();
+
+        isOkPressed = false;
+
+        appWidgetId = getAppWidgetId();
+        widgetOptions = getWidgetOptions(appWidgetId);
+        options = loadDefaultOptions();
+
+        applyOptions(options, widgetOptions);
     }
 
     @Override
@@ -94,7 +94,7 @@ public class WidgetPreferencesActivity extends Activity {
         Logger.d(TAG, "OK button clicked");
 
         saveDefaultPreferences();
-        saveWidgetPreferences();
+        saveWidgetOptions();
 
         sendToWidgetService();
 
@@ -110,15 +110,6 @@ public class WidgetPreferencesActivity extends Activity {
         Logger.i(TAG, "Finished Widget Preferences Activity with RESULT_CANCELED");
         finish();
     }
-
-/*
-    private void startWidgetService() {
-        Logger.i(TAG, "Sending START intent to Service");
-
-        Intent widgetServiceIntent = new Intent(WidgetService.START);
-        startService(widgetServiceIntent);
-    }
-*/
 
     private void sendToWidgetService() {
         Logger.i(TAG, "Sending UPDATED intent to Service");
@@ -152,6 +143,9 @@ public class WidgetPreferencesActivity extends Activity {
         titleEditText = (EditText) findViewById(R.id.titleEditText);
         datePicker = (DatePicker) findViewById(R.id.datePicker);
         timePicker = (TimePicker) findViewById(R.id.timePicker);
+
+        timePicker.setIs24HourView( DateFormat.is24HourFormat(this) );
+
         secondsCheckBox = (CheckBox) findViewById(R.id.secondsCheckBox);
     }
 
@@ -168,11 +162,13 @@ public class WidgetPreferencesActivity extends Activity {
 
                 if (appWidgetId == AppWidgetManager.INVALID_APPWIDGET_ID) {
                     Logger.e(TAG, "Invalid widget id specified in starting Intent. Exiting.");
+                    Toast.makeText(this, "Widget not found", Toast.LENGTH_LONG).show();
                     finish();
                 }
 
             } else {
                 Logger.e(TAG, "Can't find appWidgetId in a starting Intent's extras; Extras == null!");
+                Toast.makeText(this, "Widget not found", Toast.LENGTH_LONG).show();
                 finish();
                 appWidgetId = AppWidgetManager.INVALID_APPWIDGET_ID;
             }
@@ -185,7 +181,18 @@ public class WidgetPreferencesActivity extends Activity {
         host.deleteAppWidgetId(appWidgetId);
     }
 
-    private void saveWidgetPreferences() {
+    private WidgetOptions getWidgetOptions(int appWidgetId) {
+        Logger.i(TAG, "Loading Widget Options");
+
+        WidgetOptions options = widgetManager.load(appWidgetId);
+        if (options == null) {
+            Logger.i(TAG, "Can't find Widget Options for id: %s", appWidgetId);
+            return new WidgetOptions();
+        }
+        return options;
+    }
+
+    private void saveWidgetOptions() {
         Logger.i(TAG, "Saving Widget Options");
 
         //TODO
@@ -231,14 +238,38 @@ public class WidgetPreferencesActivity extends Activity {
         Logger.d(TAG, "Finished saving Global Options");
     }
 
-    private void loadDefaultPreferences() {
+    private DefaultOptions loadDefaultOptions() {
         Logger.i(TAG, "Loading Global Options");
 
-        options = prefManager.loadDefaultPrefs();
+        DefaultOptions options = prefManager.loadDefaultPrefs();
 
         Logger.i(TAG, "Global Options: %s", options);
 
-        secondsCheckBox.setChecked(options.enableSeconds);
+        return options;
     }
+
+    private void applyOptions(DefaultOptions options, WidgetOptions widgetOptions) {
+        Logger.i(TAG, "Applying Options");
+
+        // Default first
+        secondsCheckBox.setChecked(options.enableSeconds);
+
+        // Then basically override
+        if (widgetOptions.widgetId != AppWidgetManager.INVALID_APPWIDGET_ID) {
+
+            titleEditText.setText(widgetOptions.title);
+
+            Time time = new Time();
+            time.set(widgetOptions.timestamp);
+
+            datePicker.updateDate(time.year, time.month, time.monthDay);
+            timePicker.setCurrentHour(time.hour);
+            timePicker.setCurrentMinute(time.minute);
+
+            secondsCheckBox.setChecked(widgetOptions.enableSeconds);
+        }
+    }
+
+
 
 }

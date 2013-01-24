@@ -50,7 +50,7 @@ public class WidgetPreferencesActivity extends Activity {
 
     private CheckBox secondsCheckBox;
 
-    private boolean isOkPressed;
+    private boolean doForceRemoveOnCancel;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -67,10 +67,14 @@ public class WidgetPreferencesActivity extends Activity {
 
         obtainFormElements();
 
-        isOkPressed = false;
+        doForceRemoveOnCancel = true;
 
         appWidgetId = getAppWidgetId();
         widgetOptions = getWidgetOptions(appWidgetId);
+
+        // Enable force remove widget if it's not stored
+        doForceRemoveOnCancel = !widgetOptions.isValid();
+
         options = loadDefaultOptions();
 
         applyOptions(options, widgetOptions);
@@ -83,7 +87,7 @@ public class WidgetPreferencesActivity extends Activity {
         // There's a bug somewhere, see
         // http://stackoverflow.com/questions/4393144/widget-not-deleted-when-passing-result-canceled-as-result-for-configuration-acti
         Logger.i(TAG, "Stopped");
-        if (!isOkPressed) {
+        if (doForceRemoveOnCancel) {
             Logger.i(TAG, "Ok wasn't pressed, forcing removal of a widget %s", getAppWidgetId());
             forceRemoveWidget(getAppWidgetId());
         }
@@ -131,12 +135,12 @@ public class WidgetPreferencesActivity extends Activity {
 
     private void setResultOk() {
         setResult(RESULT_OK, getResultIntent());
-        isOkPressed = true;
+        doForceRemoveOnCancel = false;
     }
 
     private void setResultCanceled() {
         setResult(RESULT_CANCELED, getResultIntent());
-        isOkPressed = false;
+        doForceRemoveOnCancel = true;
     }
 
     private void obtainFormElements() {
@@ -255,7 +259,7 @@ public class WidgetPreferencesActivity extends Activity {
         secondsCheckBox.setChecked(options.enableSeconds);
 
         // Then basically override
-        if (widgetOptions.widgetId != AppWidgetManager.INVALID_APPWIDGET_ID) {
+        if (widgetOptions.isValid()) {
 
             titleEditText.setText(widgetOptions.title);
 

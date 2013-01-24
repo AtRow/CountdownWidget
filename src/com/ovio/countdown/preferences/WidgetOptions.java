@@ -26,6 +26,10 @@ public class WidgetOptions implements Serializable {
 
     public String calendarEventUrl;
 
+    public boolean isValid() {
+        return widgetId != AppWidgetManager.INVALID_APPWIDGET_ID;
+    }
+
     @Override
     public String toString() {
         return "WidgetOptions{" +

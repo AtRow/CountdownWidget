@@ -20,6 +20,8 @@ public class SecondCounter {
 
     private Thread secondCounterThread;
 
+    private SecondCounterRunnable secondCounterRunnable;
+
     private final Collection<WidgetProxy> widgetProxies;
 
     private final PowerManager powerManager;
@@ -33,13 +35,16 @@ public class SecondCounter {
 
     public void start() {
         if (powerManager.isScreenOn() && (secondCounterThread == null || !secondCounterThread.isAlive())) {
-            secondCounterThread = new Thread(new SecondCounterRunnable());
+            secondCounterRunnable = new SecondCounterRunnable();
+
+            secondCounterThread = new Thread(secondCounterRunnable);
             secondCounterThread.start();
         }
     }
 
     public void stop() {
         if (secondCounterThread != null && secondCounterThread.isAlive()) {
+            secondCounterRunnable.prepareToStop();
             secondCounterThread.interrupt();
         }
     }
@@ -62,9 +67,8 @@ public class SecondCounter {
                     updateWidgetSeconds();
 
                     if ((System.currentTimeMillis() - now) > 2 * SEC) {
-                        Log.w(TAG, "Lagging, sleeping 5 secs");
-                        Thread.sleep(5 * SEC);
-                        System.gc();
+                        Log.w(TAG, "Lagging, sleeping 1 sec");
+                        Thread.sleep(SEC);
                     }
 
                     now = System.currentTimeMillis();
@@ -80,11 +84,14 @@ public class SecondCounter {
                     }
 
                 } catch (InterruptedException e) {
-                    Logger.i(TAG, "Interrupted SecondCounterRunnable thread, stopping");
-                    stopRequested = true;
+                    Logger.i(TAG, "Interrupted SecondCounterRunnable thread");
                 }
             }
             Logger.i(TAG, "Finished SecondCounterRunnable thread");
+        }
+
+        public void prepareToStop() {
+            stopRequested = true;
         }
 
         private void updateWidgetSeconds() {

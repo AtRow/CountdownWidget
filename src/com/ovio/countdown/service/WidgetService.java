@@ -240,7 +240,7 @@ public class WidgetService extends Service {
 
         for (WidgetProxy proxy: proxies) {
             if (proxy.isCountingSeconds) {
-                Logger.d(TAG, "Proxy %s is counting seconds, starting Second counter", proxy.getOptions().widgetId);
+                Logger.i(TAG, "Proxy %s is counting seconds, starting Second counter", proxy.getOptions().widgetId);
                 secondCounter.start();
                 break;
             }

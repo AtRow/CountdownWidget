@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<appwidget-provider
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:initialLayout="@layout/countdown_widget_layout_1x1"
+    android:minWidth="65dp"
+    android:minHeight="65dp"
+    android:label="@string/widget_name_1x1"
+    android:updatePeriodMillis="0"
+    android:configure="com.ovio.countdown.WidgetPreferencesActivity"
+    />

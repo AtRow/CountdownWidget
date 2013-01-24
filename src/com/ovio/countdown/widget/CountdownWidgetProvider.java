@@ -1,4 +1,4 @@
-package com.ovio.countdown;
+package com.ovio.countdown.widget;
 
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
@@ -7,7 +7,6 @@ import android.content.Context;
 import android.content.Intent;
 import com.ovio.countdown.log.Logger;
 import com.ovio.countdown.service.WidgetService;
-import com.ovio.countdown.task.CleanupWidgetTask;
 import com.ovio.countdown.task.DeleteWidgetsTask;
 import com.ovio.countdown.util.Util;
 
@@ -18,7 +17,7 @@ import java.util.List;
  * Countdown
  * com.ovio.countdown
  */
-public class CountdownWidgetProvider extends AppWidgetProvider {
+public abstract class CountdownWidgetProvider extends AppWidgetProvider {
 
     private static final String TAG = Logger.PREFIX + "Provider";
 
@@ -30,6 +29,9 @@ public class CountdownWidgetProvider extends AppWidgetProvider {
 
         startWidgetService();
 
+        Logger.w(TAG, "Cleanup disabled because of a BUG");
+
+/*
         Logger.i(TAG, "Performing Update for widgets: %s", Util.getString(appWidgetIds));
 
         CleanupWidgetTask task = new CleanupWidgetTask(context);
@@ -38,6 +40,7 @@ public class CountdownWidgetProvider extends AppWidgetProvider {
         Logger.i(TAG, "Current valid widgets: %s", Util.getString(installedAppWidgetIds));
 
         task.execute(Util.toIntegerList(installedAppWidgetIds));
+*/
 
         Logger.d(TAG, "Finished onUpdate");
     }

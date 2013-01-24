@@ -37,7 +37,7 @@ public class WidgetPreferencesManager {
     public List<Integer> cleanup(List<Integer> validWidgetIds) {
 
         Logger.i(TAG, "Starting cleanup");
-        Logger.d(TAG, "Valid widget ids are: %s", Util.getString(validWidgetIds));
+        Logger.i(TAG, "Valid widget ids are: %s", Util.getString(validWidgetIds));
 
         DefaultOptions defaultOptions = prefManager.loadDefaultPrefs();
 
@@ -73,7 +73,7 @@ public class WidgetPreferencesManager {
     }
 
     public void delete(int widgetId) {
-        Logger.d(TAG, "Deleting widget %s", widgetId);
+        Logger.i(TAG, "Deleting widget %s", widgetId);
         prefManager.deleteWidgetPrefs(PREFIX + widgetId);
     }
 

@@ -13,7 +13,7 @@ public final class Logger {
 
     public static final String PREFIX = "CW_";
 
-    public static final boolean DEBUG = true;
+    public static final boolean DEBUG = false;
 
     private static final String TAG = PREFIX + "Log";
 
@@ -34,11 +34,11 @@ public final class Logger {
     }
 
     public static void i(String tag, String msg, Object... params) {
-        if (Log.isLoggable(tag, Log.INFO)) Log.i(tag, getLocation() + getMessage(msg, params));
+        if (DEBUG && Log.isLoggable(tag, Log.INFO)) Log.i(tag, getLocation() + getMessage(msg, params));
     }
 
     public static void i(String tag, Throwable tr, String msg, Object... params) {
-        if (Log.isLoggable(tag, Log.INFO)) Log.i(tag, getLocation() + getMessage(msg, params), tr);
+        if (DEBUG && Log.isLoggable(tag, Log.INFO)) Log.i(tag, getLocation() + getMessage(msg, params), tr);
     }
 
     public static void w(String tag, String msg, Object... params) {

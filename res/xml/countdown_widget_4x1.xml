@@ -2,9 +2,9 @@
 <appwidget-provider
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:initialLayout="@layout/countdown_widget_layout_4x1"
-    android:minWidth="292dp"
-    android:minHeight="73dp"
-    android:label="My App Widget"
+    android:minWidth="260dp"
+    android:minHeight="65dp"
+    android:label="@string/widget_name_4x1"
     android:updatePeriodMillis="0"
     android:configure="com.ovio.countdown.WidgetPreferencesActivity"
     />

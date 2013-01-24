@@ -29,6 +29,13 @@ public abstract class WidgetProxy {
 
     protected int minCountingVal;
 
+    protected int nextIncrement;
+
+    protected final static int SECOND = 1000;
+    protected final static int MINUTE = (1000 * 60);
+    protected final static int HOUR = (1000 * 60 * 60);
+    protected final static int DAY = (1000 * 60 * 60 * 24);
+
 
     private final static String TAG = Logger.PREFIX + "proxy";
 
@@ -54,7 +61,10 @@ public abstract class WidgetProxy {
         RemoteViews views = new RemoteViews(context.getPackageName(), layout);
 
         views.setTextViewText(R.id.titleTextView, options.title);
-        updateTimeViews(views, options.timestamp);
+
+        TimeDifference diff = TimeDifference.between(System.currentTimeMillis(), options.timestamp);
+        updateCounters(diff);
+        updateTimeViews(views, diff);
 
         appWidgetManager.updateAppWidget(options.widgetId, views);
 
@@ -68,7 +78,12 @@ public abstract class WidgetProxy {
         AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
         RemoteViews views = new RemoteViews(context.getPackageName(), layout);
 
-        updateTimeViews(views, options.timestamp);
+        views.setTextViewText(R.id.titleTextView, options.title);
+
+        TimeDifference diff = TimeDifference.between(System.currentTimeMillis(), options.timestamp);
+        updateCounters(diff);
+        updateTimeViews(views, diff);
+
         appWidgetManager.updateAppWidget(options.widgetId, views);
 
     }
@@ -82,43 +97,28 @@ public abstract class WidgetProxy {
         updateWidget();
     }
 
+    protected abstract void updateCounters(TimeDifference diff);
 
-    private void updateTimeViews(RemoteViews views, long timestamp) {
-        TimeDifference diff = TimeDifference.between(System.currentTimeMillis(), timestamp);
-
-        maxCountingVal = getMaxCountingVal(diff);
-        minCountingVal = getMinCountingVal(maxCountingVal);
-
+    private void updateTimeViews(RemoteViews views, TimeDifference diff) {
         String text = getTimeText(diff);
-
         views.setTextViewText(R.id.counterTextView, text);
     }
 
     protected abstract String getTimeText(TimeDifference diff);
 
-    protected abstract int getMaxCountingVal(TimeDifference diff);
-
-    protected abstract int getMinCountingVal(int maxCountingVal);
-
+    void setCountSeconds(boolean doCount) {
+        if (options.enableSeconds && doCount) {
+            isCountingSeconds = true;
+        } else {
+            isCountingSeconds = false;
+        }
+    }
 
     private void calculateNextUpdateTime() {
 
-        nextUpdateTimestamp = System.currentTimeMillis();
+        nextUpdateTimestamp = (System.currentTimeMillis() / (1000 * 60)) * (1000 * 60); // rounded to minute
 
-        switch (minCountingVal) {
-
-            case Time.SECOND:
-            case Time.MINUTE:
-                nextUpdateTimestamp = (nextUpdateTimestamp / (1000 * 60) + 1) * (1000 * 60); // next minute, rounded
-                break;
-
-            case Time.HOUR:
-                nextUpdateTimestamp = (nextUpdateTimestamp / (1000 * 60 * 60) + 1) * (1000 * 60 * 60); // next hour, rounded
-                break;
-
-            default:
-                nextUpdateTimestamp = (nextUpdateTimestamp / (1000 * 60 * 60 * 24) + 1) * (1000 * 60 * 60 * 24); // next day, rounded
-        }
+        nextUpdateTimestamp += nextIncrement;
 
         //TODO
 /*
@@ -131,11 +131,13 @@ public abstract class WidgetProxy {
         }
 */
 
+/*
         if (minCountingVal == Time.SECOND) {
             isCountingSeconds = true;
         } else {
             isCountingSeconds = false;
         }
+*/
 
         if (Logger.DEBUG) {
             Time time = new Time();

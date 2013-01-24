@@ -1,8 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Countdown Widget</string>
+    <string name="widget_name_1x1">Countdown 1x1</string>
+    <string name="widget_name_2x1">Countdown 2x1</string>
+    <string name="widget_name_4x1">Countdown 4x1</string>
     <string name="preferences_activity_title">Preferences</string>
     <string name="widget_label">Countdown Widget</string>
     <string name="ok_button_text">OK</string>
-    <string name="cancel_button_text">Cancel</string><string name="title_prompt">Event title</string><string name="Date">date_prompt</string><string name="date_prompt">Date</string><string name="time_prompt">Time</string><string name="time_enable_prompt">Set time</string><string name="count_seconds_prompt">Count seconds</string>
+    <string name="cancel_button_text">Cancel</string>
+    <string name="title_prompt">Event title</string>
+    <string name="Date">date_prompt</string>
+    <string name="date_prompt">Date</string>
+    <string name="time_prompt">Time</string>
+    <string name="time_enable_prompt">Set time</string>
+    <string name="count_seconds_prompt">Count seconds</string>
 </resources>

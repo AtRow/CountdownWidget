@@ -1,7 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="TextWidgetTime">
-        <item name="android:textSize">24sp</item>
+    <style name="TextWidgetTime1x1">
+        <item name="android:textSize">18sp</item>
+        <item name="android:textStyle">normal</item>
+    </style>
+    <style name="TextWidgetTime2x1">
+        <item name="android:textSize">18sp</item>
+        <item name="android:textStyle">normal</item>
+    </style>
+    <style name="TextWidgetTime4x1">
+        <item name="android:textSize">26sp</item>
         <item name="android:textStyle">normal</item>
     </style>
 </resources>

@@ -208,7 +208,7 @@ public class WidgetPreferencesActivity extends Activity {
 
         widgetOptions.repeatingPeriod = 0L;
 
-        Logger.d(TAG, "Widget Options: %s", widgetOptions);
+        Logger.i(TAG, "Widget Options: %s", widgetOptions);
 
         widgetManager.add(widgetOptions);
 
@@ -224,7 +224,7 @@ public class WidgetPreferencesActivity extends Activity {
         options.savedWidgets = Util.toIntArray(list);
         options.enableSeconds = secondsCheckBox.isChecked();
 
-        Logger.d(TAG, "Global Options: %s", options);
+        Logger.i(TAG, "Global Options: %s", options);
 
         prefManager.saveDefaultPrefs(options);
 
@@ -236,7 +236,7 @@ public class WidgetPreferencesActivity extends Activity {
 
         options = prefManager.loadDefaultPrefs();
 
-        Logger.d(TAG, "Global Options: %s", options);
+        Logger.i(TAG, "Global Options: %s", options);
 
         secondsCheckBox.setChecked(options.enableSeconds);
     }

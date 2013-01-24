@@ -11,13 +11,13 @@ import com.ovio.countdown.preferences.WidgetOptions;
  * Countdown
  * com.ovio.countdown
  */
-public class LargeWidgetProxy extends WidgetProxy {
+public class MediumWidgetProxy extends WidgetProxy {
 
     private static final String TAG = Logger.PREFIX + "proxy";
 
-    private static final int LAYOUT = R.layout.countdown_widget_layout_4x1;
+    private static final int LAYOUT = R.layout.countdown_widget_layout_2x1;
 
-    public LargeWidgetProxy(Context context, WidgetOptions options) {
+    public MediumWidgetProxy(Context context, WidgetOptions options) {
         super(context, LAYOUT, options);
     }
 
@@ -28,19 +28,23 @@ public class LargeWidgetProxy extends WidgetProxy {
 
         switch (maxCountingVal) {
             case Time.YEAR:
-                text = getTextY2D(diff);
+                text = getTextY2M(diff);
                 break;
 
             case Time.MONTH:
-                text = getTextM2H(diff);
+                text = getTextM2D(diff);
                 break;
 
             case Time.MONTH_DAY:
-                text = getTextD2M(diff);
+                text = getTextD2H(diff);
                 break;
 
             case Time.HOUR:
-                text = getTextH2S(diff);
+                text = getTextH2M(diff);
+                break;
+
+            case Time.MINUTE:
+                text = getTextM2S(diff);
                 break;
 
             default:
@@ -57,44 +61,56 @@ public class LargeWidgetProxy extends WidgetProxy {
     @Override
     protected void updateCounters(TimeDifference diff) {
 
-        // Year-Month-Day
+        // Year-Month
         if (diff.years > 0) {
             maxCountingVal = Time.YEAR;
-            minCountingVal = Time.MONTH_DAY;
+            minCountingVal = Time.MONTH;
             nextIncrement = DAY;
             setCountSeconds(false);
 
-        // Month-Day-Hour
+        // Month-Day
         } else if (diff.months > 0) {
             maxCountingVal = Time.MONTH;
+            minCountingVal = Time.MONTH_DAY;
+
+            if (diff.months == 1 && diff.days == 0) {
+                nextIncrement = HOUR;
+            } else {
+                nextIncrement = DAY;
+            }
+            setCountSeconds(false);
+
+        // Day-Hour
+        } else if (diff.days > 0) {
+            maxCountingVal = Time.MONTH_DAY;
             minCountingVal = Time.HOUR;
-            if (diff.months == 1 && diff.days == 0 && diff.hours == 0) {
+
+            if (diff.days == 1 && diff.hours == 0) {
                 nextIncrement = MINUTE;
             } else {
                 nextIncrement = HOUR;
             }
             setCountSeconds(false);
 
-        // Day-Hour-Minute
-        } else if (diff.days > 0) {
-            maxCountingVal = Time.MONTH_DAY;
+        // Hour-Minute
+        } else if (diff.hours > 0) {
+            maxCountingVal = Time.HOUR;
             minCountingVal = Time.MINUTE;
             nextIncrement = MINUTE;
 
-            setCountSeconds(false);
-            if (diff.days == 1 && diff.hours == 0 && diff.mins == 0) {
+            if (diff.hours == 1 && diff.mins == 0) {
                 setCountSeconds(true);
             } else {
                 setCountSeconds(false);
             }
 
-        // Hour-Minute-Second
+        // Minute-Second
         } else {
             if (options.enableSeconds) {
-                maxCountingVal = Time.HOUR;
+                maxCountingVal = Time.MINUTE;
                 minCountingVal = Time.SECOND;
             } else {
-                maxCountingVal = Time.MONTH_DAY;
+                maxCountingVal = Time.HOUR;
                 minCountingVal = Time.MINUTE;
             }
 
@@ -104,32 +120,37 @@ public class LargeWidgetProxy extends WidgetProxy {
     }
 
 
-
-    private String getTextY2D(TimeDifference diff) {
+    private String getTextY2M(TimeDifference diff) {
         StringBuilder sb = new StringBuilder();
 
         sb.append(diff.years).append("y ")
-                .append(diff.months).append("m ")
+                .append(diff.months).append("m ");
+
+        return sb.toString();
+    }
+
+    private String getTextM2D(TimeDifference diff) {
+        StringBuilder sb = new StringBuilder();
+
+        sb.append(diff.months).append("m ")
                 .append(diff.days).append("d");
 
         return sb.toString();
     }
 
-    private String getTextM2H(TimeDifference diff) {
+    private String getTextD2H(TimeDifference diff) {
         StringBuilder sb = new StringBuilder();
 
-        sb.append(diff.months).append("m ")
-                .append(diff.days).append("d :");
+        sb.append(diff.days).append("d ");
         if (diff.hours < 10) sb.append(0);
-        sb.append(diff.hours);
+        sb.append(diff.hours).append("h");
 
         return sb.toString();
     }
 
-    private String getTextD2M(TimeDifference diff) {
+    private String getTextH2M(TimeDifference diff) {
         StringBuilder sb = new StringBuilder();
 
-        sb.append(diff.days).append("d ");
         if (diff.hours < 10) sb.append(0);
         sb.append(diff.hours).append(":");
         if (diff.mins < 10) sb.append(0);
@@ -138,11 +159,9 @@ public class LargeWidgetProxy extends WidgetProxy {
         return sb.toString();
     }
 
-    private String getTextH2S(TimeDifference diff) {
+    private String getTextM2S(TimeDifference diff) {
         StringBuilder sb = new StringBuilder();
 
-        if (diff.hours < 10) sb.append(0);
-        sb.append(diff.hours).append(":");
         if (diff.mins < 10) sb.append(0);
         sb.append(diff.mins).append(":");
         if (diff.secs < 10) sb.append(0);

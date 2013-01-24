@@ -43,7 +43,7 @@ public final class Scheduler {
     }
 
     public long scheduleUpdate(Collection<WidgetProxy> widgetProxies) {
-        Logger.d(TAG, "Scheduling next update alarm for one of %s proxies", widgetProxies.size());
+        Logger.i(TAG, "Scheduling next update alarm for one of %s proxies", widgetProxies.size());
 
         long nearestUpdateTimestamp = -1;
 

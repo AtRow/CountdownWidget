@@ -8,6 +8,16 @@
     <TextView
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:text="Hello!"
-        android:id="@+id/textView"/>
+        android:text="@string/greeting_text"
+        android:id="@+id/textView"
+        style="@style/TextGreeting"
+        android:layout_margin="25dp"/>
+
+    <Button
+        android:layout_width="100dp"
+        android:layout_height="wrap_content"
+        android:text="OK"
+        android:id="@+id/button"
+        android:layout_gravity="center"
+        android:onClick="onOk"/>
 </LinearLayout>

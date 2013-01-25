@@ -13,4 +13,8 @@
     <string name="time_prompt">Время</string>
     <string name="time_enable_prompt">Указать время</string>
     <string name="count_seconds_prompt">Считать секунды</string>
+    <string name="greeting_text">
+        Это приложение - виджет. Добавьте его на домашний экран.
+        Для этого используйте длинное нажатие на пустой области экрана, или настройки персонализации. Выберите \"Отсчет\" из списка виджетов.
+    </string>
 </resources>

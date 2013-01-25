@@ -2,6 +2,7 @@ package com.ovio.countdown;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.view.View;
 import com.ovio.countdown.log.Logger;
 
 public class GreetingActivity extends Activity {
@@ -18,5 +19,9 @@ public class GreetingActivity extends Activity {
         Logger.i(TAG, "Created Greeting Activity");
 
         setContentView(R.layout.greeting);
+    }
+
+    public void onOk(View view) {
+        finish();
     }
 }

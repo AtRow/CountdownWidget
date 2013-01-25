@@ -1,12 +1,13 @@
 package com.ovio.countdown.task;
 
+import android.appwidget.AppWidgetHost;
 import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import com.ovio.countdown.service.WidgetService;
 import com.ovio.countdown.log.Logger;
 import com.ovio.countdown.preferences.WidgetPreferencesManager;
+import com.ovio.countdown.service.WidgetService;
 import com.ovio.countdown.util.Util;
 
 import java.util.Arrays;
@@ -37,8 +38,21 @@ public class CleanupWidgetTask extends AsyncTask<List<Integer>, Void, Void> {
         }
 
         WidgetPreferencesManager manager = WidgetPreferencesManager.getInstance(context);
+        AppWidgetHost host = new AppWidgetHost(context, 1);
+
 
         List<Integer> deletedIds = manager.cleanup(validWidgetIds[0]);
+
+        List<Integer> persistedIds = manager.getAllIds();
+
+        for (int id: validWidgetIds[0]) {
+            if (!persistedIds.contains(id)) {
+                host.deleteAppWidgetId(id);
+                deletedIds.add(id);
+            }
+        }
+
+        deletedIds.addAll(deletedIds);
 
         if (!deletedIds.isEmpty()) {
             int[] deletedArray = Util.toIntArray(deletedIds);

@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import com.ovio.countdown.log.Logger;
 import com.ovio.countdown.service.WidgetService;
+import com.ovio.countdown.task.CleanupWidgetTask;
 import com.ovio.countdown.task.DeleteWidgetsTask;
 import com.ovio.countdown.util.Util;
 
@@ -29,10 +30,10 @@ public abstract class CountdownWidgetProvider extends AppWidgetProvider {
 
         startWidgetService();
 
-        Logger.w(TAG, "Cleanup disabled because of a BUG");
+//        Logger.w(TAG, "Cleanup disabled because of a BUG");
 
-/*
-        Logger.i(TAG, "Performing Update for widgets: %s", Util.getString(appWidgetIds));
+
+        Logger.e(TAG, "Performing Update for widgets: %s", Util.getString(appWidgetIds));
 
         CleanupWidgetTask task = new CleanupWidgetTask(context);
         int[] installedAppWidgetIds = getInstalledWidgets(context, appWidgetManager);
@@ -40,7 +41,7 @@ public abstract class CountdownWidgetProvider extends AppWidgetProvider {
         Logger.i(TAG, "Current valid widgets: %s", Util.getString(installedAppWidgetIds));
 
         task.execute(Util.toIntegerList(installedAppWidgetIds));
-*/
+
 
         Logger.d(TAG, "Finished onUpdate");
     }
@@ -63,8 +64,23 @@ public abstract class CountdownWidgetProvider extends AppWidgetProvider {
     }
 
     private int[] getInstalledWidgets(Context context, AppWidgetManager appWidgetManager) {
-        ComponentName thisWidget = new ComponentName(context, CountdownWidgetProvider.class);
-        return appWidgetManager.getAppWidgetIds(thisWidget);
+        Logger.d(TAG, "Getting all valid widgets");
+
+        ComponentName smallWidget = new ComponentName(context, CountdownWidgetProviderSmall.class);
+        int[] smalls = appWidgetManager.getAppWidgetIds(smallWidget);
+        Logger.d(TAG, "Got [%s] small", smalls.length);
+
+        ComponentName mediumWidget = new ComponentName(context, CountdownWidgetProviderMedium.class);
+        int[] mediums = appWidgetManager.getAppWidgetIds(mediumWidget);
+        Logger.d(TAG, "Got [%s] medium", mediums.length);
+
+        ComponentName largeWidget = new ComponentName(context, CountdownWidgetProviderLarge.class);
+        int[] larges = appWidgetManager.getAppWidgetIds(largeWidget);
+        Logger.d(TAG, "Got [%s] large", larges.length);
+
+        int[] all = Util.concatArrays(smalls, mediums, larges);
+
+        return all;
     }
 
 

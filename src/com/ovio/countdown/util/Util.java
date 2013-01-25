@@ -92,4 +92,15 @@ public class Util {
         sb.append(']');
         return sb.toString();
     }
+
+    public static int[] concatArrays(int[]... arrays) {
+        List<Integer> list = new ArrayList<Integer>();
+
+        for (int i = 0; i < arrays.length; i++) {
+            List<Integer> part = toIntegerList(arrays[i]);
+            list.addAll(part);
+        }
+
+        return toIntArray(list);
+    }
 }

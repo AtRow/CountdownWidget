@@ -95,4 +95,13 @@ public class WidgetPreferencesManager {
 
         prefManager.saveDefaultPrefs(defaultOptions);
     }
+
+    public List<Integer> getAllIds() {
+        Logger.d(TAG, "Getting a list of all widget Ids");
+
+        DefaultOptions defaultOptions = prefManager.loadDefaultPrefs();
+        int[] alIds = defaultOptions.savedWidgets;
+
+        return Util.toIntegerList(alIds);
+    }
 }

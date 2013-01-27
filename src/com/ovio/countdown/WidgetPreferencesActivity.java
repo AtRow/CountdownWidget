@@ -60,6 +60,8 @@ public class WidgetPreferencesActivity extends Activity {
 
         setContentView(R.layout.preferences);
 
+        initTabHost();
+
         setResultCanceled();
 
         prefManager = PreferencesManager.getInstance(self);
@@ -78,6 +80,33 @@ public class WidgetPreferencesActivity extends Activity {
         options = loadDefaultOptions();
 
         applyOptions(options, widgetOptions);
+    }
+
+    private void initTabHost() {
+        TabHost tabHost = (TabHost) findViewById(R.id.defaultTabHost);
+        tabHost.setup();
+
+        TabHost.TabSpec tabSpec;
+
+        tabSpec = tabHost.newTabSpec("tag1");
+
+        tabSpec.setIndicator(getString(R.string.tab_manual));
+        tabSpec.setContent(R.id.tabManual);
+        tabHost.addTab(tabSpec);
+
+        tabSpec = tabHost.newTabSpec("tag2");
+        tabSpec.setIndicator(getString(R.string.tab_google));
+        tabSpec.setContent(R.id.tabGoogle);
+        tabHost.addTab(tabSpec);
+
+        //tabHost.setCurrentTabByTag("tag1");
+
+        // обработчик переключения вкладок
+        tabHost.setOnTabChangedListener(new TabHost.OnTabChangeListener() {
+            public void onTabChanged(String tabId) {
+                Toast.makeText(getBaseContext(), "tabId = " + tabId, Toast.LENGTH_LONG).show();
+            }
+        });
     }
 
     @Override

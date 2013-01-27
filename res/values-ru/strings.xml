@@ -22,5 +22,10 @@
     <string name="google_calendar_prompt">Add from Google Calendar</string>
     <string name="repeat_prompt">Повторять</string>
     <string name="count_up_prompt">Считать после события</string>
-    <string name="notify_prompt">Напомнить</string><string name="icon_prompt">Icon</string><string name="style_prompt">Style</string><string name="choose_event_prompt">Choose Event</string>
+    <string name="notify_prompt">Напомнить</string>
+    <string name="icon_prompt">Иконка</string>
+    <string name="style_prompt">Стиль</string>
+    <string name="choose_event_prompt">Выбрать событие</string>
+    <string name="tab_manual">Создать</string>
+    <string name="tab_google">Из Календаря</string>
 </resources>

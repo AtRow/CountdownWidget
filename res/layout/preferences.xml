@@ -7,7 +7,7 @@
                 <TabHost
                     android:layout_width="fill_parent"
                     android:layout_height="fill_parent"
-                    android:id="@+id/tabHost"
+                    android:id="@+id/defaultTabHost"
                     android:layout_above="@+id/bottomButtons">
 
                     <LinearLayout
@@ -26,123 +26,6 @@
                             android:id="@android:id/tabcontent"
                             android:layout_width="fill_parent"
                             android:layout_height="fill_parent">
-
-                            <LinearLayout
-                                android:id="@+id/tabGoogle"
-                                android:layout_width="fill_parent"
-                                android:layout_height="fill_parent"
-                                android:orientation="vertical">
-
-                                <ScrollView
-                                    android:layout_width="fill_parent"
-                                    android:layout_height="wrap_content"
-                                    android:id="@+id/scrollView1"
-                                    android:layout_weight="1"
-                                    android:layout_alignParentTop="true">
-
-                                    <LinearLayout
-                                        android:orientation="vertical"
-                                        android:layout_width="fill_parent"
-                                        android:layout_height="fill_parent">
-
-                                        <TextView
-                                            style="@style/TextSettings"
-                                            android:layout_width="fill_parent"
-                                            android:layout_height="wrap_content"
-                                            android:text="@string/title_prompt"
-                                            android:layout_marginTop="5dp"
-                                            android:layout_marginLeft="5dp"
-                                            android:layout_marginRight="5dp"/>
-
-                                        <Button
-                                            android:layout_width="fill_parent"
-                                            android:layout_height="wrap_content"
-                                            android:text="@string/choose_event_prompt"
-                                            android:id="@+id/eventButton"
-                                            style="@style/TextSettings"
-                                            android:layout_marginLeft="5dp"
-                                            android:layout_marginRight="5dp"
-                                            android:maxLines="4"
-                                            android:singleLine="false"/>
-
-                                        <CheckBox
-                                            style="@style/TextSettings"
-                                            android:layout_width="wrap_content"
-                                            android:layout_height="wrap_content"
-                                            android:text="@string/count_seconds_prompt"
-                                            android:id="@+id/checkBox1"
-                                            android:singleLine="true"
-                                            android:layout_marginLeft="5dp"
-                                            android:layout_marginRight="5dp"/>
-
-                                        <CheckBox
-                                            style="@style/TextSettings"
-                                            android:layout_width="wrap_content"
-                                            android:layout_height="wrap_content"
-                                            android:text="@string/count_up_prompt"
-                                            android:id="@+id/checkBox2"
-                                            android:singleLine="true"
-                                            android:layout_marginLeft="5dp"
-                                            android:layout_marginRight="5dp"/>
-
-                                        <LinearLayout
-                                            android:orientation="horizontal"
-                                            android:layout_width="fill_parent"
-                                            android:layout_height="wrap_content"
-                                            android:weightSum="2"
-                                            android:layout_weight="1"
-                                            android:baselineAligned="false"
-                                            android:layout_alignParentBottom="true">
-
-                                            <LinearLayout
-                                                android:orientation="vertical"
-                                                android:layout_width="fill_parent"
-                                                android:layout_height="fill_parent"
-                                                android:layout_weight="1">
-
-                                                <TextView
-                                                    style="@style/TextSettings"
-                                                    android:layout_width="wrap_content"
-                                                    android:layout_height="wrap_content"
-                                                    android:text="@string/icon_prompt"
-                                                    android:layout_marginTop="5dp"
-                                                    android:layout_marginLeft="5dp"
-                                                    android:layout_marginRight="5dp"/>
-
-                                                <ExpandableListView
-                                                    style="@style/TextSettings"
-                                                    android:layout_width="fill_parent"
-                                                    android:layout_height="wrap_content"
-                                                    android:id="@+id/expandableListView2"
-                                                    android:drawSelectorOnTop="false"/>
-                                            </LinearLayout>
-
-                                            <LinearLayout
-                                                android:orientation="vertical"
-                                                android:layout_width="fill_parent"
-                                                android:layout_height="fill_parent"
-                                                android:layout_weight="1">
-
-                                                <TextView
-                                                    style="@style/TextSettings"
-                                                    android:layout_width="wrap_content"
-                                                    android:layout_height="wrap_content"
-                                                    android:text="@string/style_prompt"
-                                                    android:layout_marginTop="5dp"
-                                                    android:layout_marginLeft="5dp"
-                                                    android:layout_marginRight="5dp"/>
-
-                                                <ExpandableListView
-                                                    style="@style/TextSettings"
-                                                    android:layout_width="fill_parent"
-                                                    android:layout_height="wrap_content"
-                                                    android:id="@+id/expandableListView3"
-                                                    android:drawSelectorOnTop="false"/>
-                                            </LinearLayout>
-                                        </LinearLayout>
-                                    </LinearLayout>
-                                </ScrollView>
-                            </LinearLayout>
 
                             <LinearLayout
                                 android:id="@+id/tabManual"
@@ -198,7 +81,7 @@
                                             android:layout_marginLeft="5dp"
                                             android:layout_marginRight="5dp"
                                             android:layout_gravity="center"
-                                            android:visibility="gone"/>
+                                            android:visibility="visible"/>
 
                                         <CheckBox
                                             style="@style/TextSettings"
@@ -215,7 +98,7 @@
                                             android:layout_height="wrap_content"
                                             android:id="@+id/timePicker"
                                             android:layout_gravity="center"
-                                            android:visibility="gone"/>
+                                            android:visibility="visible"/>
 
                                         <CheckBox
                                             android:layout_width="wrap_content"
@@ -232,7 +115,7 @@
                                             android:layout_width="wrap_content"
                                             android:layout_height="wrap_content"
                                             android:text="@string/count_up_prompt"
-                                            android:id="@id/countUpCheckBox"
+                                            android:id="@+id/countUpCheckBox"
                                             android:singleLine="true"
                                             android:layout_marginLeft="5dp"
                                             android:layout_marginRight="5dp"/>
@@ -322,12 +205,129 @@
                                                     style="@style/TextSettings"
                                                     android:layout_width="fill_parent"
                                                     android:layout_height="wrap_content"
-                                                    android:id="@+id/styleExpandableListView1"
+                                                    android:id="@+id/styleExpandableListView"
                                                     android:drawSelectorOnTop="false"/>
                                             </LinearLayout>
 
                                         </LinearLayout>
 
+                                    </LinearLayout>
+                                </ScrollView>
+
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:id="@+id/tabGoogle"
+                                android:layout_width="fill_parent"
+                                android:layout_height="fill_parent"
+                                android:orientation="vertical">
+
+                                <ScrollView
+                                    android:layout_width="fill_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="1"
+                                    android:layout_alignParentTop="true">
+
+                                    <LinearLayout
+                                        android:orientation="vertical"
+                                        android:layout_width="fill_parent"
+                                        android:layout_height="fill_parent">
+
+                                        <TextView
+                                            style="@style/TextSettings"
+                                            android:layout_width="fill_parent"
+                                            android:layout_height="wrap_content"
+                                            android:text="@string/title_prompt"
+                                            android:layout_marginTop="5dp"
+                                            android:layout_marginLeft="5dp"
+                                            android:layout_marginRight="5dp"/>
+
+                                        <Button
+                                            android:layout_width="fill_parent"
+                                            android:layout_height="wrap_content"
+                                            android:text="@string/choose_event_prompt"
+                                            android:id="@+id/eventButton"
+                                            style="@style/TextSettings"
+                                            android:layout_marginLeft="5dp"
+                                            android:layout_marginRight="5dp"
+                                            android:maxLines="4"
+                                            android:singleLine="false"/>
+
+                                        <CheckBox
+                                            style="@style/TextSettings"
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:text="@string/count_seconds_prompt"
+                                            android:id="@+id/secondsCheckBoxG"
+                                            android:singleLine="true"
+                                            android:layout_marginLeft="5dp"
+                                            android:layout_marginRight="5dp"/>
+
+                                        <CheckBox
+                                            style="@style/TextSettings"
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:text="@string/count_up_prompt"
+                                            android:id="@+id/countUpCheckBoxG"
+                                            android:singleLine="true"
+                                            android:layout_marginLeft="5dp"
+                                            android:layout_marginRight="5dp"/>
+
+                                        <LinearLayout
+                                            android:orientation="horizontal"
+                                            android:layout_width="fill_parent"
+                                            android:layout_height="wrap_content"
+                                            android:weightSum="2"
+                                            android:layout_weight="1"
+                                            android:baselineAligned="false"
+                                            android:layout_alignParentBottom="true">
+
+                                            <LinearLayout
+                                                android:orientation="vertical"
+                                                android:layout_width="fill_parent"
+                                                android:layout_height="fill_parent"
+                                                android:layout_weight="1">
+
+                                                <TextView
+                                                    style="@style/TextSettings"
+                                                    android:layout_width="wrap_content"
+                                                    android:layout_height="wrap_content"
+                                                    android:text="@string/icon_prompt"
+                                                    android:layout_marginTop="5dp"
+                                                    android:layout_marginLeft="5dp"
+                                                    android:layout_marginRight="5dp"/>
+
+                                                <ExpandableListView
+                                                    style="@style/TextSettings"
+                                                    android:layout_width="fill_parent"
+                                                    android:layout_height="wrap_content"
+                                                    android:id="@+id/iconExpandableListViewG"
+                                                    android:drawSelectorOnTop="false"/>
+                                            </LinearLayout>
+
+                                            <LinearLayout
+                                                android:orientation="vertical"
+                                                android:layout_width="fill_parent"
+                                                android:layout_height="fill_parent"
+                                                android:layout_weight="1">
+
+                                                <TextView
+                                                    style="@style/TextSettings"
+                                                    android:layout_width="wrap_content"
+                                                    android:layout_height="wrap_content"
+                                                    android:text="@string/style_prompt"
+                                                    android:layout_marginTop="5dp"
+                                                    android:layout_marginLeft="5dp"
+                                                    android:layout_marginRight="5dp"/>
+
+                                                <ExpandableListView
+                                                    style="@style/TextSettings"
+                                                    android:layout_width="fill_parent"
+                                                    android:layout_height="wrap_content"
+                                                    android:id="@+id/styleExpandableListViewG"
+                                                    android:drawSelectorOnTop="false"/>
+                                            </LinearLayout>
+                                        </LinearLayout>
                                     </LinearLayout>
                                 </ScrollView>
 
@@ -345,7 +345,7 @@
         android:layout_weight="1"
         android:baselineAligned="false"
         android:layout_alignParentBottom="true"
-        android:id="@id/bottomButtons"
+        android:id="@+id/bottomButtons"
         android:longClickable="false">
 
         <Button

@@ -15,6 +15,12 @@
     <string name="count_seconds_prompt">Считать секунды</string>
     <string name="greeting_text">
         Это приложение - виджет. Добавьте его на домашний экран.
-        Для этого используйте длинное нажатие на пустой области экрана, или настройки персонализации. Выберите \"Отсчет\" из списка виджетов.
+        Для этого используйте длинное нажатие на пустой области экрана, или настройки персонализации. Выберите
+        \"Отсчет\" из списка виджетов.
     </string>
+    <string name="count_time_prompt">Указать Время (9:00 по умолчанию)</string>
+    <string name="google_calendar_prompt">Add from Google Calendar</string>
+    <string name="repeat_prompt">Повторять</string>
+    <string name="count_up_prompt">Считать после события</string>
+    <string name="notify_prompt">Напомнить</string><string name="icon_prompt">Icon</string><string name="style_prompt">Style</string>
 </resources>

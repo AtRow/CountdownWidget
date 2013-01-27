@@ -7,8 +7,7 @@
 
     <uses-sdk android:minSdkVersion="7"
               android:targetSdkVersion="8"
-              android:maxSdkVersion="13"
-        />
+              android:maxSdkVersion="17"/>
 
 
     <!-- TODO <uses-permission android:name="com.ovio.countdown.service.WidgetService.PERMISSION"/> -->
@@ -28,7 +27,8 @@
 
         <activity
             android:name=".WidgetPreferencesActivity"
-            android:label="@string/preferences_activity_title">
+            android:label="@string/preferences_activity_title"
+            android:noHistory="true">
             <intent-filter>
                 <action android:name="android.apwidget.action.APPWIDGET_CONFIGURE"/>
             </intent-filter>

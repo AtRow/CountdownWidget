@@ -6,7 +6,6 @@ import android.appwidget.AppWidgetManager;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.text.format.DateFormat;
 import android.text.format.Time;
 import android.view.View;
 import android.widget.*;
@@ -17,6 +16,7 @@ import com.ovio.countdown.preferences.WidgetOptions;
 import com.ovio.countdown.preferences.WidgetPreferencesManager;
 import com.ovio.countdown.service.WidgetService;
 import com.ovio.countdown.util.Util;
+import com.ovio.countdown.view.WidgetPreferencesView;
 
 import java.util.List;
 
@@ -40,17 +40,9 @@ public class WidgetPreferencesActivity extends Activity {
 
     private DefaultOptions options;
 
-    // UI
-
-    private EditText titleEditText;
-
-    private DatePicker datePicker;
-
-    private TimePicker timePicker;
-
-    private CheckBox secondsCheckBox;
-
     private boolean doForceRemoveOnCancel;
+
+    private WidgetPreferencesView view;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -60,14 +52,12 @@ public class WidgetPreferencesActivity extends Activity {
 
         setContentView(R.layout.preferences);
 
-        initTabHost();
+        view = new WidgetPreferencesView(this);
 
         setResultCanceled();
 
         prefManager = PreferencesManager.getInstance(self);
         widgetManager = WidgetPreferencesManager.getInstance(self);
-
-        obtainFormElements();
 
         doForceRemoveOnCancel = true;
 
@@ -80,33 +70,6 @@ public class WidgetPreferencesActivity extends Activity {
         options = loadDefaultOptions();
 
         applyOptions(options, widgetOptions);
-    }
-
-    private void initTabHost() {
-        TabHost tabHost = (TabHost) findViewById(R.id.defaultTabHost);
-        tabHost.setup();
-
-        TabHost.TabSpec tabSpec;
-
-        tabSpec = tabHost.newTabSpec("tag1");
-
-        tabSpec.setIndicator(getString(R.string.tab_manual));
-        tabSpec.setContent(R.id.tabManual);
-        tabHost.addTab(tabSpec);
-
-        tabSpec = tabHost.newTabSpec("tag2");
-        tabSpec.setIndicator(getString(R.string.tab_google));
-        tabSpec.setContent(R.id.tabGoogle);
-        tabHost.addTab(tabSpec);
-
-        //tabHost.setCurrentTabByTag("tag1");
-
-        // обработчик переключения вкладок
-        tabHost.setOnTabChangedListener(new TabHost.OnTabChangeListener() {
-            public void onTabChanged(String tabId) {
-                Toast.makeText(getBaseContext(), "tabId = " + tabId, Toast.LENGTH_LONG).show();
-            }
-        });
     }
 
     @Override
@@ -144,6 +107,10 @@ public class WidgetPreferencesActivity extends Activity {
         finish();
     }
 
+    public void onTimeCheckBoxClick(View view) {
+        this.view.onTimeCheckBoxClick(view);
+    }
+
     private void sendToWidgetService() {
         Logger.i(TAG, "Sending UPDATED intent to Service");
 
@@ -170,16 +137,6 @@ public class WidgetPreferencesActivity extends Activity {
     private void setResultCanceled() {
         setResult(RESULT_CANCELED, getResultIntent());
         doForceRemoveOnCancel = true;
-    }
-
-    private void obtainFormElements() {
-        titleEditText = (EditText) findViewById(R.id.titleEditText);
-        datePicker = (DatePicker) findViewById(R.id.datePicker);
-        timePicker = (TimePicker) findViewById(R.id.timePicker);
-
-        timePicker.setIs24HourView( DateFormat.is24HourFormat(this) );
-
-        secondsCheckBox = (CheckBox) findViewById(R.id.secondsCheckBox);
     }
 
     private int getAppWidgetId() {
@@ -231,20 +188,17 @@ public class WidgetPreferencesActivity extends Activity {
         //TODO
 
         widgetOptions.widgetId = getAppWidgetId();
-        widgetOptions.title = titleEditText.getText().toString();
+        widgetOptions.title = view.getTitle();
 
-        Time time = new Time();
-        time.year = datePicker.getYear();
-        time.month = datePicker.getMonth();
-        time.monthDay = datePicker.getDayOfMonth();
-        time.hour = timePicker.getCurrentHour();
-        time.minute = timePicker.getCurrentMinute();
+        Time time = view.getTime();
 
         widgetOptions.timestamp = time.toMillis(false);
 
-        widgetOptions.upward = true;
+        widgetOptions.upward = view.getCountUp();
 
-        widgetOptions.enableSeconds = secondsCheckBox.isChecked();
+        widgetOptions.enableSeconds = view.getCountSeconds();
+
+        widgetOptions.enableTime = view.getEnableTime();
 
         widgetOptions.repeatingPeriod = 0L;
 
@@ -262,7 +216,10 @@ public class WidgetPreferencesActivity extends Activity {
         list.add(getAppWidgetId());
 
         options.savedWidgets = Util.toIntArray(list);
-        options.enableSeconds = secondsCheckBox.isChecked();
+
+        options.enableSeconds = view.getCountSeconds();
+        options.enableTime = view.getEnableTime();
+
 
         Logger.i(TAG, "Global Options: %s", options);
 
@@ -285,21 +242,23 @@ public class WidgetPreferencesActivity extends Activity {
         Logger.i(TAG, "Applying Options");
 
         // Default first
-        secondsCheckBox.setChecked(options.enableSeconds);
+        view.setCountSeconds(options.enableSeconds);
+        view.setCountUp(options.upward);
+        view.setEnableTime(options.enableTime);
 
         // Then basically override
         if (widgetOptions.isValid()) {
 
-            titleEditText.setText(widgetOptions.title);
+            view.setTitle(widgetOptions.title);
 
             Time time = new Time();
             time.set(widgetOptions.timestamp);
 
-            datePicker.updateDate(time.year, time.month, time.monthDay);
-            timePicker.setCurrentHour(time.hour);
-            timePicker.setCurrentMinute(time.minute);
+            view.setTime(time);
 
-            secondsCheckBox.setChecked(widgetOptions.enableSeconds);
+            view.setCountSeconds(widgetOptions.enableSeconds);
+            view.setEnableTime(widgetOptions.enableTime);
+            view.setCountUp(widgetOptions.upward);
         }
     }
 

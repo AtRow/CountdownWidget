@@ -6,7 +6,12 @@ import android.text.format.Time;
 import android.view.View;
 import android.widget.*;
 import com.ovio.countdown.R;
+import com.ovio.countdown.calendar.Calendar;
+import com.ovio.countdown.calendar.CalendarManager;
+import com.ovio.countdown.calendar.Event;
 import com.ovio.countdown.log.Logger;
+
+import java.util.List;
 
 /**
  * Countdown
@@ -24,7 +29,16 @@ public class WidgetPreferencesView {
 
     private final Activity activity;
 
+    private CalendarManager calendarManager;
 
+    private boolean calendarCompatible;
+
+    private boolean isDataValid = false;
+
+
+    private Button okButton;
+
+    private Button cancelButton;
 
     private TabHost tabHost;
 
@@ -44,26 +58,83 @@ public class WidgetPreferencesView {
 
     private CheckBox countUpCheckBoxG;
 
-    private ExpandableListView recurringExpandableListView;
+    private Spinner recurringSpinner;
 
-    private ExpandableListView notifyExpandableListView;
+    private Spinner notifySpinner;
 
-    private ExpandableListView iconExpandableListView;
+    private Spinner iconSpinner;
 
-    private ExpandableListView iconExpandableListViewG;
+    private Spinner iconSpinnerG;
 
-    private ExpandableListView styleExpandableListView;
+    private Spinner styleSpinner;
 
-    private ExpandableListView styleExpandableListViewG;
+    private Spinner styleSpinnerG;
 
-    private Button eventButton;
+    private Spinner calendarSpinner;
+
+    private Spinner eventSpinner;
+
+    private TextView calendarErrorTextView;
+
+    private LinearLayout calendarControlsLayout;
 
 
     public WidgetPreferencesView(Activity activity) {
         this.activity = activity;
 
         obtainFormElements();
+
         initTabHost();
+        initCalendarPickers();
+    }
+
+    private void initCalendarPickers() {
+        calendarManager = CalendarManager.getInstance(activity);
+
+        if (calendarManager.isCompatible()) {
+            calendarCompatible = true;
+
+        } else {
+            Logger.i(TAG, "Device is NOT Calendar-compatible; disabling controls");
+
+            calendarCompatible = false;
+            setGoogleCalendarControlsEnabled(calendarCompatible);
+            isDataValid = false;
+            return;
+        }
+
+        setGoogleCalendarControlsEnabled(calendarCompatible);
+
+        List<Calendar> calendars = calendarManager.getCalendars();
+
+        ArrayAdapter calendarAdapter = new ArrayAdapter<Calendar>(activity, android.R.layout.simple_spinner_item, calendars);
+        calendarAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+        calendarSpinner.setAdapter(calendarAdapter);
+        calendarAdapter.notifyDataSetChanged();
+
+        List<Event> events = calendarManager.getEvents(CalendarManager.ALL_CALENDARS);
+
+        ArrayAdapter eventAdapter = new ArrayAdapter<Event>(activity, android.R.layout.simple_spinner_item, events);
+        eventAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+        eventSpinner.setAdapter(eventAdapter);
+        eventAdapter.notifyDataSetChanged();
+
+    }
+
+    private void setGoogleCalendarControlsEnabled(boolean enabled) {
+
+        if (enabled) {
+            calendarErrorTextView.setVisibility(View.GONE);
+            calendarControlsLayout.setVisibility(View.VISIBLE);
+            Logger.i(TAG, "Setting visibility to View.VISIBLE");
+
+        } else {
+            calendarErrorTextView.setVisibility(View.VISIBLE);
+            calendarControlsLayout.setVisibility(View.GONE);
+            Logger.i(TAG, "Setting visibility to View.GONE");
+        }
     }
 
     public void setTitle(String text) {
@@ -213,19 +284,29 @@ public class WidgetPreferencesView {
 
         countUpCheckBoxG = (CheckBox) activity.findViewById(R.id.countUpCheckBoxG);
 
-        recurringExpandableListView = (ExpandableListView) activity.findViewById(R.id.recurringExpandableListView);
+        recurringSpinner = (Spinner) activity.findViewById(R.id.recurringSpinner);
 
-        notifyExpandableListView = (ExpandableListView) activity.findViewById(R.id.notifyExpandableListView);
+        notifySpinner = (Spinner) activity.findViewById(R.id.notifySpinner);
 
-        iconExpandableListView = (ExpandableListView) activity.findViewById(R.id.iconExpandableListView);
+        iconSpinner = (Spinner) activity.findViewById(R.id.iconSpinner);
 
-        iconExpandableListViewG = (ExpandableListView) activity.findViewById(R.id.iconExpandableListViewG);
+        iconSpinnerG = (Spinner) activity.findViewById(R.id.iconSpinnerG);
 
-        styleExpandableListView = (ExpandableListView) activity.findViewById(R.id.styleExpandableListView);
+        styleSpinner = (Spinner) activity.findViewById(R.id.styleSpinner);
 
-        styleExpandableListViewG = (ExpandableListView) activity.findViewById(R.id.styleExpandableListViewG);
+        styleSpinnerG = (Spinner) activity.findViewById(R.id.styleSpinnerG);
 
-        eventButton = (Button) activity.findViewById(R.id.eventButton);
+        calendarSpinner = (Spinner) activity.findViewById(R.id.calendarSpinner);
+
+        eventSpinner = (Spinner) activity.findViewById(R.id.eventSpinner);
+
+        calendarErrorTextView = (TextView) activity.findViewById(R.id.calendarErrorTextView);
+
+        calendarControlsLayout = (LinearLayout) activity.findViewById(R.id.calendarControlsLayout);
+
+        okButton = (Button) activity.findViewById(R.id.okButton);
+
+        cancelButton = (Button) activity.findViewById(R.id.cancelButton);
 
     }
 
@@ -246,18 +327,20 @@ public class WidgetPreferencesView {
         secondsCheckBox.setChecked(secondsCheckBoxG.isChecked());
         countUpCheckBox.setChecked(countUpCheckBoxG.isChecked());
 
-        iconExpandableListView.setSelection(iconExpandableListViewG.getSelectedItemPosition());
-        styleExpandableListView.setSelection(styleExpandableListViewG.getSelectedItemPosition());
+        iconSpinner.setSelection(iconSpinnerG.getSelectedItemPosition());
+        styleSpinner.setSelection(styleSpinnerG.getSelectedItemPosition());
 
+        okButton.setEnabled(true);
     }
 
     private void onGoogleTab() {
         secondsCheckBoxG.setChecked(secondsCheckBox.isChecked());
         countUpCheckBoxG.setChecked(countUpCheckBox.isChecked());
 
-        iconExpandableListViewG.setSelection(iconExpandableListView.getSelectedItemPosition());
-        styleExpandableListViewG.setSelection(styleExpandableListView.getSelectedItemPosition());
+        iconSpinnerG.setSelection(iconSpinner.getSelectedItemPosition());
+        styleSpinnerG.setSelection(styleSpinner.getSelectedItemPosition());
 
+        okButton.setEnabled(isDataValid);
     }
 
 }

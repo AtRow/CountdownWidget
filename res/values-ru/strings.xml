@@ -28,4 +28,8 @@
     <string name="choose_event_prompt">Выбрать событие</string>
     <string name="tab_manual">Создать</string>
     <string name="tab_google">Из Календаря</string>
+    <string name="calendar_prompt">Календарь</string>
+    <string name="calendar_error_text">К сожалению, календари не найдены на Вашем устройстве</string>
+    <string name="calendar_all_name">Все</string>
+    <string name="event_nearest_title">Nearest</string>
 </resources>

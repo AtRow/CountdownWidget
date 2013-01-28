@@ -130,12 +130,14 @@
                                             android:layout_marginLeft="5dp"
                                             android:layout_marginRight="5dp"/>
 
-                                        <ExpandableListView
+                                        <Spinner
                                             android:layout_width="fill_parent"
                                             android:layout_height="wrap_content"
-                                            android:id="@+id/recurringExpandableListView"
+                                            android:id="@+id/recurringSpinner"
                                             style="@style/TextSettings"
-                                            android:drawSelectorOnTop="false"/>
+                                            android:drawSelectorOnTop="false"
+                                            android:layout_marginLeft="5dp"
+                                            android:layout_marginRight="5dp"/>
 
                                         <TextView
                                             style="@style/TextSettings"
@@ -147,12 +149,14 @@
                                             android:layout_marginRight="5dp"
                                             />
 
-                                        <ExpandableListView
+                                        <Spinner
                                             style="@style/TextSettings"
                                             android:layout_width="fill_parent"
                                             android:layout_height="wrap_content"
-                                            android:id="@+id/notifyExpandableListView"
-                                            android:drawSelectorOnTop="false"/>
+                                            android:id="@+id/notifySpinner"
+                                            android:drawSelectorOnTop="false"
+                                            android:layout_marginLeft="5dp"
+                                            android:layout_marginRight="5dp"/>
 
                                         <LinearLayout
                                             android:orientation="horizontal"
@@ -179,12 +183,14 @@
                                                     android:layout_marginLeft="5dp"
                                                     android:layout_marginRight="5dp"/>
 
-                                                <ExpandableListView
+                                                <Spinner
                                                     style="@style/TextSettings"
                                                     android:layout_width="fill_parent"
                                                     android:layout_height="wrap_content"
-                                                    android:id="@+id/iconExpandableListView"
-                                                    android:drawSelectorOnTop="false"/>
+                                                    android:id="@+id/iconSpinner"
+                                                    android:drawSelectorOnTop="false"
+                                                    android:layout_marginLeft="5dp"
+                                                    android:layout_marginRight="5dp"/>
                                             </LinearLayout>
 
                                             <LinearLayout
@@ -202,12 +208,14 @@
                                                     android:layout_marginLeft="5dp"
                                                     android:layout_marginRight="5dp"/>
 
-                                                <ExpandableListView
+                                                <Spinner
                                                     style="@style/TextSettings"
                                                     android:layout_width="fill_parent"
                                                     android:layout_height="wrap_content"
-                                                    android:id="@+id/styleExpandableListView"
-                                                    android:drawSelectorOnTop="false"/>
+                                                    android:id="@+id/styleSpinner"
+                                                    android:drawSelectorOnTop="false"
+                                                    android:layout_marginLeft="5dp"
+                                                    android:layout_marginRight="5dp"/>
                                             </LinearLayout>
 
                                         </LinearLayout>
@@ -235,100 +243,137 @@
                                         android:layout_height="fill_parent">
 
                                         <TextView
-                                            style="@style/TextSettings"
                                             android:layout_width="fill_parent"
                                             android:layout_height="wrap_content"
-                                            android:text="@string/title_prompt"
-                                            android:layout_marginTop="5dp"
-                                            android:layout_marginLeft="5dp"
-                                            android:layout_marginRight="5dp"/>
-
-                                        <Button
-                                            android:layout_width="fill_parent"
-                                            android:layout_height="wrap_content"
-                                            android:text="@string/choose_event_prompt"
-                                            android:id="@+id/eventButton"
+                                            android:text="@string/calendar_error_text"
+                                            android:id="@+id/calendarErrorTextView"
                                             style="@style/TextSettings"
-                                            android:layout_marginLeft="5dp"
-                                            android:layout_marginRight="5dp"
-                                            android:maxLines="4"
-                                            android:singleLine="false"/>
-
-                                        <CheckBox
-                                            style="@style/TextSettings"
-                                            android:layout_width="wrap_content"
-                                            android:layout_height="wrap_content"
-                                            android:text="@string/count_seconds_prompt"
-                                            android:id="@+id/secondsCheckBoxG"
-                                            android:singleLine="true"
-                                            android:layout_marginLeft="5dp"
-                                            android:layout_marginRight="5dp"/>
-
-                                        <CheckBox
-                                            style="@style/TextSettings"
-                                            android:layout_width="wrap_content"
-                                            android:layout_height="wrap_content"
-                                            android:text="@string/count_up_prompt"
-                                            android:id="@+id/countUpCheckBoxG"
-                                            android:singleLine="true"
-                                            android:layout_marginLeft="5dp"
-                                            android:layout_marginRight="5dp"/>
+                                            android:layout_margin="15dp"
+                                            android:textStyle="bold"/>
 
                                         <LinearLayout
-                                            android:orientation="horizontal"
+                                            android:orientation="vertical"
                                             android:layout_width="fill_parent"
-                                            android:layout_height="wrap_content"
-                                            android:weightSum="2"
-                                            android:layout_weight="1"
-                                            android:baselineAligned="false"
-                                            android:layout_alignParentBottom="true">
+                                            android:layout_height="fill_parent"
+                                            android:longClickable="false"
+                                            android:id="@+id/calendarControlsLayout">
+
+                                            <TextView
+                                                style="@style/TextSettings"
+                                                android:layout_width="fill_parent"
+                                                android:layout_height="wrap_content"
+                                                android:text="@string/calendar_prompt"
+                                                android:layout_marginTop="5dp"
+                                                android:layout_marginLeft="5dp"
+                                                android:layout_marginRight="5dp"/>
+
+                                            <Spinner
+                                                android:layout_width="fill_parent"
+                                                android:layout_height="wrap_content"
+                                                android:id="@+id/calendarSpinner"
+                                                android:layout_marginLeft="5dp"
+                                                android:layout_marginRight="5dp"
+                                                android:focusable="false"
+                                                android:prompt="@string/calendar_prompt"/>
+
+                                            <TextView
+                                                style="@style/TextSettings"
+                                                android:layout_width="fill_parent"
+                                                android:layout_height="wrap_content"
+                                                android:text="@string/title_prompt"
+                                                android:layout_marginTop="5dp"
+                                                android:layout_marginLeft="5dp"
+                                                android:layout_marginRight="5dp"
+                                                android:id="@+id/textView"/>
+
+                                            <Spinner
+                                                android:layout_width="fill_parent"
+                                                android:layout_height="wrap_content"
+                                                android:id="@+id/eventSpinner"
+                                                android:layout_marginLeft="5dp"
+                                                android:layout_marginRight="5dp"/>
+
+                                            <CheckBox
+                                                style="@style/TextSettings"
+                                                android:layout_width="wrap_content"
+                                                android:layout_height="wrap_content"
+                                                android:text="@string/count_seconds_prompt"
+                                                android:id="@+id/secondsCheckBoxG"
+                                                android:singleLine="true"
+                                                android:layout_marginLeft="5dp"
+                                                android:layout_marginRight="5dp"/>
+
+                                            <CheckBox
+                                                style="@style/TextSettings"
+                                                android:layout_width="wrap_content"
+                                                android:layout_height="wrap_content"
+                                                android:text="@string/count_up_prompt"
+                                                android:id="@+id/countUpCheckBoxG"
+                                                android:singleLine="true"
+                                                android:layout_marginLeft="5dp"
+                                                android:layout_marginRight="5dp"/>
 
                                             <LinearLayout
-                                                android:orientation="vertical"
+                                                android:orientation="horizontal"
                                                 android:layout_width="fill_parent"
-                                                android:layout_height="fill_parent"
-                                                android:layout_weight="1">
+                                                android:layout_height="wrap_content"
+                                                android:weightSum="2"
+                                                android:layout_weight="1"
+                                                android:baselineAligned="false"
+                                                android:layout_alignParentBottom="true">
 
-                                                <TextView
-                                                    style="@style/TextSettings"
-                                                    android:layout_width="wrap_content"
-                                                    android:layout_height="wrap_content"
-                                                    android:text="@string/icon_prompt"
-                                                    android:layout_marginTop="5dp"
-                                                    android:layout_marginLeft="5dp"
-                                                    android:layout_marginRight="5dp"/>
-
-                                                <ExpandableListView
-                                                    style="@style/TextSettings"
+                                                <LinearLayout
+                                                    android:orientation="vertical"
                                                     android:layout_width="fill_parent"
-                                                    android:layout_height="wrap_content"
-                                                    android:id="@+id/iconExpandableListViewG"
-                                                    android:drawSelectorOnTop="false"/>
-                                            </LinearLayout>
+                                                    android:layout_height="fill_parent"
+                                                    android:layout_weight="1">
 
-                                            <LinearLayout
-                                                android:orientation="vertical"
-                                                android:layout_width="fill_parent"
-                                                android:layout_height="fill_parent"
-                                                android:layout_weight="1">
+                                                    <TextView
+                                                        style="@style/TextSettings"
+                                                        android:layout_width="wrap_content"
+                                                        android:layout_height="wrap_content"
+                                                        android:text="@string/icon_prompt"
+                                                        android:layout_marginTop="5dp"
+                                                        android:layout_marginLeft="5dp"
+                                                        android:layout_marginRight="5dp"/>
 
-                                                <TextView
-                                                    style="@style/TextSettings"
-                                                    android:layout_width="wrap_content"
-                                                    android:layout_height="wrap_content"
-                                                    android:text="@string/style_prompt"
-                                                    android:layout_marginTop="5dp"
-                                                    android:layout_marginLeft="5dp"
-                                                    android:layout_marginRight="5dp"/>
+                                                    <Spinner
+                                                        style="@style/TextSettings"
+                                                        android:layout_width="fill_parent"
+                                                        android:layout_height="wrap_content"
+                                                        android:id="@+id/iconSpinnerG"
+                                                        android:drawSelectorOnTop="false"
+                                                        android:layout_marginLeft="5dp"
+                                                        android:layout_marginRight="5dp"/>
+                                                </LinearLayout>
 
-                                                <ExpandableListView
-                                                    style="@style/TextSettings"
+                                                <LinearLayout
+                                                    android:orientation="vertical"
                                                     android:layout_width="fill_parent"
-                                                    android:layout_height="wrap_content"
-                                                    android:id="@+id/styleExpandableListViewG"
-                                                    android:drawSelectorOnTop="false"/>
+                                                    android:layout_height="fill_parent"
+                                                    android:layout_weight="1">
+
+                                                    <TextView
+                                                        style="@style/TextSettings"
+                                                        android:layout_width="wrap_content"
+                                                        android:layout_height="wrap_content"
+                                                        android:text="@string/style_prompt"
+                                                        android:layout_marginTop="5dp"
+                                                        android:layout_marginLeft="5dp"
+                                                        android:layout_marginRight="5dp"/>
+
+                                                    <Spinner
+                                                        style="@style/TextSettings"
+                                                        android:layout_width="fill_parent"
+                                                        android:layout_height="wrap_content"
+                                                        android:id="@+id/styleSpinnerG"
+                                                        android:drawSelectorOnTop="false"
+                                                        android:layout_marginLeft="5dp"
+                                                        android:layout_marginRight="5dp"/>
+                                                </LinearLayout>
                                             </LinearLayout>
                                         </LinearLayout>
+
                                     </LinearLayout>
                                 </ScrollView>
 

@@ -28,4 +28,8 @@
     <string name="choose_event_prompt">Choose Event</string>
     <string name="tab_manual">Create</string>
     <string name="tab_google">From Calendar</string>
+    <string name="calendar_prompt">Calendar</string>
+    <string name="calendar_error_text">Sorry, no Calendar capability found on your device</string>
+    <string name="calendar_all_name">All</string>
+    <string name="event_nearest_title">Nearest</string>
 </resources>

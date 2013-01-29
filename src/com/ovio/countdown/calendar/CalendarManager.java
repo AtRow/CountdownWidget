@@ -1,6 +1,8 @@
 package com.ovio.countdown.calendar;
 
-import android.app.Activity;
+import android.content.ContentResolver;
+import android.content.ContentUris;
+import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
 import com.ovio.countdown.R;
@@ -20,11 +22,11 @@ public final class CalendarManager {
 
     private static final String CALENDARS = "calendars";
 
-    private static final String EVENTS = "events";
+    private static final String EVENTS = "instances/when";
 
     private static CalendarManager instance;
 
-    private final Activity activity;
+    private final Context context;
 
     private Uri baseUri;
 
@@ -33,16 +35,16 @@ public final class CalendarManager {
     public static final long NEAREST_EVENT = -1;
 
 
-    private CalendarManager(Activity activity) {
+    private CalendarManager(Context context) {
         Logger.d(TAG, "Instantiated CalendarManager");
-        this.activity = activity;
+        this.context = context;
 
         getBaseUri();
     }
 
-    public static synchronized CalendarManager getInstance(Activity activity) {
+    public static synchronized CalendarManager getInstance(Context context) {
         if (instance == null) {
-            instance = new CalendarManager(activity);
+            instance = new CalendarManager(context);
         }
         Logger.d(TAG, "Returning CalendarManager instance");
         return instance;
@@ -61,31 +63,34 @@ public final class CalendarManager {
     }
 
     public List<Calendar> getCalendars() {
+
+        ContentResolver contentResolver = context.getContentResolver();
+
         List<Calendar> list = new ArrayList<Calendar>();
         Calendar allCalendars = new Calendar();
         allCalendars.id = ALL_CALENDARS;
-        allCalendars.name = activity.getString(R.string.calendar_all_name);
+        allCalendars.name = context.getString(R.string.calendar_all_name);
         list.add(allCalendars);
 
         Uri calendarUri = Uri.withAppendedPath(baseUri, CALENDARS);
 
         String[] projection = getIdAndNameColumns();
 
-        Cursor managedCursor = activity.managedQuery(calendarUri, projection, null, null, null);
-        if (managedCursor != null && managedCursor.moveToFirst()) {
+        Cursor cursor = contentResolver.query(calendarUri, projection, null, null, null);
+        if (cursor != null && cursor.moveToFirst()) {
 
-            int nameColumn = managedCursor.getColumnIndex(projection[1]);
-            int idColumn = managedCursor.getColumnIndex(projection[0]);
+            int nameColumn = cursor.getColumnIndex(projection[1]);
+            int idColumn = cursor.getColumnIndex(projection[0]);
             do {
                 Calendar calendar = new Calendar();
-                calendar.name = managedCursor.getString(nameColumn);
-                calendar.id = managedCursor.getInt(idColumn);
-                calendar.strId = managedCursor.getString(idColumn);
+                calendar.name = cursor.getString(nameColumn);
+                calendar.id = cursor.getInt(idColumn);
+                calendar.strId = cursor.getString(idColumn);
                 list.add(calendar);
 
-            } while (managedCursor.moveToNext());
+            } while (cursor.moveToNext());
 
-            managedCursor.close();
+            cursor.close();
         }
 
         return list;
@@ -106,49 +111,54 @@ public final class CalendarManager {
         return new String[] { "_id", name };
     }
 
-    public List<Event> getEvents(int calendarId) {
+    public List<Event> getEvents(long startMills, long endMills) {
+
+        ContentResolver contentResolver = context.getContentResolver();
+
         List<Event> list = new ArrayList<Event>();
 
         Event nearestEvent = new Event();
         nearestEvent.id = NEAREST_EVENT;
-        nearestEvent.title = activity.getString(R.string.event_nearest_title);
+        nearestEvent.title = context.getString(R.string.event_nearest_title);
         list.add(nearestEvent);
 
-        Uri eventUri = Uri.withAppendedPath(baseUri, EVENTS);
+        Uri.Builder builder = Uri.withAppendedPath(baseUri, EVENTS).buildUpon();
+        ContentUris.appendId(builder, startMills);
+        ContentUris.appendId(builder, endMills);
 
-        String[] projection = getEventColumns();
+        Uri eventUri = builder.build();
+
+        String[] projection = Event.COLUMNS;
         String selection = null;
 
-        if (calendarId != ALL_CALENDARS) {
-            selection = Event.CALENDAR_ID + "=" + calendarId;
-        }
-
-        Cursor managedCursor = activity.managedQuery(eventUri, projection, selection, null, null);
-        if (managedCursor != null && managedCursor.moveToFirst()) {
+        Cursor cursor = contentResolver.query(eventUri, projection, selection, null, null);
+        if (cursor != null && cursor.moveToFirst()) {
 
             do {
                 Event event = new Event();
 
-                event.id = managedCursor.getInt(managedCursor.getColumnIndex(Event.ID));
-                event.title = managedCursor.getString(managedCursor.getColumnIndex(Event.TITLE));
-                event.calendarId = managedCursor.getInt(managedCursor.getColumnIndex(Event.CALENDAR_ID));
-                event.allDay = managedCursor.getInt(managedCursor.getColumnIndex(Event.ALL_DAY));
-                event.start = managedCursor.getLong(managedCursor.getColumnIndex(Event.DTSTART));
-                //event.end = managedCursor.getLong(managedCursor.getColumnIndex(Event.DTEND));
-                event.timezone = managedCursor.getString(managedCursor.getColumnIndex(Event.EVENT_TIMEZONE));
+                event.id = cursor.getInt(cursor.getColumnIndex(Event.ID));
+                event.title = cursor.getString(cursor.getColumnIndex(Event.TITLE));
+                event.calendarId = cursor.getInt(cursor.getColumnIndex(Event.CALENDAR_ID));
+                event.allDay = cursor.getInt(cursor.getColumnIndex(Event.ALL_DAY));
+                event.start = cursor.getLong(cursor.getColumnIndex(Event.DTSTART));
+                event.end = cursor.getLong(cursor.getColumnIndex(Event.DTEND));
+                event.rdate = cursor.getString(cursor.getColumnIndex(Event.RDATE));
+
+                event.duration = cursor.getString(cursor.getColumnIndex(Event.DURATION));
+
+                event.timezone = cursor.getString(cursor.getColumnIndex(Event.EVENT_TIMEZONE));
+
+                Logger.i(TAG, "Got Event: %s", event.toDebugString());
 
                 list.add(event);
 
-            } while (managedCursor.moveToNext());
+            } while (cursor.moveToNext());
 
-            managedCursor.close();
+            cursor.close();
         }
 
         return list;
-    }
-
-    private String[] getEventColumns() {
-        return new String[] { "_id", "allDay", "calendar_id", "dtstart", "eventTimezone", "title" };
     }
 
     private Uri getBaseUri() {

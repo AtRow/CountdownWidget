@@ -14,8 +14,15 @@ public class Event {
     public static final String CALENDAR_ID = "calendar_id";
     public static final String DTSTART = "dtstart";
     public static final String DTEND = "dtend";
+    public static final String RDATE = "rdate";
+    public static final String RRULE = "rrule";
+
+    public static final String DURATION = "duration";
+
     public static final String EVENT_TIMEZONE = "eventTimezone";
     public static final String TITLE = "title";
+
+    public static final String[] COLUMNS = new String[] {ID, ALL_DAY, CALENDAR_ID, DTSTART, DTEND, RDATE, RRULE, DURATION, EVENT_TIMEZONE, TITLE};
 
     public long id;
 
@@ -31,17 +38,38 @@ public class Event {
 
     public String timezone;
 
+    public String rdate;
+
+    public String rrule;
+
+    public String duration;
+
+    public String toDebugString() {
+        return "Event{" +
+                "id=" + id +
+                ", calendarId=" + calendarId +
+                ", title='" + title + '\'' +
+                ", allDay=" + allDay +
+                ", start=" + start +
+                ", end=" + end +
+                ", timezone='" + timezone + '\'' +
+                ", rdate='" + rdate + '\'' +
+                ", rrule='" + rrule + '\'' +
+                ", duration='" + duration + '\'' +
+                '}';
+    }
+
     @Override
     public String toString() {
 
         Time time = new Time();
 
         time.set(start);
-        time.timezone = timezone;
+        time.switchTimezone(timezone);
         time.normalize(false);
 
         String timeStr = time.format(Util.TF);
 
-        return timeStr + " : " + title;
+        return "" + id + ":" + timeStr + " : " + title;
     }
 }

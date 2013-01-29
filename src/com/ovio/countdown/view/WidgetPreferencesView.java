@@ -113,9 +113,17 @@ public class WidgetPreferencesView {
         calendarSpinner.setAdapter(calendarAdapter);
         calendarAdapter.notifyDataSetChanged();
 
-        List<Event> events = calendarManager.getEvents(CalendarManager.ALL_CALENDARS);
+        Time time = new Time();
+        time.setToNow();
+        time.month--;
+        long start = time.toMillis(false);
 
-        ArrayAdapter eventAdapter = new ArrayAdapter<Event>(activity, android.R.layout.simple_spinner_item, events);
+        time.month += 2;
+        long end = time.toMillis(false);
+
+        final List<Event> events = calendarManager.getEvents(start, end);
+
+        final ArrayAdapter eventAdapter = new ArrayAdapter<Event>(activity, android.R.layout.simple_spinner_item, events);
         eventAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
         eventSpinner.setAdapter(eventAdapter);

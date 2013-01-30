@@ -29,7 +29,8 @@
             android:name=".WidgetPreferencesActivity"
             android:label="@string/preferences_activity_title"
             android:noHistory="true"
-            android:windowSoftInputMode="stateHidden">
+            android:windowSoftInputMode="stateHidden"
+            android:configChanges="orientation|keyboard|keyboardHidden">
             <intent-filter>
                 <action android:name="android.apwidget.action.APPWIDGET_CONFIGURE"/>
             </intent-filter>

@@ -6,9 +6,9 @@ import android.text.format.Time;
 import android.view.View;
 import android.widget.*;
 import com.ovio.countdown.R;
-import com.ovio.countdown.calendar.Calendar;
-import com.ovio.countdown.calendar.CalendarManager;
-import com.ovio.countdown.calendar.Event;
+import com.ovio.countdown.event.Calendar;
+import com.ovio.countdown.event.EventManager;
+import com.ovio.countdown.event.Event;
 import com.ovio.countdown.log.Logger;
 
 import java.util.List;
@@ -29,7 +29,7 @@ public class WidgetPreferencesView {
 
     private final Activity activity;
 
-    private CalendarManager calendarManager;
+    private EventManager eventManager;
 
     private boolean calendarCompatible;
 
@@ -89,9 +89,9 @@ public class WidgetPreferencesView {
     }
 
     private void initCalendarPickers() {
-        calendarManager = CalendarManager.getInstance(activity);
+        eventManager = EventManager.getInstance(activity);
 
-        if (calendarManager.isCompatible()) {
+        if (eventManager.isCompatible()) {
             calendarCompatible = true;
 
         } else {
@@ -105,7 +105,7 @@ public class WidgetPreferencesView {
 
         setGoogleCalendarControlsEnabled(calendarCompatible);
 
-        List<Calendar> calendars = calendarManager.getCalendars();
+        List<Calendar> calendars = eventManager.getCalendars();
 
         ArrayAdapter calendarAdapter = new ArrayAdapter<Calendar>(activity, android.R.layout.simple_spinner_item, calendars);
         calendarAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -121,7 +121,7 @@ public class WidgetPreferencesView {
         time.month += 2;
         long end = time.toMillis(false);
 
-        final List<Event> events = calendarManager.getEvents(start, end);
+        final List<Event> events = eventManager.getEvents(start, end);
 
         final ArrayAdapter eventAdapter = new ArrayAdapter<Event>(activity, android.R.layout.simple_spinner_item, events);
         eventAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);

@@ -1,4 +1,4 @@
-package com.ovio.countdown.calendar;
+package com.ovio.countdown.event;
 
 /**
  * Countdown

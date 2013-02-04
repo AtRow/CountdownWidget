@@ -1,4 +1,4 @@
-package com.ovio.countdown.calendar;
+package com.ovio.countdown.event;
 
 import android.text.format.Time;
 import com.ovio.countdown.util.Util;

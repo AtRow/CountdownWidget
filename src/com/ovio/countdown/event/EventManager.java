@@ -1,4 +1,4 @@
-package com.ovio.countdown.calendar;
+package com.ovio.countdown.event;
 
 import android.content.ContentResolver;
 import android.content.ContentUris;
@@ -14,9 +14,9 @@ import java.util.List;
 
 /**
  * Countdown
- * com.ovio.countdown.calendar
+ * com.ovio.countdown.event
  */
-public final class CalendarManager {
+public final class EventManager {
 
     private static final String TAG = Logger.PREFIX + "CalendarM";
 
@@ -24,7 +24,7 @@ public final class CalendarManager {
 
     private static final String EVENTS = "instances/when";
 
-    private static CalendarManager instance;
+    private static EventManager instance;
 
     private final Context context;
 
@@ -35,18 +35,18 @@ public final class CalendarManager {
     public static final long NEAREST_EVENT = -1;
 
 
-    private CalendarManager(Context context) {
-        Logger.d(TAG, "Instantiated CalendarManager");
+    private EventManager(Context context) {
+        Logger.d(TAG, "Instantiated EventManager");
         this.context = context;
 
         getBaseUri();
     }
 
-    public static synchronized CalendarManager getInstance(Context context) {
+    public static synchronized EventManager getInstance(Context context) {
         if (instance == null) {
-            instance = new CalendarManager(context);
+            instance = new EventManager(context);
         }
-        Logger.d(TAG, "Returning CalendarManager instance");
+        Logger.d(TAG, "Returning EventManager instance");
         return instance;
     }
 

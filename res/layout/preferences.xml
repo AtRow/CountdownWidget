@@ -74,14 +74,29 @@
                                             android:layout_marginLeft="5dp"
                                             android:layout_marginRight="5dp"/>
 
-                                        <DatePicker
-                                            android:layout_width="wrap_content"
-                                            android:layout_height="wrap_content"
-                                            android:id="@+id/datePicker"
-                                            android:layout_marginLeft="5dp"
-                                            android:layout_marginRight="5dp"
-                                            android:layout_gravity="center"
-                                            android:visibility="visible"/>
+                                        <LinearLayout
+                                            android:orientation="horizontal"
+                                            android:layout_width="fill_parent"
+                                            android:layout_height="fill_parent">
+
+                                            <DatePicker
+                                                android:layout_width="wrap_content"
+                                                android:layout_height="wrap_content"
+                                                android:id="@+id/datePicker"
+                                                android:layout_marginLeft="5dp"
+                                                android:layout_gravity="center"
+                                                android:visibility="visible"/>
+
+                                            <ImageButton
+                                                android:layout_width="wrap_content"
+                                                android:layout_height="wrap_content"
+                                                android:id="@+id/calendarButton"
+                                                android:layout_gravity="center"
+                                                android:baselineAlignBottom="false"
+                                                android:src="@drawable/calendar_icon"
+                                                android:layout_marginRight="5dp"
+                                                android:onClick="onCalendarPickerClick"/>
+                                        </LinearLayout>
 
                                         <CheckBox
                                             style="@style/TextSettings"

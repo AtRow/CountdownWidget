@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.text.format.Time;
 import android.view.View;
 import android.widget.*;
+import com.ovio.countdown.calendar.CalendarActivity;
 import com.ovio.countdown.log.Logger;
 import com.ovio.countdown.preferences.DefaultOptions;
 import com.ovio.countdown.preferences.PreferencesManager;
@@ -29,6 +30,7 @@ public class WidgetPreferencesActivity extends Activity {
     private static final String TAG = Logger.PREFIX + "PrefsActivity";
 
     private final Context self = this;
+    private static final int PICK_DATE_REQUEST = 1;
 
     private Integer appWidgetId;
 
@@ -73,8 +75,8 @@ public class WidgetPreferencesActivity extends Activity {
     }
 
     @Override
-    protected void onStop() {
-        super.onStop();
+    protected void onDestroy() {
+        super.onDestroy();
 
         // There's a bug somewhere, see
         // http://stackoverflow.com/questions/4393144/widget-not-deleted-when-passing-result-canceled-as-result-for-configuration-acti
@@ -109,6 +111,29 @@ public class WidgetPreferencesActivity extends Activity {
 
     public void onTimeCheckBoxClick(View view) {
         this.view.onTimeCheckBoxClick(view);
+    }
+
+    public void onCalendarPickerClick(View view) {
+        Time date = this.view.getTime();
+        Intent intent = new Intent(getApplicationContext(), CalendarActivity.class);
+        Bundle extras = new Bundle();
+        extras.putInt(CalendarActivity.YEAR, date.year);
+        extras.putInt(CalendarActivity.MONTH, date.month);
+        extras.putInt(CalendarActivity.DAY, date.monthDay);
+        intent.putExtras(extras);
+        
+        startActivityForResult(intent, PICK_DATE_REQUEST);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if ((requestCode == PICK_DATE_REQUEST) && (resultCode == RESULT_OK)) {
+            Time date = CalendarActivity.getDateFromIntent(data);
+            if (date != null) {
+                this.view.setTime(date);
+            }
+        }
     }
 
     private void sendToWidgetService() {

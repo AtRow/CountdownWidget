@@ -23,10 +23,11 @@ import android.util.Log;
 import android.view.*;
 import android.widget.FrameLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 import com.ovio.countdown.R;
 
 
-public class SwitcherCalendarView extends FrameLayout {
+public class SwitcherCalendarView extends FrameLayout implements CalendarView.OnDateSelectedListener {
 
     private static final int LEFT = 0;
     private static final int CENTER = 1;
@@ -60,6 +61,15 @@ public class SwitcherCalendarView extends FrameLayout {
         init();
     }
 
+    @Override
+    public void onDateSelected(Time date) {
+        selectedDate = new Time(date);
+
+        if (onDateSelectedListener != null) {
+            onDateSelectedListener.onDateSelected(selectedDate);
+        }
+    }
+
     public static interface OnDateSelectedListener {
         void onDateSelected(Time date);
     }
@@ -83,6 +93,10 @@ public class SwitcherCalendarView extends FrameLayout {
         currCalendar = new CalendarView(getContext());
         nextCalendar = new CalendarView(getContext());
 
+        prevCalendar.setOnDateSelectedListener(this);
+        currCalendar.setOnDateSelectedListener(this);
+        nextCalendar.setOnDateSelectedListener(this);
+
         Time time = new Time();
         time.setToNow();
 
@@ -101,27 +115,27 @@ public class SwitcherCalendarView extends FrameLayout {
         pager.setOnScreenSwitchListener(onScreenSwitchListener);
 
 
-        final GestureDetector tapGestureDetector = new GestureDetector(getContext(), new GestureDetector.SimpleOnGestureListener() {
-            @Override
-            public boolean onSingleTapConfirmed(MotionEvent e) {
-                onSingleClick();
-                return true;
-            }
-        });
-
-        pager.setOnTouchListener(new OnTouchListener() {
-            public boolean onTouch(View v, MotionEvent event) {
-                tapGestureDetector.onTouchEvent(event);
-                return false;
-            }
-        });
+//        final GestureDetector tapGestureDetector = new GestureDetector(getContext(), new GestureDetector.SimpleOnGestureListener() {
+//            @Override
+//            public boolean onSingleTapConfirmed(MotionEvent e) {
+//                onSingleClick();
+//                return true;
+//            }
+//        });
+//
+//        pager.setOnTouchListener(new OnTouchListener() {
+//            public boolean onTouch(View v, MotionEvent event) {
+//                tapGestureDetector.onTouchEvent(event);
+//                return false;
+//            }
+//        });
 
         container.addView(pager);
     }
 
     private void inflate() {
         LayoutInflater li = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        li.inflate(R.layout.switcher, this, true);
+        li.inflate(R.layout.calendar_switcher, this, true);
 
         container = (FrameLayout) findViewById(R.id.switcherContainer);
         title = (TextView) findViewById(R.id.title);
@@ -182,10 +196,9 @@ public class SwitcherCalendarView extends FrameLayout {
             onDateSelectedListener.onDateSelected(selectedDate);
         }
 
-//        String day = selectedDate.format("%Y.%m.%d %H:%M:%S");
-//
-//        String msg = "Selected: " + day;
-//        Toast.makeText(getContext(), msg, Toast.LENGTH_SHORT).show();
+        String day = selectedDate.format("%Y.%m.%d %H:%M:%S");
+        String msg = "Selected: " + day;
+        Toast.makeText(getContext(), msg, Toast.LENGTH_SHORT).show();
     }
 
     private void updateCurrentMonth() {

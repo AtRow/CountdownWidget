@@ -25,30 +25,26 @@ import android.text.format.Time;
 public class CalendarActivity extends Activity {
 
 
-    private static final String YEAR = "Y";
-    private static final String MONTH = "M";
-    private static final String DAY = "D";
-    private static final int INVALID_VALUE = -1;
+    public static final String YEAR = "Y";
+    public static final String MONTH = "M";
+    public static final String DAY = "D";
+    public static final int INVALID_VALUE = -1;
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        Time date = getDateFromIntent(getIntent());
-
         SwitcherCalendarView switcherCalendarView = new SwitcherCalendarView(getApplicationContext());
-        switcherCalendarView.setDate(date);
-        switcherCalendarView.setOnDateSelectedListener(listener);
 
+        Time date = getDateFromIntent(getIntent());
+        if (date != null) {
+            switcherCalendarView.setDate(date);
+        }
+
+        switcherCalendarView.setOnDateSelectedListener(listener);
 	    setContentView(switcherCalendarView);
     }
 
-    private Time getDateFromIntent(Intent intent) {
-        Time date = new Time();
-        date.setToNow();
-        date.hour = 0;
-        date.minute = 0;
-        date.second = 0;
-
+    public static Time getDateFromIntent(Intent intent) {
         Bundle extras = intent.getExtras();
         if (extras != null) {
             int year = extras.getInt(YEAR, INVALID_VALUE);
@@ -59,32 +55,41 @@ public class CalendarActivity extends Activity {
                     (month != INVALID_VALUE) &&
                     (day != INVALID_VALUE)) {
 
+                Time date = new Time();
+                date.hour = 0;
+                date.minute = 0;
+                date.second = 0;
+
                 date.year = year;
                 date.month = month;
                 date.monthDay = day;
+
+                return date;
             }
         }
 
-        return date;
+        return null;
     }
 
-    private SwitcherCalendarView.OnDateSelectedListener listener = new SwitcherCalendarView.OnDateSelectedListener() {
-        @Override
-        public void onDateSelected(Time date) {
-            returnDate(date);
-        }
-    };
-
-    private void returnDate(Time date) {
-        Intent intent = new Intent();
-
+    public static void putDateToIntent(Time date, Intent intent) {
         Bundle extras = new Bundle();
         extras.putInt(YEAR, date.year);
         extras.putInt(MONTH, date.month);
         extras.putInt(DAY, date.monthDay);
 
         intent.putExtras(extras);
-        setResult(RESULT_OK, intent);
-        finish();
     }
+
+
+    private SwitcherCalendarView.OnDateSelectedListener listener = new SwitcherCalendarView.OnDateSelectedListener() {
+        @Override
+        public void onDateSelected(Time date) {
+            Intent intent = new Intent();
+            putDateToIntent(date, intent);
+            setResult(RESULT_OK, intent);
+            finish();
+        }
+    };
+
+
 }

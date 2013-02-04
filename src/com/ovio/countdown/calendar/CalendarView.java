@@ -25,6 +25,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
+import android.widget.Toast;
 import com.ovio.countdown.R;
 
 import java.util.Map;
@@ -47,6 +48,7 @@ public class CalendarView extends FrameLayout {
     private DayTile selectedDayTile;
     private LinearLayout container;
 
+    private OnDateSelectedListener onDateSelectedListener;
 
     public CalendarView(Context context) {
         super(context);
@@ -56,6 +58,14 @@ public class CalendarView extends FrameLayout {
     public CalendarView(Context context, AttributeSet attrs) {
         super(context, attrs);
         init();
+    }
+
+    public void setOnDateSelectedListener(OnDateSelectedListener onDateSelectedListener) {
+        this.onDateSelectedListener = onDateSelectedListener;
+    }
+
+    public interface OnDateSelectedListener {
+        void onDateSelected(Time date);
     }
 
     private void init() {
@@ -156,8 +166,12 @@ public class CalendarView extends FrameLayout {
             selected = new Time(month);
             selected.monthDay = dayTile.getMonthDay();
 
-//            String msg = "Selected: " + selected.format("%Y %m %d");
-//            Toast.makeText(getContext(), msg, Toast.LENGTH_SHORT).show();
+            String msg = "Selected: " + selected.format("%Y %m %d");
+            Toast.makeText(getContext(), msg, Toast.LENGTH_SHORT).show();
+
+            if (onDateSelectedListener != null) {
+                onDateSelectedListener.onDateSelected(selected);
+            }
         }
     };
 

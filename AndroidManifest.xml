@@ -28,12 +28,24 @@
         <activity
             android:name=".WidgetPreferencesActivity"
             android:label="@string/preferences_activity_title"
-            android:noHistory="true"
+
+            android:excludeFromRecents="true"
             android:windowSoftInputMode="stateHidden"
             android:configChanges="orientation|keyboard|keyboardHidden">
             <intent-filter>
                 <action android:name="android.apwidget.action.APPWIDGET_CONFIGURE"/>
             </intent-filter>
+        </activity>
+
+        <activity
+            android:name=".calendar.CalendarActivity"
+            android:excludeFromRecents="true">
+
+            <!--
+            android:noHistory="true"
+            android:theme="@android:style/Theme.Dialog"
+            -->
+
         </activity>
 
         <!-- //////////// WIDGETS \\\\\\\\\\\\ -->

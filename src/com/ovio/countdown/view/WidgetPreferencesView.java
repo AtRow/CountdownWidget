@@ -7,8 +7,8 @@ import android.view.View;
 import android.widget.*;
 import com.ovio.countdown.R;
 import com.ovio.countdown.event.Calendar;
-import com.ovio.countdown.event.EventManager;
 import com.ovio.countdown.event.Event;
+import com.ovio.countdown.event.EventManager;
 import com.ovio.countdown.log.Logger;
 
 import java.util.List;

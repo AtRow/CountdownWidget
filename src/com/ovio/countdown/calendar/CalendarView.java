@@ -22,10 +22,7 @@ import android.text.format.Time;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.widget.AbsListView;
-import android.widget.FrameLayout;
-import android.widget.GridView;
-import android.widget.Toast;
+import android.widget.*;
 import com.ovio.countdown.R;
 
 import java.util.Map;
@@ -43,12 +40,13 @@ public class CalendarView extends FrameLayout {
     private Time month;
     private Time selected;
 
-    private Map<Integer, DayInfo> items; // gridView to store some random calendar items
+    private Map<Integer, DayInfo> items; // dayGridView to store some random calendar items
     private DayTile[] dayTiles;
 
     private DayTile selectedDayTile;
-    private GridView gridView;
-    private FrameLayout rootLayout;
+    private GridView dayGridView;
+    private GridView weekGridView;
+    private LinearLayout rootLayout;
     private DayTileAdapter dayTileArrayAdapter;
 
     private OnDateSelectedListener onDateSelectedListener;
@@ -76,16 +74,37 @@ public class CalendarView extends FrameLayout {
         LayoutInflater li = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         li.inflate(R.layout.calendar_table, this, true);
 
-        gridView = (GridView) findViewById(R.id.gridView);
-        rootLayout = (FrameLayout) findViewById(R.id.rootLayout);
+        dayGridView = (GridView) findViewById(R.id.dayGridView);
+        weekGridView = (GridView) findViewById(R.id.weekGridView);
+        rootLayout = (LinearLayout) findViewById(R.id.rootLayout);
 
         dayTiles = new DayTile[CELLS];
         for (int i = 0; i < CELLS; i++) {
-            dayTiles[i] = (DayTile) li.inflate(R.layout.calendar_item, null);
+            dayTiles[i] = (DayTile) li.inflate(R.layout.calendar_day_tile, null);
         }
 
         dayTileArrayAdapter = new DayTileAdapter(getContext(), dayTiles);
-        gridView.setAdapter(dayTileArrayAdapter);
+        dayGridView.setAdapter(dayTileArrayAdapter);
+
+        ArrayAdapter<String> weekAdapter = new ArrayAdapter<String>(getContext(), R.layout.calendar_week_tile, getWeeks());
+        weekGridView.setAdapter(weekAdapter);
+    }
+
+    private String[] getWeeks() {
+        String[] weeks = new String[WEEK];
+        Time time = new Time();
+        time.weekDay = Time.MONDAY;
+
+        for (int i = 0; i < WEEK; i++) {
+            weeks[i] = time.format("%a");
+
+            time.weekDay++;
+            if (time.weekDay > 6) {
+                time.weekDay = 0;
+            }
+        }
+
+        return weeks;
     }
 
 

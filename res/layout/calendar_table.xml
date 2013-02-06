@@ -1,17 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-             android:layout_width="fill_parent"
-             android:layout_height="fill_parent"
-             android:id="@+id/rootLayout">
 
-<GridView
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
-    android:id="@+id/gridView"
-    android:numColumns="7"
-    android:stretchMode="columnWidth"
-    android:horizontalSpacing="1dp"
-    android:verticalSpacing="1dp"></GridView>
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:orientation="vertical"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:id="@+id/rootLayout">
 
-</FrameLayout>
+        <GridView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/weekGridView"
+            android:numColumns="7"
+            android:stretchMode="columnWidth"
+            android:horizontalSpacing="1dp"
+            android:verticalSpacing="1dp"/>
+
+        <GridView
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:id="@+id/dayGridView"
+        android:numColumns="7"
+        android:stretchMode="columnWidth"
+        android:horizontalSpacing="1dp"
+        android:verticalSpacing="1dp"></GridView>
+
+    </LinearLayout>

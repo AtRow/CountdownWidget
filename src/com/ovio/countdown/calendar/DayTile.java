@@ -18,10 +18,6 @@ public class DayTile extends RelativeLayout {
 
     public DayInfo dayInfo;
 
-    public boolean containsDay;
-
-    public boolean isCurrentDay;
-
     private Time tileDate;
 
     private Time now;

@@ -1,9 +1,10 @@
 package com.ovio.countdown.calendar;
 
+import android.content.Context;
 import android.text.format.Time;
-import android.util.Log;
+import android.util.AttributeSet;
 import android.view.View;
-import android.view.ViewGroup;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import com.ovio.countdown.R;
 
@@ -11,7 +12,9 @@ import com.ovio.countdown.R;
  * CalendarViewSample
  * com.examples.android.calendar
  */
-public class DayTile {
+public class DayTile extends RelativeLayout {
+
+    public static final int INVALID = -1;
 
     public DayInfo dayInfo;
 
@@ -19,78 +22,93 @@ public class DayTile {
 
     public boolean isCurrentDay;
 
-    private final Time time;
+    private Time tileDate;
+
+    private Time now;
+
+    private Time currentMonth;
 
     private OnClickListener clickListener;
 
     private DayTile self = this;
 
-    private ViewGroup tileView;
+
+    public DayTile(Context context) {
+        super(context);
+    }
+
+    public DayTile(Context context, AttributeSet attrs) {
+        super(context, attrs);
+    }
+
+    public DayTile(Context context, AttributeSet attrs, int defStyle) {
+        super(context, attrs, defStyle);
+    }
 
     public void setSelected(boolean selected) {
         if (selected) {
-            tileView.setBackgroundResource(R.drawable.item_bg_selected);
+            setBackgroundResource(R.drawable.item_bg_selected);
         } else {
-            tileView.setBackgroundResource(R.drawable.item_bg_default);
+            setBackgroundResource(R.drawable.item_bg_default);
         }
+    }
+
+    public void setTileDate(Time tileDate) {
+        this.tileDate = new Time(tileDate);
+    }
+
+    public void setCurrentMonth(Time currentMonth) {
+        this.currentMonth = new Time(currentMonth);
+    }
+
+    public Time getDate() {
+        return tileDate;
     }
 
     public static interface OnClickListener {
         void onClick(DayTile dayTile);
     }
 
-    public DayTile() {
-        time = new Time();
-        containsDay = false;
-    }
-
-    public DayTile(Time time) {
-        this.time = new Time(time);
-        this.time.normalize(true);
-        containsDay = true;
-    }
-
     public int getMonthDay() {
-        return time.monthDay;
+        if (tileDate != null) {
+            return tileDate.monthDay;
+        } else {
+            return INVALID;
+        }
     }
 
-    public boolean isHoliday() {
-        return (time.weekDay == Time.SATURDAY ||
-                time.weekDay == Time.SUNDAY);
+    private boolean isHoliday() {
+        return (tileDate != null) &&
+                (tileDate.weekDay == Time.SATURDAY || tileDate.weekDay == Time.SUNDAY);
     }
 
     public void setOnClickListener(OnClickListener clickListener) {
         this.clickListener = clickListener;
     }
 
-    public void renderTo(ViewGroup tileView) {
 
-        this.tileView = tileView;
-        render();
-    }
+    public void update() {
 
-    public void render() {
+        TextView hint = (TextView) getChildAt(0);
+        TextView day = (TextView) getChildAt(1);
 
-        if (tileView == null) {
-            Log.w("DayTile", "Trying to render before assigning TileView, aborting");
-            return;
-        }
+        day.setText(getMonthDayString());
 
-        TextView hint = (TextView) tileView.getChildAt(0);
-        TextView dayView = (TextView)tileView.getChildAt(1);
-
-        dayView.setText(Integer.toString(time.monthDay));
-
-        if(isCurrentDay) {
-            tileView.setBackgroundResource(R.drawable.item_bg_selected);
-
-        } else if (isHoliday()) {
-            tileView.setBackgroundResource(R.drawable.item_bg_holiday);
-
+        if (!isDayEnabled()) {
+            setBackgroundResource(R.drawable.item_bg_selected);
         } else {
-            tileView.setBackgroundResource(R.drawable.item_bg_default);
-        }
 
+            if(isCurrentDay()) {
+                setBackgroundResource(R.drawable.item_bg_selected);
+
+            } else if (isHoliday()) {
+                setBackgroundResource(R.drawable.item_bg_holiday);
+
+            } else {
+                setBackgroundResource(R.drawable.item_bg_default);
+            }
+
+        }
         // show icon if date is not empty and it exists in the items array
         //ImageView hint = (ImageView)v.findViewById(R.id.date_icon);
 
@@ -101,7 +119,7 @@ public class DayTile {
             hint.setVisibility(View.INVISIBLE);
         }
 
-        tileView.setOnClickListener(new View.OnClickListener() {
+        setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if (clickListener != null) {
@@ -110,4 +128,29 @@ public class DayTile {
             }
         });
     }
+
+    private boolean isDayEnabled() {
+        return (tileDate != null) &&
+               (currentMonth != null) &&
+               (tileDate.year == currentMonth.year) &&
+               (tileDate.month == currentMonth.month);
+    }
+
+    private boolean isCurrentDay() {
+        if (now == null) {
+            now = new Time();
+            now.setToNow();
+        }
+
+        return (tileDate != null) &&
+               (now != null) &&
+               (tileDate.year == now.year) &&
+               (tileDate.month == now.month) &&
+               (tileDate.monthDay == now.monthDay);
+    }
+
+    private String getMonthDayString() {
+        return Integer.toString(getMonthDay());
+    }
+
 }

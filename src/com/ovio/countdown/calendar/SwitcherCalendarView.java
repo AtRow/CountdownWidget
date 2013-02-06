@@ -97,11 +97,6 @@ public class SwitcherCalendarView extends FrameLayout implements CalendarView.On
         currCalendar.setOnDateSelectedListener(this);
         nextCalendar.setOnDateSelectedListener(this);
 
-        Time time = new Time();
-        time.setToNow();
-
-        setDate(time);
-
         leftScreen.addView(prevCalendar);
         centerScreen.addView(currCalendar);
         rightScreen.addView(nextCalendar);

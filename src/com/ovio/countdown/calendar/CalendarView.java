@@ -17,14 +17,14 @@
 package com.ovio.countdown.calendar;
 
 import android.content.Context;
+import android.graphics.Rect;
 import android.text.format.Time;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.FrameLayout;
-import android.widget.LinearLayout;
+import android.widget.GridView;
 import android.widget.Toast;
 import com.ovio.countdown.R;
 
@@ -38,17 +38,21 @@ public class CalendarView extends FrameLayout {
 
     private static final int ROWS = 6;
     private static final int WEEK = 7;
+    private static final int CELLS = WEEK * ROWS;
 
     private Time month;
     private Time selected;
 
-    private Map<Integer, DayInfo> items; // container to store some random calendar items
-    private int offset;
+    private Map<Integer, DayInfo> items; // gridView to store some random calendar items
     private DayTile[] dayTiles;
+
     private DayTile selectedDayTile;
-    private LinearLayout container;
+    private GridView gridView;
+    private FrameLayout rootLayout;
+    private DayTileAdapter dayTileArrayAdapter;
 
     private OnDateSelectedListener onDateSelectedListener;
+
 
     public CalendarView(Context context) {
         super(context);
@@ -72,9 +76,68 @@ public class CalendarView extends FrameLayout {
         LayoutInflater li = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         li.inflate(R.layout.calendar_table, this, true);
 
-        container = (LinearLayout) findViewById(R.id.container);
+        gridView = (GridView) findViewById(R.id.gridView);
+        rootLayout = (FrameLayout) findViewById(R.id.rootLayout);
+
+        dayTiles = new DayTile[CELLS];
+        for (int i = 0; i < CELLS; i++) {
+            dayTiles[i] = (DayTile) li.inflate(R.layout.calendar_item, null);
+        }
+
+        dayTileArrayAdapter = new DayTileAdapter(getContext(), dayTiles);
+        gridView.setAdapter(dayTileArrayAdapter);
     }
 
+
+    @Override
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+
+        int tileHeight = getTileHeight();
+
+        for (int i = 0; i < CELLS; i++) {
+            dayTiles[i].setLayoutParams(new AbsListView.LayoutParams(AbsListView.LayoutParams.WRAP_CONTENT, tileHeight));
+        }
+    }
+
+    private void updateTiles(Time currentMonth) {
+
+        int offset = getOffset(currentMonth);
+
+        Time now = new Time();
+        now.setToNow();
+
+        Time counter = new Time(currentMonth);
+        counter.monthDay = 1;
+        counter.monthDay -= offset;
+        counter.normalize(true);
+
+        for (int i = 0; i < CELLS; i++) {
+            dayTiles[i].setCurrentMonth(month);
+            dayTiles[i].setOnClickListener(onTileClickListener);
+
+            counter.normalize(true);
+            dayTiles[i].setTileDate(counter);
+            counter.monthDay++;
+
+            dayTiles[i].update();
+        }
+    }
+
+    private int getTileHeight() {
+        Rect rect = new Rect();
+        rootLayout.getDrawingRect(rect);
+
+        return rootLayout.getMeasuredHeight() / 7;
+
+        //return rect.height() / 7;
+
+//        WindowManager wm = (WindowManager) getContext().getSystemService(Context.WINDOW_SERVICE);
+//        Display display = wm.getDefaultDisplay();
+//        int height = display.getHeight();  // deprecated
+//
+//        return height / 7;
+    }
 
     public Time getMonth() {
         return month;
@@ -108,12 +171,27 @@ public class CalendarView extends FrameLayout {
         Log.d("SCV", "Set selected day to: " + day);
 
         update();
+        selectCurrentTile();
+    }
+
+    private void selectCurrentTile() {
+
+        for (int i = 0; i < CELLS; i++) {
+            Time date = dayTiles[i].getDate();
+
+            if ((selected != null) &&
+                    (date.year == selected.year) &&
+                    (date.month == selected.month) &&
+                    (date.monthDay == selected.monthDay)) {
+                selectTile(dayTiles[i]);
+            }
+        }
+
     }
 
     private void update() {
         if (month != null) {
-            refreshDays();
-            fillTable();
+            updateTiles(month);
         }
     }
 
@@ -127,23 +205,6 @@ public class CalendarView extends FrameLayout {
         }
     }
 
-    private void fillTable() {
-        int i = 0;
-
-        for (int r = 0; r < ROWS; r++) {
-
-            LinearLayout row = (LinearLayout) container.getChildAt(r);
-
-            for (int c = 0; c < WEEK; c++) {
-
-                ViewGroup day = (ViewGroup) row.getChildAt(c);
-                renderDayTileView(day, i);
-
-                i++;
-            }
-        }
-    }
-
     public void setItems(Map<Integer, DayInfo> items) {
 
         for (int day : items.keySet()) {
@@ -151,7 +212,8 @@ public class CalendarView extends FrameLayout {
             if ((i >=0) && (dayTiles != null) && (i < dayTiles.length)) {
 
                 dayTiles[i].dayInfo = items.get(day);
-                dayTiles[i].render();
+                // TODO
+                //dayTiles[i].render();
             }
         }
     }
@@ -183,56 +245,20 @@ public class CalendarView extends FrameLayout {
         selectedDayTile = dayTile;
     }
 
+    private int getOffset(Time currentMonth) {
 
-    public View renderDayTileView(ViewGroup tileView, int position) {
-
-        if ((position >= offset) && (position - offset) < dayTiles.length) {
-
-            DayTile tile = dayTiles[position - offset];
-
-            tile.setOnClickListener(onTileClickListener);
-            tile.renderTo(tileView);
-
-            // don't forget to show view
-            tileView.setVisibility(View.VISIBLE);
-
-        } else {
-            // disable empty days from the beginning
-            tileView.setVisibility(View.INVISIBLE);
-        }
-
-        return tileView;
-    }
-
-    public void refreshDays() {
-
-        Time counter = new Time(month);
+        Time counter = new Time(currentMonth);
 
         counter.monthDay = 1;
         counter.normalize(true);
 
         int weekDayOn1st = counter.weekDay;
-        int daysInMonth = counter.getActualMaximum(Time.MONTH_DAY);
 
-        offset = weekDayOn1st - FIRST_DAY_OF_WEEK;
+        int offset = weekDayOn1st - FIRST_DAY_OF_WEEK;
         if (offset < 0) {
             offset += 7;
         }
 
-        dayTiles = new DayTile[daysInMonth];
-
-        for (int i = 0; i < daysInMonth; i++) {
-            dayTiles[i] = new DayTile(counter);
-
-            if ((selected != null) &&
-                    (counter.year == selected.year) &&
-                    (counter.month == selected.month) &&
-                    (counter.monthDay == selected.monthDay)) {
-                dayTiles[i].isCurrentDay = true;
-            } else {
-                dayTiles[i].isCurrentDay = false;
-            }
-            counter.monthDay++;
-        }
+        return offset;
     }
 }

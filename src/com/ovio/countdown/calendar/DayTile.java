@@ -28,6 +28,9 @@ public class DayTile extends RelativeLayout {
 
     private DayTile self = this;
 
+    private TextView hint;
+    private TextView day;
+
 
     public DayTile(Context context) {
         super(context);
@@ -90,9 +93,6 @@ public class DayTile extends RelativeLayout {
 
     public void update() {
 
-        TextView hint = (TextView) getChildAt(0);
-        TextView day = (TextView) getChildAt(1);
-
         day.setText(getMonthDayString());
 
         if (!isDayEnabled()) {
@@ -110,9 +110,6 @@ public class DayTile extends RelativeLayout {
             }
 
         }
-        // show icon if date is not empty and it exists in the items array
-        //ImageView hint = (ImageView)v.findViewById(R.id.date_icon);
-
 
         if(dayInfo != null) {
             hint.setText(Integer.toString(dayInfo.eventCount));
@@ -129,6 +126,14 @@ public class DayTile extends RelativeLayout {
                 }
             }
         });
+    }
+
+    @Override
+    protected void onFinishInflate() {
+        super.onFinishInflate();
+
+        day = (TextView) getChildAt(1);
+        hint = (TextView) getChildAt(0);
     }
 
     private boolean isDayEnabled() {

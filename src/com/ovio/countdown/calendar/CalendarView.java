@@ -22,8 +22,6 @@ import android.text.format.Time;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
-import android.view.View;
 import android.widget.*;
 import com.ovio.countdown.R;
 
@@ -96,15 +94,7 @@ public class CalendarView extends FrameLayout {
         ArrayAdapter<String> weekAdapter = new ArrayAdapter<String>(getContext(), R.layout.calendar_week_tile, getWeeks());
         weekGridView.setAdapter(weekAdapter);
 
-        dayGridView.setOnTouchListener(new OnTouchListener() {
-            @Override
-            public boolean onTouch(View view, MotionEvent motionEvent) {
-                if(motionEvent.getAction() == MotionEvent.ACTION_MOVE){
-                    return true;
-                }
-                return false;
-            }
-        });
+        dayGridView.setEnabled(false);
     }
 
     @Override
@@ -228,6 +218,8 @@ public class CalendarView extends FrameLayout {
 
             dayTiles[i].update();
         }
+
+        dayTileArrayAdapter.notifyDataSetChanged();
     }
 
     private int getTileHeight() {

@@ -8,8 +8,9 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.format.Time;
 import android.view.View;
-import android.widget.*;
+import android.widget.Toast;
 import com.ovio.countdown.R;
+import com.ovio.countdown.event.Event;
 import com.ovio.countdown.log.Logger;
 import com.ovio.countdown.preferences.DefaultOptions;
 import com.ovio.countdown.preferences.PreferencesManager;
@@ -42,6 +43,8 @@ public class WidgetPreferencesActivity extends Activity {
     private WidgetPreferencesManager widgetManager;
 
     private WidgetOptions widgetOptions;
+
+    private Event widgetEvent;
 
     private DefaultOptions options;
 
@@ -150,8 +153,13 @@ public class WidgetPreferencesActivity extends Activity {
                     break;
 
                 case PICK_EVENT_REQUEST:
-                    // TODO
-                    Toast.makeText(getApplicationContext(), "IMPLEMENT ME!", Toast.LENGTH_LONG).show();
+                    Bundle extras = data.getExtras();
+                    if (extras != null) {
+                        widgetEvent = (Event) extras.getSerializable(EventPickerActivity.EVENT);
+                        if (widgetEvent != null) {
+                            this.view.setEvent(widgetEvent);
+                        }
+                    }
                     break;
             }
         }

@@ -31,10 +31,9 @@ public class WidgetPreferencesView {
 
     private EventManager eventManager;
 
-    private boolean calendarCompatible;
+    private boolean isCalendarCompatible;
 
-    private boolean isDataValid = false;
-
+    private boolean isManualTab;
 
     private Button okButton;
 
@@ -76,6 +75,8 @@ public class WidgetPreferencesView {
 
     private LinearLayout calendarControlsLayout;
 
+    private Event widgetEvent;
+
 
     public WidgetPreferencesView(Activity activity) {
         this.activity = activity;
@@ -84,24 +85,26 @@ public class WidgetPreferencesView {
 
         initTabHost();
         initCalendarPickers();
+
+        updateOkButton();
     }
 
     private void initCalendarPickers() {
         eventManager = EventManager.getInstance(activity);
 
         if (eventManager.isCompatible()) {
-            calendarCompatible = true;
+            isCalendarCompatible = true;
 
         } else {
             Logger.i(TAG, "Device is NOT Calendar-compatible; disabling controls");
 
-            calendarCompatible = false;
-            setGoogleCalendarControlsEnabled(calendarCompatible);
-            isDataValid = false;
+            isCalendarCompatible = false;
+            setGoogleCalendarControlsEnabled(isCalendarCompatible);
+            updateOkButton();
             return;
         }
 
-        setGoogleCalendarControlsEnabled(calendarCompatible);
+        setGoogleCalendarControlsEnabled(isCalendarCompatible);
 
         List<Calendar> calendars = eventManager.getCalendars();
 
@@ -127,6 +130,17 @@ public class WidgetPreferencesView {
 //        eventSpinner.setAdapter(eventAdapter);
 //        eventAdapter.notifyDataSetChanged();
 
+    }
+
+    public void setEvent(Event widgetEvent) {
+        if (widgetEvent != null) {
+            this.widgetEvent = widgetEvent;
+            // TODO
+            calendarInfoTextView.setText(widgetEvent.toString());
+        } else {
+            calendarInfoTextView.setText(R.string.calendar_not_choosen_text);
+        }
+        updateOkButton();
     }
 
     private void setGoogleCalendarControlsEnabled(boolean enabled) {
@@ -327,6 +341,14 @@ public class WidgetPreferencesView {
         }
     }
 
+    private void updateOkButton() {
+        boolean enabled = isManualTab ||
+                (isCalendarCompatible &&
+                (widgetEvent != null));
+
+        okButton.setEnabled(enabled);
+    }
+
     private void onManualTab() {
         secondsCheckBox.setChecked(secondsCheckBoxG.isChecked());
         countUpCheckBox.setChecked(countUpCheckBoxG.isChecked());
@@ -334,7 +356,9 @@ public class WidgetPreferencesView {
         iconSpinner.setSelection(iconSpinnerG.getSelectedItemPosition());
         styleSpinner.setSelection(styleSpinnerG.getSelectedItemPosition());
 
-        okButton.setEnabled(true);
+        isManualTab = true;
+
+        updateOkButton();
     }
 
     private void onGoogleTab() {
@@ -344,7 +368,9 @@ public class WidgetPreferencesView {
         iconSpinnerG.setSelection(iconSpinner.getSelectedItemPosition());
         styleSpinnerG.setSelection(styleSpinner.getSelectedItemPosition());
 
-        okButton.setEnabled(isDataValid);
+        isManualTab = false;
+
+        updateOkButton();
     }
 
 }

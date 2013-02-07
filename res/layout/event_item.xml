@@ -12,7 +12,8 @@
         android:text="New Text"
         android:id="@+id/descTextView"
         android:layout_margin="5dp"
-        android:textSize="16sp"/>
+        android:textSize="16sp"
+        android:textColor="@android:color/black"/>
 
     <TextView
         android:layout_width="wrap_content"
@@ -22,5 +23,6 @@
         android:textSize="14sp"
         android:layout_marginLeft="5dp"
         android:layout_marginRight="5dp"
-        android:layout_marginBottom="3dp"/>
+        android:layout_marginBottom="3dp"
+        android:textColor="@android:color/black"/>
 </LinearLayout>

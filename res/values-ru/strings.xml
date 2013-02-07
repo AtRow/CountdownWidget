@@ -31,10 +31,10 @@
     <string name="calendar_prompt">Календарь</string>
     <string name="calendar_error_text">К сожалению, календари не найдены на Вашем устройстве</string>
     <string name="calendar_all_name">Все</string>
-    <string name="event_nearest_title">Nearest</string>
-    <string name="calendar_not_choosen_text">Event is not chosen</string>
-    <string name="calendar_pick_event_prompt">Chose event from calendar</string>
-    <string name="calendar_pick_event_button">Pick event</string>
-    <string name="calendar_nearest_event_prompt">Nearest event from calendar</string>
-    <string name="event_picker_no_events">No events for selected day</string>
+    <string name="event_nearest_title">Ближайший</string>
+    <string name="calendar_not_choosen_text">Событие не выбрано</string>
+    <string name="calendar_pick_event_prompt">Выбрать событие из календаря</string>
+    <string name="calendar_pick_event_button">Выбрать</string>
+    <string name="calendar_nearest_event_prompt">Ближайшее событие из календаря</string>
+    <string name="event_picker_no_events">Нет событий для выбранного дня</string>
 </resources>

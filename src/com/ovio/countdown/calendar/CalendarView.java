@@ -288,8 +288,8 @@ public class CalendarView extends FrameLayout {
             selected = new Time(month);
             selected.monthDay = dayTile.getMonthDay();
 
-            String msg = "Selected: " + selected.format("%Y %m %d");
-            Toast.makeText(getContext(), msg, Toast.LENGTH_SHORT).show();
+//            String msg = "Selected: " + selected.format("%Y %m %d");
+//            Toast.makeText(getContext(), msg, Toast.LENGTH_SHORT).show();
 
             if (onDateSelectedListener != null) {
                 onDateSelectedListener.onDateSelected(selected);

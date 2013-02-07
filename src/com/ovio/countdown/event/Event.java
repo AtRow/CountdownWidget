@@ -3,11 +3,13 @@ package com.ovio.countdown.event;
 import android.text.format.Time;
 import com.ovio.countdown.util.Util;
 
+import java.io.Serializable;
+
 /**
  * Countdown
  * com.ovio.countdown.preferences
  */
-public class Event {
+public class Event implements Serializable {
 
     public static final String ID = "_id";
     public static final String ALL_DAY = "allDay";

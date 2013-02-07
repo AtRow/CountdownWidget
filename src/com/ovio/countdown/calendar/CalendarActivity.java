@@ -20,6 +20,12 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.format.Time;
+import com.ovio.countdown.event.Event;
+import com.ovio.countdown.event.EventManager;
+
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 
 public class CalendarActivity extends Activity {
@@ -35,12 +41,14 @@ public class CalendarActivity extends Activity {
 
         SwitcherCalendarView switcherCalendarView = new SwitcherCalendarView(getApplicationContext());
 
+        switcherCalendarView.setOnDateSelectedListener(listener);
+        switcherCalendarView.setDayInfoFetcher(getDayInfoFetcher());
+
         Time date = getDateFromIntent(getIntent());
         if (date != null) {
             switcherCalendarView.setDate(date);
         }
 
-        switcherCalendarView.setOnDateSelectedListener(listener);
 	    setContentView(switcherCalendarView);
     }
 
@@ -91,5 +99,50 @@ public class CalendarActivity extends Activity {
         }
     };
 
+    private DayInfoFetcher getDayInfoFetcher() {
+        return  new DayInfoFetcher() {
+            EventManager manager = EventManager.getInstance(getApplicationContext());
+
+            @Override
+            public Map<Integer, DayInfo> fetchForMonth(int year, int month) {
+
+                Map<Integer, DayInfo> map = new TreeMap<Integer, DayInfo>();
+
+                Time time = new Time();
+                time.year = year;
+                time.month = month;
+
+                long start = time.toMillis(true);
+
+                time.monthDay = time.getActualMaximum(Time.MONTH_DAY);
+                time.hour = 23;
+                time.minute = 59;
+                time.second = 59;
+
+                long end = time.toMillis(true);
+
+                List<Event> events = manager.getEvents(start, end);
+
+                for (Event event: events) {
+
+                    Time eventStart = new Time();
+                    eventStart.set(event.start);
+                    int day = eventStart.monthDay;
+
+                    if (!map.containsKey(day)) {
+                        DayInfo info = new DayInfo();
+                        info.eventCount = 1;
+                        map.put(day, info);
+
+                    } else {
+                        DayInfo info = map.get(day);
+                        info.eventCount++;
+                    }
+                }
+
+                return map;
+            }
+        };
+    }
 
 }

@@ -12,7 +12,7 @@ public class Event {
     public static final String ID = "_id";
     public static final String ALL_DAY = "allDay";
     public static final String CALENDAR_ID = "calendar_id";
-    public static final String DTSTART = "dtstart";
+    public static final String DTSTART = "begin";//"dtstart";
     public static final String DTEND = "dtend";
     public static final String RDATE = "rdate";
     public static final String RRULE = "rrule";

@@ -120,7 +120,7 @@ public final class EventManager {
         Event nearestEvent = new Event();
         nearestEvent.id = NEAREST_EVENT;
         nearestEvent.title = context.getString(R.string.event_nearest_title);
-        list.add(nearestEvent);
+        // TODO list.add(nearestEvent);
 
         Uri.Builder builder = Uri.withAppendedPath(baseUri, EVENTS).buildUpon();
         ContentUris.appendId(builder, startMills);

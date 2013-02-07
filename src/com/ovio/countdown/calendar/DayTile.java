@@ -61,6 +61,11 @@ public class DayTile extends RelativeLayout {
         return tileDate;
     }
 
+    public void setDayInfo(DayInfo dayInfo) {
+        this.dayInfo = dayInfo;
+        update();
+    }
+
     public static interface OnClickListener {
         void onClick(DayTile dayTile);
     }
@@ -110,6 +115,7 @@ public class DayTile extends RelativeLayout {
 
 
         if(dayInfo != null) {
+            hint.setText(Integer.toString(dayInfo.eventCount));
             hint.setVisibility(View.VISIBLE);
         } else {
             hint.setVisibility(View.INVISIBLE);

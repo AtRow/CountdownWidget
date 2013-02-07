@@ -20,7 +20,9 @@ import android.content.Context;
 import android.text.format.Time;
 import android.util.AttributeSet;
 import android.util.Log;
-import android.view.*;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -49,6 +51,7 @@ public class SwitcherCalendarView extends FrameLayout implements CalendarView.On
     private Time selectedDate;
 
     private OnDateSelectedListener onDateSelectedListener;
+    private DayInfoFetcher dayInfoFetcher;
 
 
     public SwitcherCalendarView(Context context) {
@@ -68,6 +71,14 @@ public class SwitcherCalendarView extends FrameLayout implements CalendarView.On
         if (onDateSelectedListener != null) {
             onDateSelectedListener.onDateSelected(selectedDate);
         }
+    }
+
+    public void setDayInfoFetcher(DayInfoFetcher dayInfoFetcher) {
+        this.dayInfoFetcher = dayInfoFetcher;
+
+        prevCalendar.setDayInfoFetcher(dayInfoFetcher);
+        currCalendar.setDayInfoFetcher(dayInfoFetcher);
+        nextCalendar.setDayInfoFetcher(dayInfoFetcher);
     }
 
     public static interface OnDateSelectedListener {

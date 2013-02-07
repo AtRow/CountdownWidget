@@ -8,7 +8,7 @@ import android.os.Bundle;
 import android.text.format.Time;
 import android.widget.RemoteViews;
 import com.ovio.countdown.R;
-import com.ovio.countdown.WidgetPreferencesActivity;
+import com.ovio.countdown.prefs.WidgetPreferencesActivity;
 import com.ovio.countdown.date.TimeDifference;
 import com.ovio.countdown.log.Logger;
 import com.ovio.countdown.preferences.WidgetOptions;

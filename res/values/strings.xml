@@ -32,4 +32,8 @@
     <string name="calendar_error_text">Sorry, no Calendar capability found on your device</string>
     <string name="calendar_all_name">All</string>
     <string name="event_nearest_title">Nearest</string>
+    <string name="calendar_not_choosen_text">Event is not chosen</string>
+    <string name="calendar_pick_event_prompt">Chose event from calendar</string>
+    <string name="calendar_pick_event_button">Pick event</string>
+    <string name="calendar_nearest_event_prompt">Nearest event from calendar</string>
 </resources>

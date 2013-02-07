@@ -26,7 +26,7 @@
         </activity>
 
         <activity
-            android:name=".WidgetPreferencesActivity"
+            android:name=".prefs.WidgetPreferencesActivity"
             android:label="@string/preferences_activity_title"
 
             android:excludeFromRecents="true"
@@ -38,7 +38,7 @@
         </activity>
 
         <activity
-            android:name=".calendar.CalendarActivity"
+            android:name=".prefs.CalendarActivity"
             android:excludeFromRecents="true">
 
             <!--
@@ -46,6 +46,16 @@
             android:theme="@android:style/Theme.Dialog"
             -->
 
+        </activity>
+
+        <activity
+            android:name=".prefs.DayInfoCalendarActivity"
+            android:excludeFromRecents="true">
+        </activity>
+
+        <activity
+            android:name=".prefs.EventPickerActivity"
+            android:excludeFromRecents="true">
         </activity>
 
         <!-- //////////// WIDGETS \\\\\\\\\\\\ -->

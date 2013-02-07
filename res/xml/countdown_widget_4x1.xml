@@ -6,5 +6,5 @@
     android:minHeight="65dp"
     android:label="@string/widget_name_4x1"
     android:updatePeriodMillis="0"
-    android:configure="com.ovio.countdown.WidgetPreferencesActivity"
+    android:configure="com.ovio.countdown.prefs.WidgetPreferencesActivity"
     />

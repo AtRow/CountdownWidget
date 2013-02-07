@@ -1,4 +1,4 @@
-package com.ovio.countdown;
+package com.ovio.countdown.prefs;
 
 import android.app.Activity;
 import android.appwidget.AppWidgetHost;
@@ -9,7 +9,7 @@ import android.os.Bundle;
 import android.text.format.Time;
 import android.view.View;
 import android.widget.*;
-import com.ovio.countdown.calendar.CalendarActivity;
+import com.ovio.countdown.R;
 import com.ovio.countdown.log.Logger;
 import com.ovio.countdown.preferences.DefaultOptions;
 import com.ovio.countdown.preferences.PreferencesManager;
@@ -30,7 +30,10 @@ public class WidgetPreferencesActivity extends Activity {
     private static final String TAG = Logger.PREFIX + "PrefsActivity";
 
     private final Context self = this;
+
     private static final int PICK_DATE_REQUEST = 1;
+    private static final int PICK_EVENTS_DATE_REQUEST = 2;
+    private static final int PICK_EVENT_REQUEST = 3;
 
     private Integer appWidgetId;
 
@@ -116,24 +119,48 @@ public class WidgetPreferencesActivity extends Activity {
     public void onCalendarPickerClick(View view) {
         Time date = this.view.getTime();
         Intent intent = new Intent(getApplicationContext(), CalendarActivity.class);
-        Bundle extras = new Bundle();
-        extras.putInt(CalendarActivity.YEAR, date.year);
-        extras.putInt(CalendarActivity.MONTH, date.month);
-        extras.putInt(CalendarActivity.DAY, date.monthDay);
-        intent.putExtras(extras);
-        
+        DateHelper.putDateToIntent(date, intent);
         startActivityForResult(intent, PICK_DATE_REQUEST);
+    }
+
+    public void onCalendarEventPickerClick(View view) {
+        Intent intent = new Intent(getApplicationContext(), DayInfoCalendarActivity.class);
+        startActivityForResult(intent, PICK_EVENTS_DATE_REQUEST);
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if ((requestCode == PICK_DATE_REQUEST) && (resultCode == RESULT_OK)) {
-            Time date = CalendarActivity.getDateFromIntent(data);
-            if (date != null) {
-                this.view.setTime(date);
+        if (resultCode == RESULT_OK) {
+            Time date;
+
+            switch (requestCode) {
+                case PICK_DATE_REQUEST:
+                    date = DateHelper.getDateFromIntent(data);
+                    if (date != null) {
+                        this.view.setTime(date);
+                    }
+                    break;
+
+                case PICK_EVENTS_DATE_REQUEST:
+                    date = DateHelper.getDateFromIntent(data);
+                    if (date != null) {
+                        startEventPickerForDate(date);
+                    }
+                    break;
+
+                case PICK_EVENT_REQUEST:
+                    // TODO
+                    Toast.makeText(getApplicationContext(), "IMPLEMENT ME!", Toast.LENGTH_LONG).show();
+                    break;
             }
         }
+    }
+
+    private void startEventPickerForDate(Time date) {
+        Intent intent = new Intent(getApplicationContext(), EventPickerActivity.class);
+        DateHelper.putDateToIntent(date, intent);
+        startActivityForResult(intent, PICK_EVENT_REQUEST);
     }
 
     private void sendToWidgetService() {

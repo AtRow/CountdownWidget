@@ -72,9 +72,7 @@ public class WidgetPreferencesView {
 
     private Spinner calendarSpinner;
 
-    private Spinner eventSpinner;
-
-    private TextView calendarErrorTextView;
+    private TextView calendarInfoTextView;
 
     private LinearLayout calendarControlsLayout;
 
@@ -126,20 +124,20 @@ public class WidgetPreferencesView {
         final ArrayAdapter eventAdapter = new ArrayAdapter<Event>(activity, android.R.layout.simple_spinner_item, events);
         eventAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
-        eventSpinner.setAdapter(eventAdapter);
-        eventAdapter.notifyDataSetChanged();
+//        eventSpinner.setAdapter(eventAdapter);
+//        eventAdapter.notifyDataSetChanged();
 
     }
 
     private void setGoogleCalendarControlsEnabled(boolean enabled) {
 
         if (enabled) {
-            calendarErrorTextView.setVisibility(View.GONE);
+            calendarInfoTextView.setText(R.string.calendar_not_choosen_text);
             calendarControlsLayout.setVisibility(View.VISIBLE);
             Logger.i(TAG, "Setting visibility to View.VISIBLE");
 
         } else {
-            calendarErrorTextView.setVisibility(View.VISIBLE);
+            calendarInfoTextView.setText(R.string.calendar_error_text);
             calendarControlsLayout.setVisibility(View.GONE);
             Logger.i(TAG, "Setting visibility to View.GONE");
         }
@@ -306,9 +304,7 @@ public class WidgetPreferencesView {
 
         calendarSpinner = (Spinner) activity.findViewById(R.id.calendarSpinner);
 
-        eventSpinner = (Spinner) activity.findViewById(R.id.eventSpinner);
-
-        calendarErrorTextView = (TextView) activity.findViewById(R.id.calendarErrorTextView);
+        calendarInfoTextView = (TextView) activity.findViewById(R.id.calendarErrorTextView);
 
         calendarControlsLayout = (LinearLayout) activity.findViewById(R.id.calendarControlsLayout);
 

@@ -15,8 +15,8 @@ public class Blinker {
 
     private static final String TAG = Logger.PREFIX + "Blinker";
 
-    private static final int SHOW = 600;
-    private static final int HIDE = 200;
+    private static final int SHOW = 400;
+    private static final int HIDE = 400;
 
     private Thread blinkerThread;
 

@@ -25,8 +25,6 @@ public abstract class WidgetProxy {
 
     private boolean showText = true;
 
-    private boolean wasAlive = true;
-
     protected WidgetOptions options;
 
     protected int maxCountingVal;
@@ -36,9 +34,9 @@ public abstract class WidgetProxy {
     protected int nextIncrement;
 
     protected final static int SECOND = 1000;
-    protected final static int MINUTE = (1000 * 60);
-    protected final static int HOUR = (1000 * 60 * 60);
-    protected final static int DAY = (1000 * 60 * 60 * 24);
+    protected final static int MINUTE = (SECOND * 60);
+    protected final static int HOUR = (MINUTE * 60);
+    protected final static int DAY = (HOUR * 24);
 
     private static final long BLINKING_MILLS = 15 * SECOND;
 
@@ -132,12 +130,6 @@ public abstract class WidgetProxy {
             return true;
         } else {
             Logger.i(TAG, "Px[%s]: Target time is already reached, widget is finished", options.widgetId);
-
-//            if (wasAlive) {
-//                wasAlive = false;
-//                updateWidget();
-//            }
-
             return false;
         }
     }

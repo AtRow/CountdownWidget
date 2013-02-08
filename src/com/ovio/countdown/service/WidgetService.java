@@ -44,6 +44,7 @@ public class WidgetService extends Service {
     private Scheduler scheduler;
 
     private SecondCounter secondCounter;
+    private Blinker blinker;
 
     private PreferencesManager preferencesManager;
 
@@ -74,6 +75,7 @@ public class WidgetService extends Service {
         preferencesManager = PreferencesManager.getInstance(context);
         scheduler = Scheduler.getInstance(context);
         secondCounter = new SecondCounter(context, Collections.unmodifiableCollection(widgetProxies.values()));
+        blinker = new Blinker(context, Collections.unmodifiableCollection(widgetProxies.values()));
 
         // TODO: remove
         Toast.makeText(this, "Service created", Toast.LENGTH_LONG).show();
@@ -105,6 +107,7 @@ public class WidgetService extends Service {
         Logger.i(TAG, "Stopping WidgetService");
 
         secondCounter.stop();
+        blinker.stop();
 
         widgetPreferencesManager = null;
         widgetProxyFactory = null;
@@ -200,8 +203,32 @@ public class WidgetService extends Service {
         Logger.i(TAG, "Received ALARM Intent");
 
         updateWidgets();
-        scheduleUpdate();
 
+        scheduleUpdate();
+    }
+
+    private void startBlinking() {
+
+        for (WidgetProxy proxy: widgetProxies.values()) {
+            if (proxy.isBlinking()) {
+                Logger.i(TAG, "Proxy %s is blinking, starting Blinker", proxy.getOptions().widgetId);
+                blinker.start();
+                break;
+            }
+            blinker.stop();
+        }
+    }
+
+    private void startCountingSeconds() {
+
+        for (WidgetProxy proxy: widgetProxies.values()) {
+            if (proxy.isCountingSeconds() && proxy.isAlive()) {
+                Logger.i(TAG, "Proxy %s is counting seconds, starting Second counter", proxy.getOptions().widgetId);
+                secondCounter.start();
+                break;
+            }
+            secondCounter.stop();
+        }
     }
 
     private WidgetOptions getUpdateWidgetOptions(Intent updateIntent) {
@@ -238,15 +265,6 @@ public class WidgetService extends Service {
 
         long nextUpdate = scheduler.scheduleUpdate(proxies);
 
-        for (WidgetProxy proxy: proxies) {
-            if (proxy.isCountingSeconds) {
-                Logger.i(TAG, "Proxy %s is counting seconds, starting Second counter", proxy.getOptions().widgetId);
-                secondCounter.start();
-                break;
-            }
-            secondCounter.stop();
-        }
-
         // If no update needed or too long to wait for update
         if (nextUpdate == -1) {
             Logger.i(TAG, "No update needed, Forcing Service shutdown");
@@ -254,8 +272,10 @@ public class WidgetService extends Service {
         } else if ((nextUpdate - System.currentTimeMillis()) > MAX_ACTIVE_WAIT_MILLS ) {
             Logger.i(TAG, "To long to wait: %s ms, Forcing Service shutdown", nextUpdate - System.currentTimeMillis());
             shutdownService();
+        } else {
+            startCountingSeconds();
+            startBlinking();
         }
-
     }
 
     private void shutdownService() {
@@ -263,25 +283,27 @@ public class WidgetService extends Service {
     }
 
     private void updateWidgets() {
-        Logger.d(TAG, "Updating Widget Proxies");
+        Logger.i(TAG, "Updating Widget Proxies");
 
         for (WidgetProxy proxy: widgetProxies.values()) {
             WidgetOptions options = proxy.getOptions();
             Logger.i(TAG, "Updating widget %s", options.widgetId);
 
-            if (proxy.isAlive) {
-                Logger.d(TAG, "Widget is alive, title: '%s'", options.title);
+            if (proxy.isAlive()) {
+                Logger.i(TAG, "Widget is alive, title: '%s'", options.title);
+
+                long next = proxy.getNextUpdateTimestamp();
 
                 if (Logger.DEBUG) {
                     Time time = new Time();
                     time.setToNow();
                     Time updTime = new Time();
-                    updTime.set(proxy.nextUpdateTimestamp);
+                    updTime.set(next);
 
                     Logger.i(TAG, "Current time is [%s] and proxy.nextUpdate is [%s]", time.format(Util.TF), updTime.format(Util.TF));
                 }
 
-                if (System.currentTimeMillis() >= proxy.nextUpdateTimestamp) {
+                if (System.currentTimeMillis() >= next) {
                     Logger.i(TAG, "Widget will be updated now");
                     proxy.updateWidget();
                 }

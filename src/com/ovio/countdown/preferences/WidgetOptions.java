@@ -16,7 +16,7 @@ public class WidgetOptions implements Serializable {
 
     public long timestamp;
 
-    public boolean upward;
+    public boolean countUp;
 
     public boolean enableSeconds;
 
@@ -38,7 +38,7 @@ public class WidgetOptions implements Serializable {
                 "widgetId=" + widgetId +
                 ", title='" + title + '\'' +
                 ", timestamp=" + timestamp +
-                ", upward=" + upward +
+                ", countUp=" + countUp +
                 ", enableSeconds=" + enableSeconds +
                 ", repeatingPeriod=" + repeatingPeriod +
                 ", calendarEventUrl='" + calendarEventUrl + '\'' +

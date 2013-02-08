@@ -96,17 +96,17 @@ public class SecondCounter {
 
         private void updateWidgetSeconds() {
             if (Logger.DEBUG) {
-                Logger.d(TAG, "Starting updating widget Seconds");
+                Logger.i(TAG, "Starting updating widget Seconds");
             }
 
             for (WidgetProxy proxy: widgetProxies) {
 
                 if (Logger.DEBUG) {
-                    Logger.d(TAG, "Walking trough widget %s to update seconds only", proxy.getOptions().widgetId);
+                    Logger.i(TAG, "Walking trough widget %s to update seconds only", proxy.getOptions().widgetId);
                 }
 
-                if (proxy.isAlive && proxy.isCountingSeconds) {
-                    proxy.updateWidgetTimeOnly();
+                if (proxy.isAlive() && proxy.isCountingSeconds()) {
+                    proxy.updateWidgetTimeOnly(System.currentTimeMillis());
                 }
             }
         }

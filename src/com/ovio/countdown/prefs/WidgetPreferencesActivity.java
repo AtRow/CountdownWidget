@@ -254,7 +254,7 @@ public class WidgetPreferencesActivity extends Activity {
 
         widgetOptions.timestamp = time.toMillis(false);
 
-        widgetOptions.upward = view.getCountUp();
+        widgetOptions.countUp = view.getCountUp();
 
         widgetOptions.enableSeconds = view.getCountSeconds();
 
@@ -318,7 +318,7 @@ public class WidgetPreferencesActivity extends Activity {
 
             view.setCountSeconds(widgetOptions.enableSeconds);
             view.setEnableTime(widgetOptions.enableTime);
-            view.setCountUp(widgetOptions.upward);
+            view.setCountUp(widgetOptions.countUp);
         }
     }
 

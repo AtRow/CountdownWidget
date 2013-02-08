@@ -33,7 +33,7 @@ public class WidgetPreferencesView {
 
     private boolean isCalendarCompatible;
 
-    private boolean isManualTab;
+    private boolean isManualTab = true;
 
     private Button okButton;
 
@@ -275,6 +275,8 @@ public class WidgetPreferencesView {
         tabSpec.setIndicator(activity.getString(R.string.tab_google));
         tabSpec.setContent(R.id.tabGoogle);
         tabHost.addTab(tabSpec);
+
+        isManualTab = true;
 
         //tabHost.setCurrentTabByTag("tag1");
 

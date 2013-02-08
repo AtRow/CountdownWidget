@@ -23,7 +23,7 @@ public class DefaultOptions {
     @Override
     public String toString() {
         return "DefaultOptions{" +
-                "upward=" + upward +
+                "countUp=" + upward +
                 ", enableSeconds=" + enableSeconds +
                 ", enableTime=" + enableTime +
                 ", repeating=" + repeating +

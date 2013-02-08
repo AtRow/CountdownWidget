@@ -43,7 +43,7 @@ public final class PreferencesManager {
         editor.putInt("widgetId", widgetOptions.widgetId);
         editor.putString("title", widgetOptions.title);
         editor.putLong("timestamp", widgetOptions.timestamp);
-        editor.putBoolean("upward", widgetOptions.upward);
+        editor.putBoolean("countUp", widgetOptions.countUp);
         editor.putBoolean("enableSeconds", widgetOptions.enableSeconds);
         editor.putLong("repeatingPeriod", widgetOptions.repeatingPeriod);
         editor.putString("calendarEventUrl", widgetOptions.calendarEventUrl);
@@ -68,7 +68,7 @@ public final class PreferencesManager {
         widgetOptions.widgetId = id;
         widgetOptions.title = prefs.getString("title", null);
         widgetOptions.timestamp = prefs.getLong("timestamp", 0L);
-        widgetOptions.upward = prefs.getBoolean("upward", true);
+        widgetOptions.countUp = prefs.getBoolean("countUp", true);
         widgetOptions.enableSeconds = prefs.getBoolean("enableSeconds", false);
         widgetOptions.repeatingPeriod = prefs.getLong("repeatingPeriod", 0L);
         widgetOptions.calendarEventUrl = prefs.getString("calendarEventUrl", null);
@@ -96,7 +96,7 @@ public final class PreferencesManager {
 
         SharedPreferences.Editor editor = context.getSharedPreferences(GLOBAL, Context.MODE_PRIVATE).edit();
 
-        editor.putBoolean("upward", defaultOptions.upward);
+        editor.putBoolean("countUp", defaultOptions.upward);
         editor.putBoolean("enableSeconds", defaultOptions.enableSeconds);
         editor.putBoolean("enableTime", defaultOptions.enableTime);
         editor.putBoolean("repeating", defaultOptions.repeating);
@@ -116,7 +116,7 @@ public final class PreferencesManager {
         DefaultOptions defaultOptions = new DefaultOptions();
         SharedPreferences prefs = context.getSharedPreferences(GLOBAL, Context.MODE_PRIVATE);
 
-        defaultOptions.upward = prefs.getBoolean("upward", true);
+        defaultOptions.upward = prefs.getBoolean("countUp", true);
         defaultOptions.enableSeconds = prefs.getBoolean("enableSeconds", true);
         defaultOptions.enableTime = prefs.getBoolean("enableTime", false);
         defaultOptions.repeating = prefs.getBoolean("repeating", false);

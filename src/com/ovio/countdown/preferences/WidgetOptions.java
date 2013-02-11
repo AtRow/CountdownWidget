@@ -28,6 +28,8 @@ public class WidgetOptions implements Serializable {
 
     public boolean enableTime;
 
+    public boolean isRepeating;
+
     public boolean isValid() {
         return widgetId != AppWidgetManager.INVALID_APPWIDGET_ID;
     }

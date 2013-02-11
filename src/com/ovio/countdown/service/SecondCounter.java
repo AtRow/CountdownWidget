@@ -105,8 +105,8 @@ public class SecondCounter {
                     Logger.i(TAG, "Walking trough widget %s to update seconds only", proxy.getOptions().widgetId);
                 }
 
-                if (proxy.isAlive() && proxy.isCountingSeconds()) {
-                    proxy.updateWidgetTimeOnly(System.currentTimeMillis());
+                if (proxy.isCountingSeconds()) {
+                    proxy.updateWidget();
                 }
             }
         }

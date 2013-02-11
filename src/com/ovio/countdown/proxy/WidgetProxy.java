@@ -65,14 +65,20 @@ public abstract class WidgetProxy {
     public synchronized void updateWidget() {
         Logger.i(TAG, "Px[%s]: Updating widget", options.widgetId);
 
+        long now = System.currentTimeMillis();
+
+        if (isRepeating() && (now >= (options.timestamp + MINUTE))) {
+            loadNextEvent();
+        }
+
         if (isAlive()) {
-            updateWidgetTimeOnly(System.currentTimeMillis());
+            updateWidgetTime(now);
         } else {
-            updateWidgetTimeOnly(options.timestamp);
+            updateWidgetTime(options.timestamp);
         }
     }
 
-    public synchronized void updateWidgetTimeOnly(long now) {
+    private synchronized void updateWidgetTime(long now) {
         Logger.i(TAG, "Px[%s]: Updating widget Time only", options.widgetId);
 
         // I don't know why, but instantiating new RemoteViews works A LOT FASTER then reusing existing!
@@ -119,19 +125,7 @@ public abstract class WidgetProxy {
     }
 
     public boolean isCountingSeconds() {
-        return options.enableSeconds && doCountSeconds;
-    }
-
-    public boolean isAlive() {
-        if (options.countUp ||
-                (!options.countUp && (options.timestamp > System.currentTimeMillis()))) {
-
-            Logger.i(TAG, "Px[%s]: Target time is not yet reached, widget is alive", options.widgetId);
-            return true;
-        } else {
-            Logger.i(TAG, "Px[%s]: Target time is already reached, widget is finished", options.widgetId);
-            return false;
-        }
+        return options.enableSeconds && doCountSeconds && isAlive();
     }
 
     public boolean isBlinking() {
@@ -147,6 +141,28 @@ public abstract class WidgetProxy {
         }
     }
 
+    public void blink(boolean show) {
+        this.showText = show;
+        updateWidget();
+    }
+
+    public boolean isAlive() {
+        if (options.countUp ||
+                isRepeating() ||
+                (!options.countUp && (options.timestamp > System.currentTimeMillis()))) {
+
+            Logger.i(TAG, "Px[%s]: Target time is not yet reached, widget is alive", options.widgetId);
+            return true;
+        } else {
+            Logger.i(TAG, "Px[%s]: Target time is already reached, widget is finished", options.widgetId);
+            return false;
+        }
+    }
+
+    private boolean isRepeating() {
+        return (options.repeatingPeriod > 0) || (options.isRepeating);
+    }
+
     private PendingIntent getPendingIntent(Context context, int id) {
         Logger.d(TAG, "Px[%s]: Creating PendingIntent", id);
 
@@ -158,8 +174,6 @@ public abstract class WidgetProxy {
 
         return PendingIntent.getActivity(context, id, prefIntent, Intent.FLAG_ACTIVITY_NEW_TASK);
     }
-
-
 
     public long getNextUpdateTimestamp() {
 
@@ -183,8 +197,4 @@ public abstract class WidgetProxy {
         return nextUpdateTimestamp;
     }
 
-    public void blink(boolean show) {
-        this.showText = show;
-        updateWidget();
-    }
 }

@@ -98,8 +98,6 @@ public class WidgetService extends Service {
                 Logger.i(TAG, "Got null Options, probably the Widget is new");
             }
         }
-        //scheduleUpdate();
-
     }
 
     @Override
@@ -203,32 +201,7 @@ public class WidgetService extends Service {
         Logger.i(TAG, "Received ALARM Intent");
 
         updateWidgets();
-
         scheduleUpdate();
-    }
-
-    private void startBlinking() {
-
-        for (WidgetProxy proxy: widgetProxies.values()) {
-            if (proxy.isBlinking()) {
-                Logger.i(TAG, "Proxy %s is blinking, starting Blinker", proxy.getOptions().widgetId);
-                blinker.start();
-                break;
-            }
-            blinker.stop();
-        }
-    }
-
-    private void startCountingSeconds() {
-
-        for (WidgetProxy proxy: widgetProxies.values()) {
-            if (proxy.isCountingSeconds() && proxy.isAlive()) {
-                Logger.i(TAG, "Proxy %s is counting seconds, starting Second counter", proxy.getOptions().widgetId);
-                secondCounter.start();
-                break;
-            }
-            secondCounter.stop();
-        }
     }
 
     private WidgetOptions getUpdateWidgetOptions(Intent updateIntent) {
@@ -280,6 +253,30 @@ public class WidgetService extends Service {
 
     private void shutdownService() {
         stopSelf();
+    }
+
+    private void startBlinking() {
+
+        for (WidgetProxy proxy: widgetProxies.values()) {
+            if (proxy.isBlinking()) {
+                Logger.i(TAG, "Proxy %s is blinking, starting Blinker", proxy.getOptions().widgetId);
+                blinker.start();
+                break;
+            }
+            blinker.stop();
+        }
+    }
+
+    private void startCountingSeconds() {
+
+        for (WidgetProxy proxy: widgetProxies.values()) {
+            if (proxy.isCountingSeconds()) {
+                Logger.i(TAG, "Proxy %s is counting seconds, starting Second counter", proxy.getOptions().widgetId);
+                secondCounter.start();
+                break;
+            }
+            secondCounter.stop();
+        }
     }
 
     private void updateWidgets() {

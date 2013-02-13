@@ -10,7 +10,7 @@ import android.text.format.Time;
 import android.view.View;
 import android.widget.Toast;
 import com.ovio.countdown.R;
-import com.ovio.countdown.event.Event;
+import com.ovio.countdown.event.EventData;
 import com.ovio.countdown.log.Logger;
 import com.ovio.countdown.preferences.DefaultOptions;
 import com.ovio.countdown.preferences.PreferencesManager;
@@ -44,7 +44,7 @@ public class WidgetPreferencesActivity extends Activity {
 
     private WidgetOptions widgetOptions;
 
-    private Event widgetEvent;
+    private EventData widgetCalendarEvent;
 
     private DefaultOptions options;
 
@@ -155,9 +155,9 @@ public class WidgetPreferencesActivity extends Activity {
                 case PICK_EVENT_REQUEST:
                     Bundle extras = data.getExtras();
                     if (extras != null) {
-                        widgetEvent = (Event) extras.getSerializable(EventPickerActivity.EVENT);
-                        if (widgetEvent != null) {
-                            this.view.setEvent(widgetEvent);
+                        widgetCalendarEvent = (EventData) extras.getSerializable(EventPickerActivity.EVENT);
+                        if (widgetCalendarEvent != null) {
+                            this.view.setEventData(widgetCalendarEvent);
                         }
                     }
                     break;
@@ -264,7 +264,7 @@ public class WidgetPreferencesActivity extends Activity {
 
         Logger.i(TAG, "Widget Options: %s", widgetOptions);
 
-        widgetManager.add(widgetOptions);
+        widgetManager.save(widgetOptions);
 
         Logger.d(TAG, "Finished saving Widget Options");
     }

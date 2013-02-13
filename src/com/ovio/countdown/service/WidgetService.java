@@ -155,19 +155,19 @@ public class WidgetService extends Service {
             int id = options.widgetId;
 
             WidgetProxy proxy;
-            if (widgetProxies.containsKey(id)) {
-                Logger.d(TAG, "Updating existing Proxy with id %s", id);
-
-                proxy = widgetProxies.get(id);
-                proxy.setOptions(options);
-            } else {
+//            if (widgetProxies.containsKey(id)) {
+//                Logger.d(TAG, "Updating existing Proxy with id %s", id);
+//
+//                proxy = widgetProxies.get(id);
+//                proxy.setOptions(options);
+//            } else {
                 Logger.d(TAG, "Creating new Proxy with id %s", id);
 
                 proxy = widgetProxyFactory.getWidgetProxy(options);
                 if (proxy != null) {
                     widgetProxies.put(id, proxy);
                 }
-            }
+//            }
 
             if (Logger.DEBUG) {
                 Logger.d(TAG, "Current active Widgets in widgetProxies Map: %s",
@@ -259,7 +259,7 @@ public class WidgetService extends Service {
 
         for (WidgetProxy proxy: widgetProxies.values()) {
             if (proxy.isBlinking()) {
-                Logger.i(TAG, "Proxy %s is blinking, starting Blinker", proxy.getOptions().widgetId);
+                Logger.i(TAG, "Proxy %s is blinking, starting Blinker", proxy.getWidgetId());
                 blinker.start();
                 break;
             }
@@ -271,7 +271,7 @@ public class WidgetService extends Service {
 
         for (WidgetProxy proxy: widgetProxies.values()) {
             if (proxy.isCountingSeconds()) {
-                Logger.i(TAG, "Proxy %s is counting seconds, starting Second counter", proxy.getOptions().widgetId);
+                Logger.i(TAG, "Proxy %s is counting seconds, starting Second counter", proxy.getWidgetId());
                 secondCounter.start();
                 break;
             }
@@ -283,11 +283,10 @@ public class WidgetService extends Service {
         Logger.i(TAG, "Updating Widget Proxies");
 
         for (WidgetProxy proxy: widgetProxies.values()) {
-            WidgetOptions options = proxy.getOptions();
-            Logger.i(TAG, "Updating widget %s", options.widgetId);
+            Logger.i(TAG, "Updating widget %s", proxy.getWidgetId());
 
             if (proxy.isAlive()) {
-                Logger.i(TAG, "Widget is alive, title: '%s'", options.title);
+                Logger.i(TAG, "Widget %s is alive", proxy.getWidgetId());
 
                 long next = proxy.getNextUpdateTimestamp();
 

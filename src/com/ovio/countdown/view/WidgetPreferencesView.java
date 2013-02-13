@@ -6,9 +6,9 @@ import android.text.format.Time;
 import android.view.View;
 import android.widget.*;
 import com.ovio.countdown.R;
-import com.ovio.countdown.event.Calendar;
-import com.ovio.countdown.event.Event;
-import com.ovio.countdown.event.EventManager;
+import com.ovio.countdown.event.CalendarData;
+import com.ovio.countdown.event.CalendarManager;
+import com.ovio.countdown.event.EventData;
 import com.ovio.countdown.log.Logger;
 
 import java.util.List;
@@ -29,7 +29,7 @@ public class WidgetPreferencesView {
 
     private final Activity activity;
 
-    private EventManager eventManager;
+    private CalendarManager calendarManager;
 
     private boolean isCalendarCompatible;
 
@@ -75,7 +75,7 @@ public class WidgetPreferencesView {
 
     private LinearLayout calendarControlsLayout;
 
-    private Event widgetEvent;
+    private EventData eventData;
 
 
     public WidgetPreferencesView(Activity activity) {
@@ -90,13 +90,13 @@ public class WidgetPreferencesView {
     }
 
     private void initCalendarPickers() {
-        eventManager = EventManager.getInstance(activity);
+        calendarManager = CalendarManager.getInstance(activity);
 
-        if (eventManager.isCompatible()) {
+        if (calendarManager.isCompatible()) {
             isCalendarCompatible = true;
 
         } else {
-            Logger.i(TAG, "Device is NOT Calendar-compatible; disabling controls");
+            Logger.i(TAG, "Device is NOT CalendarData-compatible; disabling controls");
 
             isCalendarCompatible = false;
             setGoogleCalendarControlsEnabled(isCalendarCompatible);
@@ -106,9 +106,9 @@ public class WidgetPreferencesView {
 
         setGoogleCalendarControlsEnabled(isCalendarCompatible);
 
-        List<Calendar> calendars = eventManager.getCalendars();
+        List<CalendarData> calendarDatas = calendarManager.getCalendars();
 
-        ArrayAdapter calendarAdapter = new ArrayAdapter<Calendar>(activity, android.R.layout.simple_spinner_item, calendars);
+        ArrayAdapter calendarAdapter = new ArrayAdapter<CalendarData>(activity, android.R.layout.simple_spinner_item, calendarDatas);
         calendarAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
         calendarSpinner.setAdapter(calendarAdapter);
@@ -122,9 +122,9 @@ public class WidgetPreferencesView {
         time.month += 2;
         long end = time.toMillis(false);
 
-        final List<Event> events = eventManager.getEvents(start, end);
+        final List<EventData> calendarEvents = calendarManager.getEvents(start, end);
 
-        final ArrayAdapter eventAdapter = new ArrayAdapter<Event>(activity, android.R.layout.simple_spinner_item, events);
+        final ArrayAdapter eventAdapter = new ArrayAdapter<EventData>(activity, android.R.layout.simple_spinner_item, calendarEvents);
         eventAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
 //        eventSpinner.setAdapter(eventAdapter);
@@ -132,11 +132,11 @@ public class WidgetPreferencesView {
 
     }
 
-    public void setEvent(Event widgetEvent) {
-        if (widgetEvent != null) {
-            this.widgetEvent = widgetEvent;
+    public void setEventData(EventData eventData) {
+        if (eventData != null) {
+            this.eventData = eventData;
             // TODO
-            calendarInfoTextView.setText(widgetEvent.toString());
+            calendarInfoTextView.setText(eventData.toString());
         } else {
             calendarInfoTextView.setText(R.string.calendar_not_choosen_text);
         }
@@ -346,7 +346,7 @@ public class WidgetPreferencesView {
     private void updateOkButton() {
         boolean enabled = isManualTab ||
                 (isCalendarCompatible &&
-                (widgetEvent != null));
+                (eventData != null));
 
         okButton.setEnabled(enabled);
     }

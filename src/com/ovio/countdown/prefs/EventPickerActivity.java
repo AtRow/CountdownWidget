@@ -27,8 +27,8 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.Toast;
 import com.ovio.countdown.R;
-import com.ovio.countdown.event.Event;
-import com.ovio.countdown.event.EventManager;
+import com.ovio.countdown.event.CalendarManager;
+import com.ovio.countdown.event.EventData;
 
 
 public class EventPickerActivity extends Activity {
@@ -51,7 +51,7 @@ public class EventPickerActivity extends Activity {
         LayoutInflater li = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         ListView listView = (ListView) li.inflate(R.layout.events_list, null);
 
-        EventManager manager = EventManager.getInstance(getApplicationContext());
+        CalendarManager manager = CalendarManager.getInstance(getApplicationContext());
 
         Time time = new Time(date);
         time.hour = 0;
@@ -64,7 +64,7 @@ public class EventPickerActivity extends Activity {
         time.second = 59;
         long end = time.toMillis(true);
 
-        Event[] events = manager.getEvents(start, end).toArray(new Event[0]);
+        EventData[] events = manager.getEvents(start, end).toArray(new EventData[0]);
 
         if (events.length == 0) {
             Toast.makeText(getApplicationContext(), R.string.event_picker_no_events, Toast.LENGTH_LONG).show();
@@ -85,17 +85,17 @@ public class EventPickerActivity extends Activity {
         return new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
-                returnSelectedEvent((Event) adapter.getItem(position));
+                returnSelectedEvent((EventData) adapter.getItem(position));
             }
         };
     }
 
-    private void returnSelectedEvent(Event event) {
+    private void returnSelectedEvent(EventData eventData) {
         Intent intent = new Intent();
 
-        if (event != null) {
+        if (eventData != null) {
             Bundle extras = new Bundle();
-            extras.putSerializable(EVENT, event);
+            extras.putSerializable(EVENT, eventData);
             intent.putExtras(extras);
 
             setResult(RESULT_OK, intent);

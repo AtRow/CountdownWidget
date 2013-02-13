@@ -67,7 +67,7 @@ public class WidgetPreferencesManager {
         return prefManager.loadWidgetPrefs(PREFIX + widgetId);
     }
 
-    public void add(WidgetOptions widgetOptions) {
+    public void save(WidgetOptions widgetOptions) {
         Logger.i(TAG, "Adding widget %s", widgetOptions.widgetId);
         prefManager.saveWidgetPrefs(PREFIX + widgetOptions.widgetId, widgetOptions);
     }

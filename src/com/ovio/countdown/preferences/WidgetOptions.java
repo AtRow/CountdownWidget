@@ -12,6 +12,10 @@ public class WidgetOptions implements Serializable {
 
     public int widgetId = AppWidgetManager.INVALID_APPWIDGET_ID;
 
+    public long eventId;
+
+    public long calendarId;
+
     public String title;
 
     public long timestamp;
@@ -29,6 +33,8 @@ public class WidgetOptions implements Serializable {
     public boolean enableTime;
 
     public boolean isRepeating;
+
+    public boolean isReloading;
 
     public boolean isValid() {
         return widgetId != AppWidgetManager.INVALID_APPWIDGET_ID;

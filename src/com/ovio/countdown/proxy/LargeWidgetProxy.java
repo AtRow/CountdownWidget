@@ -4,8 +4,8 @@ import android.content.Context;
 import android.text.format.Time;
 import com.ovio.countdown.R;
 import com.ovio.countdown.date.TimeDifference;
+import com.ovio.countdown.event.Event;
 import com.ovio.countdown.log.Logger;
-import com.ovio.countdown.preferences.WidgetOptions;
 
 /**
  * Countdown
@@ -17,8 +17,8 @@ public class LargeWidgetProxy extends WidgetProxy {
 
     private static final int LAYOUT = R.layout.countdown_widget_layout_4x1;
 
-    public LargeWidgetProxy(Context context, WidgetOptions options) {
-        super(context, LAYOUT, options);
+    public LargeWidgetProxy(Context context, int widgetId, Event event) {
+        super(context, LAYOUT, widgetId, event);
     }
 
     @Override
@@ -90,7 +90,7 @@ public class LargeWidgetProxy extends WidgetProxy {
 
         // Hour-Minute-Second
         } else {
-            if (options.enableSeconds) {
+            if (event.isCountingSeconds()) {
                 maxCountingVal = Time.HOUR;
                 minCountingVal = Time.SECOND;
             } else {

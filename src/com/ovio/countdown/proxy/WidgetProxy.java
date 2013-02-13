@@ -10,8 +10,8 @@ import android.view.View;
 import android.widget.RemoteViews;
 import com.ovio.countdown.R;
 import com.ovio.countdown.date.TimeDifference;
+import com.ovio.countdown.event.Event;
 import com.ovio.countdown.log.Logger;
-import com.ovio.countdown.preferences.WidgetOptions;
 import com.ovio.countdown.prefs.WidgetPreferencesActivity;
 import com.ovio.countdown.util.Util;
 
@@ -25,7 +25,7 @@ public abstract class WidgetProxy {
 
     private boolean showText = true;
 
-    protected WidgetOptions options;
+    protected Event event;
 
     protected int maxCountingVal;
 
@@ -48,51 +48,50 @@ public abstract class WidgetProxy {
 
     private final PendingIntent pendingIntent;
 
+    private final int widgetId;
 
-    public WidgetProxy(Context context, int layout, WidgetOptions options) {
-        Logger.d(TAG, "Instantiated WidgetProxy with options %s", options);
+
+    public WidgetProxy(Context context, int layout, int widgetId, Event event) {
+        Logger.d(TAG, "Instantiated WidgetProxy for widget %s, event '%s'", widgetId, event.getTitle());
 
         this.context = context;
         this.layout = layout;
+        this.widgetId = widgetId;
+        this.event = event;
 
-        this.options = options;
-
-        pendingIntent = getPendingIntent(context, options.widgetId);
+        pendingIntent = getPendingIntent(context, widgetId);
 
         updateWidget();
     }
 
     public synchronized void updateWidget() {
-        Logger.i(TAG, "Px[%s]: Updating widget", options.widgetId);
+        Logger.i(TAG, "Px[%s]: Updating widget", widgetId);
 
-        long now = System.currentTimeMillis();
-
-        if (isRepeating() && (now >= (options.timestamp + MINUTE))) {
-            loadNextEvent();
-        }
+        long timestamp;
 
         if (isAlive()) {
-            updateWidgetTime(now);
+            timestamp = System.currentTimeMillis();
         } else {
-            updateWidgetTime(options.timestamp);
+            timestamp = event.getTargetTimestamp();
         }
+        updateWidgetTime(timestamp);
     }
 
     private synchronized void updateWidgetTime(long now) {
-        Logger.i(TAG, "Px[%s]: Updating widget Time only", options.widgetId);
+        Logger.i(TAG, "Px[%s]: Updating widget Time only", widgetId);
 
         // I don't know why, but instantiating new RemoteViews works A LOT FASTER then reusing existing!
         AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
         RemoteViews views = new RemoteViews(context.getPackageName(), layout);
 
-        views.setTextViewText(R.id.titleTextView, options.title);
+        views.setTextViewText(R.id.titleTextView, event.getTitle());
         views.setOnClickPendingIntent(R.id.widgetLayout, pendingIntent);
 
-        TimeDifference diff = TimeDifference.between(now, options.timestamp);
+        TimeDifference diff = TimeDifference.between(now, event.getTargetTimestamp());
         updateCounters(diff);
         String text = getTimeText(diff);
 
-        Logger.i(TAG, "Px[%s]: Setting text: '%s'", options.widgetId, text);
+        Logger.i(TAG, "Px[%s]: Setting text: '%s'", widgetId, text);
 
         views.setTextViewText(R.id.counterTextView, text);
 
@@ -102,19 +101,9 @@ public abstract class WidgetProxy {
             views.setInt(R.id.counterTextView, "setVisibility", View.INVISIBLE);
         }
 
-        appWidgetManager.updateAppWidget(options.widgetId, views);
+        appWidgetManager.updateAppWidget(widgetId, views);
 
     }
-
-    public WidgetOptions getOptions() {
-        return options;
-    }
-
-    public void setOptions(WidgetOptions options) {
-        this.options = options;
-        updateWidget();
-    }
-
 
     protected abstract void updateCounters(TimeDifference diff);
 
@@ -125,18 +114,18 @@ public abstract class WidgetProxy {
     }
 
     public boolean isCountingSeconds() {
-        return options.enableSeconds && doCountSeconds && isAlive();
+        return event.isCountingSeconds() && doCountSeconds && isAlive();
     }
 
     public boolean isBlinking() {
 
         long now = System.currentTimeMillis();
 
-        if ((!options.countUp) && (now > options.timestamp) && ((now - options.timestamp) <= BLINKING_MILLS)) {
-            Logger.i(TAG, "Px[%s]: Minute or less since finishing, blinking", options.widgetId);
+        if ((!event.isCountingUp()) && (now > event.getTargetTimestamp()) && ((now - event.getTargetTimestamp()) <= BLINKING_MILLS)) {
+            Logger.i(TAG, "Px[%s]: Minute or less since finishing, blinking", widgetId);
             return true;
         } else {
-            Logger.i(TAG, "Px[%s]: No blinking", options.widgetId);
+            Logger.i(TAG, "Px[%s]: No blinking", widgetId);
             return false;
         }
     }
@@ -147,20 +136,16 @@ public abstract class WidgetProxy {
     }
 
     public boolean isAlive() {
-        if (options.countUp ||
-                isRepeating() ||
-                (!options.countUp && (options.timestamp > System.currentTimeMillis()))) {
+        if (event.isCountingUp() ||
+                event.isRepeating() ||
+                (!event.isCountingUp() && (event.getTargetTimestamp() > System.currentTimeMillis()))) {
 
-            Logger.i(TAG, "Px[%s]: Target time is not yet reached, widget is alive", options.widgetId);
+            Logger.i(TAG, "Px[%s]: Target time is not yet reached, widget is alive", widgetId);
             return true;
         } else {
-            Logger.i(TAG, "Px[%s]: Target time is already reached, widget is finished", options.widgetId);
+            Logger.i(TAG, "Px[%s]: Target time is already reached, widget is finished", widgetId);
             return false;
         }
-    }
-
-    private boolean isRepeating() {
-        return (options.repeatingPeriod > 0) || (options.isRepeating);
     }
 
     private PendingIntent getPendingIntent(Context context, int id) {
@@ -191,10 +176,13 @@ public abstract class WidgetProxy {
         if (Logger.DEBUG) {
             Time time = new Time();
             time.set(nextUpdateTimestamp);
-            Logger.i(TAG, "Px[%s]: Updated nextUpdateTime to %s", options.widgetId, time.format(Util.TF));
+            Logger.i(TAG, "Px[%s]: Updated nextUpdateTime to %s", widgetId, time.format(Util.TF));
         }
 
         return nextUpdateTimestamp;
     }
 
+    public int getWidgetId() {
+        return widgetId;
+    }
 }

@@ -8,7 +8,7 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 import com.ovio.countdown.R;
-import com.ovio.countdown.event.Event;
+import com.ovio.countdown.event.EventData;
 import com.ovio.countdown.util.Util;
 
 /**
@@ -17,10 +17,10 @@ import com.ovio.countdown.util.Util;
  */
 public class EventAdapter extends BaseAdapter {
 
-    private final Event[] events;
+    private final EventData[] events;
     private final Context context;
 
-    public EventAdapter(Context context, Event[] events) {
+    public EventAdapter(Context context, EventData[] events) {
         this.context = context;
         this.events = events;
     }
@@ -54,7 +54,7 @@ public class EventAdapter extends BaseAdapter {
         return view;
     }
 
-    private void renderEvent(Event item, ViewGroup view) {
+    private void renderEvent(EventData item, ViewGroup view) {
 
         TextView desc = (TextView) view.getChildAt(0);
         TextView date = (TextView) view.getChildAt(1);

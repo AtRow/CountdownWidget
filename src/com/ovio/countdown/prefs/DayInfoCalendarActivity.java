@@ -20,8 +20,8 @@ import android.os.Bundle;
 import android.text.format.Time;
 import com.ovio.countdown.calendar.DayInfo;
 import com.ovio.countdown.calendar.DayInfoFetcher;
-import com.ovio.countdown.event.Event;
-import com.ovio.countdown.event.EventManager;
+import com.ovio.countdown.event.CalendarManager;
+import com.ovio.countdown.event.EventData;
 
 import java.util.List;
 import java.util.Map;
@@ -42,7 +42,7 @@ public class DayInfoCalendarActivity extends CalendarActivity {
 
     private DayInfoFetcher getDayInfoFetcher() {
         return  new DayInfoFetcher() {
-            EventManager manager = EventManager.getInstance(getApplicationContext());
+            CalendarManager manager = CalendarManager.getInstance(getApplicationContext());
 
             @Override
             public Map<Integer, DayInfo> fetchForMonth(int year, int month) {
@@ -62,12 +62,12 @@ public class DayInfoCalendarActivity extends CalendarActivity {
 
                 long end = time.toMillis(true);
 
-                List<Event> events = manager.getEvents(start, end);
+                List<EventData> calendarEvents = manager.getEvents(start, end);
 
-                for (Event event: events) {
+                for (EventData data : calendarEvents) {
 
                     Time eventStart = new Time();
-                    eventStart.set(event.start);
+                    eventStart.set(data.start);
                     int day = eventStart.monthDay;
 
                     if (!map.containsKey(day)) {

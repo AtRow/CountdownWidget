@@ -4,6 +4,9 @@ import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProviderInfo;
 import android.content.Context;
 import com.ovio.countdown.R;
+import com.ovio.countdown.event.CalendarEvent;
+import com.ovio.countdown.event.Event;
+import com.ovio.countdown.event.PlainEvent;
 import com.ovio.countdown.log.Logger;
 import com.ovio.countdown.preferences.WidgetOptions;
 
@@ -52,18 +55,27 @@ public class WidgetProxyFactory {
             return null;
         }
 
+        int widgetId = options.widgetId;
+        Event event;
+
+        if (options.eventId != 0) {
+            event = new CalendarEvent(context, options);
+        } else {
+            event = new PlainEvent(context, options);
+        }
+
         switch (info.initialLayout) {
             case R.layout.countdown_widget_layout_4x1 :
                 Logger.d(TAG, "Creating Large widget");
-                return new LargeWidgetProxy(context, options);
+                return new LargeWidgetProxy(context, widgetId, event);
 
             case R.layout.countdown_widget_layout_2x1 :
                 Logger.d(TAG, "Creating Medium widget");
-                return new MediumWidgetProxy(context, options);
+                return new MediumWidgetProxy(context, widgetId, event);
 
             case R.layout.countdown_widget_layout_1x1 :
                 Logger.d(TAG, "Creating Small widget");
-                return new SmallWidgetProxy(context, options);
+                return new SmallWidgetProxy(context, widgetId, event);
 
             default:
                 Logger.e(TAG, "Couldn't find layout resource for widget's initialLayout: %s", info.initialLayout);

@@ -1,10 +1,8 @@
 package com.ovio.countdown.event;
 
-import android.content.Context;
 import android.text.format.Time;
 import com.ovio.countdown.log.Logger;
 import com.ovio.countdown.preferences.WidgetOptions;
-import com.ovio.countdown.preferences.WidgetPreferencesManager;
 import com.ovio.countdown.prefs.Recurring;
 import com.ovio.countdown.util.Util;
 
@@ -13,25 +11,19 @@ import com.ovio.countdown.util.Util;
  * com.ovio.countdown.event
  */
 public class PlainEvent implements Event {
-    protected final WidgetOptions options;
-    private final WidgetPreferencesManager widgetPreferencesManager;
-
-    protected final Context context;
 
     private final static String TAG = Logger.PREFIX + "plainEvent";
-    private final static int PAUSE = 1000 * 10; // 10 sec
+    private final static int PAUSE = 10000; // 10 sec
 
-    private long pause;
+    private final WidgetOptions options;
 
     private long targetTimestamp;
+    private long pause;
 
-    public PlainEvent(Context context, WidgetOptions options) {
+    public PlainEvent(WidgetOptions options) {
         this.options = options;
-        this.context = context;
 
-        this.targetTimestamp = getRoundTimestampRecurring(options.timestamp);
-
-        widgetPreferencesManager = WidgetPreferencesManager.getInstance(context);
+        this.targetTimestamp = getRecurringTimestamp(options.timestamp);
     }
 
     @Override
@@ -83,15 +75,14 @@ public class PlainEvent implements Event {
 
     @Override
     public boolean isPaused() {
-        if (Logger.DEBUG) {
-            Logger.i(TAG, "Px[%s]: Seconds till unPause: %s", options.widgetId, (System.currentTimeMillis() - pause)/1000);
-        }
-
         return System.currentTimeMillis() < pause;
     }
 
     @Override
     public long getPausedTill() {
+        if (Logger.DEBUG) {
+            Logger.i(TAG, "Px[%s]: Seconds till unPause: %s", options.widgetId, (System.currentTimeMillis() - pause)/1000);
+        }
         return pause;
     }
 
@@ -105,7 +96,7 @@ public class PlainEvent implements Event {
         }
     }
 
-    private long getRoundTimestampRecurring(long timestamp) {
+    private long getRecurringTimestamp(long timestamp) {
 
         if (!isRepeating()) {
             return timestamp;
@@ -117,15 +108,16 @@ public class PlainEvent implements Event {
             time.set(now);
             Logger.i(TAG, "Px[%s]: Now is: [%s]", options.widgetId, time.format(Util.TF));
         }
-        long inc = options.recurring.getMillis();
-
-        long delta = ((now - timestamp) / inc) * inc;
-        if (delta < 0) {
-            delta -= inc;
+        long incrementMills = options.recurring.getMillis();
+        long periodsCount = (now - timestamp) / incrementMills;
+        if (periodsCount < 0) {
+            periodsCount--;
         }
         if (!isCountingUp()) {
-            delta += inc;
+            periodsCount++;
         }
+
+        long delta = periodsCount * incrementMills;
 
         if (Logger.DEBUG) {
             Logger.i(TAG, "Px[%s]: Delta: %s seconds", options.widgetId, delta / 1000);
@@ -145,8 +137,7 @@ public class PlainEvent implements Event {
     }
 
     private void getNextEvent() {
-        //targetTimestamp = getNextTimestamp();
-        targetTimestamp = getRoundTimestampRecurring(targetTimestamp);
+        targetTimestamp = getRecurringTimestamp(targetTimestamp);
 
         if (Logger.DEBUG) {
             Time time = new Time();
@@ -161,15 +152,11 @@ public class PlainEvent implements Event {
             return false;
         }
 
-        boolean isExpired;
-
         if (isCountingUp()) {
-            isExpired = (System.currentTimeMillis() >= (getNextTimestamp()));
+            return (System.currentTimeMillis() >= (getNextTimestamp()));
         } else {
-            isExpired = (System.currentTimeMillis() >= (targetTimestamp));
+            return (System.currentTimeMillis() >= (targetTimestamp));
         }
-        Logger.i(TAG, "Px[%s]: Is Expired: %s", options.widgetId, isExpired);
-        return isExpired;
     }
 
 }

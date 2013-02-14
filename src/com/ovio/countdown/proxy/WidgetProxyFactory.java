@@ -61,7 +61,7 @@ public class WidgetProxyFactory {
         if (options.eventId != 0) {
             event = new CalendarEvent(context, options);
         } else {
-            event = new PlainEvent(context, options);
+            event = new PlainEvent(options);
         }
 
         switch (info.initialLayout) {

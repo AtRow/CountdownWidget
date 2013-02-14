@@ -45,6 +45,7 @@ public final class PreferencesManager {
         editor.putString("title", widgetOptions.title);
         editor.putLong("timestamp", widgetOptions.timestamp);
         editor.putBoolean("countUp", widgetOptions.countUp);
+        editor.putBoolean("enableTime", widgetOptions.enableTime);
         editor.putBoolean("enableSeconds", widgetOptions.enableSeconds);
         editor.putLong("repeatingPeriod", widgetOptions.recurring.getMillis()) ;
         editor.putString("calendarEventUrl", widgetOptions.calendarEventUrl);
@@ -70,6 +71,7 @@ public final class PreferencesManager {
         widgetOptions.title = prefs.getString("title", null);
         widgetOptions.timestamp = prefs.getLong("timestamp", 0L);
         widgetOptions.countUp = prefs.getBoolean("countUp", true);
+        widgetOptions.enableTime = prefs.getBoolean("enableTime", false);
         widgetOptions.enableSeconds = prefs.getBoolean("enableSeconds", false);
         widgetOptions.recurring = Recurring.getRecurringFor(prefs.getLong("repeatingPeriod", 0L));
         widgetOptions.calendarEventUrl = prefs.getString("calendarEventUrl", null);

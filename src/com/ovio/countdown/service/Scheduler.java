@@ -50,7 +50,7 @@ public final class Scheduler {
         // Get minimum
         long min = Long.MAX_VALUE;
         for (WidgetProxy proxy: widgetProxies) {
-            if (proxy.isAlive() || proxy.isBlinking()) {
+            if (proxy.isAlive()) {
                 long next = proxy.getNextUpdateTimestamp();
                 if (next < min) {
                     min = next;

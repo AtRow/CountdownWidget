@@ -1,6 +1,7 @@
 package com.ovio.countdown.event;
 
 import android.content.Context;
+import android.text.format.DateUtils;
 import com.ovio.countdown.preferences.WidgetOptions;
 
 /**
@@ -50,6 +51,27 @@ public class CalendarEvent implements Event {
     @Override
     public boolean isRepeating() {
         return (eventData != null) || isReloading();
+    }
+
+    @Override
+    public boolean isAlive() {
+        if (isCountingUp() || isRepeating() ||
+           (!isCountingUp() && (getTargetTimestamp() > System.currentTimeMillis()))) {
+
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    @Override
+    public boolean isPaused() {
+        return false;
+    }
+
+    @Override
+    public long getPausedTill() {
+        return System.currentTimeMillis() + DateUtils.SECOND_IN_MILLIS;
     }
 
     private boolean isReloading() {

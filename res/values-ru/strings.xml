@@ -37,4 +37,10 @@
     <string name="calendar_pick_event_button">Выбрать</string>
     <string name="calendar_nearest_event_prompt">Ближайшее событие из календаря</string>
     <string name="event_picker_no_events">Нет событий для выбранного дня</string>
+    <string name="recurring_hourly">Каждый час</string>
+    <string name="recurring_none">Не повторять</string>
+    <string name="recurring_daily">Каждый день</string>
+    <string name="recurring_weekly">Каждую неделю</string>
+    <string name="recurring_yearly">Каждый год</string>
+    <string name="recurring_custom">Другой период</string>
 </resources>

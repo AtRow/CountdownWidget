@@ -15,4 +15,10 @@ public interface Event {
     boolean isCountingUp();
 
     boolean isRepeating();
+
+    boolean isAlive();
+
+    boolean isPaused();
+
+    long getPausedTill();
 }

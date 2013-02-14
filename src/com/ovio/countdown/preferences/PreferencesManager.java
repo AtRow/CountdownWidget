@@ -4,6 +4,7 @@ import android.appwidget.AppWidgetManager;
 import android.content.Context;
 import android.content.SharedPreferences;
 import com.ovio.countdown.log.Logger;
+import com.ovio.countdown.prefs.Recurring;
 import com.ovio.countdown.util.Util;
 
 /**
@@ -45,7 +46,7 @@ public final class PreferencesManager {
         editor.putLong("timestamp", widgetOptions.timestamp);
         editor.putBoolean("countUp", widgetOptions.countUp);
         editor.putBoolean("enableSeconds", widgetOptions.enableSeconds);
-        editor.putLong("repeatingPeriod", widgetOptions.repeatingPeriod);
+        editor.putLong("repeatingPeriod", widgetOptions.recurring.getMillis()) ;
         editor.putString("calendarEventUrl", widgetOptions.calendarEventUrl);
 
         editor.commit();
@@ -70,7 +71,7 @@ public final class PreferencesManager {
         widgetOptions.timestamp = prefs.getLong("timestamp", 0L);
         widgetOptions.countUp = prefs.getBoolean("countUp", true);
         widgetOptions.enableSeconds = prefs.getBoolean("enableSeconds", false);
-        widgetOptions.repeatingPeriod = prefs.getLong("repeatingPeriod", 0L);
+        widgetOptions.recurring = Recurring.getRecurringFor(prefs.getLong("repeatingPeriod", 0L));
         widgetOptions.calendarEventUrl = prefs.getString("calendarEventUrl", null);
 
         Logger.d(TAG, "Finished loading WidgetOptions with key '%s': %s", key, widgetOptions);

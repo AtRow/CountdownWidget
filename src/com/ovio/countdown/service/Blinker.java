@@ -70,7 +70,7 @@ public class Blinker {
                     Logger.i(TAG, "Interrupted BlinkerRunnable thread");
                 }
             }
-            blink(true);
+            unBlink();
             Logger.i(TAG, "Finished BlinkerRunnable thread");
         }
 
@@ -79,14 +79,16 @@ public class Blinker {
         }
 
         private void blink(boolean show) {
-            if (Logger.DEBUG) {
-                Logger.d(TAG, "Blink showing widgets");
-            }
-
             for (WidgetProxy proxy: widgetProxies) {
                 if (proxy.isBlinking()) {
                     proxy.blink(show);
                 }
+            }
+        }
+
+        private void unBlink() {
+            for (WidgetProxy proxy: widgetProxies) {
+                proxy.blink(true);
             }
         }
 

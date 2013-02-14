@@ -67,17 +67,16 @@ public abstract class WidgetProxy {
     public synchronized void updateWidget() {
         Logger.i(TAG, "Px[%s]: Updating widget", widgetId);
 
-        long timestamp;
+        long now = System.currentTimeMillis();
+        long target = event.getTargetTimestamp();
 
-        if (isAlive()) {
-            timestamp = System.currentTimeMillis();
-        } else {
-            timestamp = event.getTargetTimestamp();
+        if (event.isPaused()) {
+            now = target;
         }
-        updateWidgetTime(timestamp);
+        updateWidgetTime(now, target);
     }
 
-    private synchronized void updateWidgetTime(long now) {
+    private synchronized void updateWidgetTime(long now, long target) {
         Logger.i(TAG, "Px[%s]: Updating widget Time only", widgetId);
 
         // I don't know why, but instantiating new RemoteViews works A LOT FASTER then reusing existing!
@@ -87,7 +86,7 @@ public abstract class WidgetProxy {
         views.setTextViewText(R.id.titleTextView, event.getTitle());
         views.setOnClickPendingIntent(R.id.widgetLayout, pendingIntent);
 
-        TimeDifference diff = TimeDifference.between(now, event.getTargetTimestamp());
+        TimeDifference diff = TimeDifference.between(now, target);
         updateCounters(diff);
         String text = getTimeText(diff);
 
@@ -114,15 +113,13 @@ public abstract class WidgetProxy {
     }
 
     public boolean isCountingSeconds() {
-        return event.isCountingSeconds() && doCountSeconds && isAlive();
+        return event.isCountingSeconds() && doCountSeconds && event.isAlive();
     }
 
     public boolean isBlinking() {
 
-        long now = System.currentTimeMillis();
-
-        if ((!event.isCountingUp()) && (now > event.getTargetTimestamp()) && ((now - event.getTargetTimestamp()) <= BLINKING_MILLS)) {
-            Logger.i(TAG, "Px[%s]: Minute or less since finishing, blinking", widgetId);
+        if (event.isPaused()) {
+            Logger.i(TAG, "Px[%s]: Blinking", widgetId);
             return true;
         } else {
             Logger.i(TAG, "Px[%s]: No blinking", widgetId);
@@ -136,16 +133,7 @@ public abstract class WidgetProxy {
     }
 
     public boolean isAlive() {
-        if (event.isCountingUp() ||
-                event.isRepeating() ||
-                (!event.isCountingUp() && (event.getTargetTimestamp() > System.currentTimeMillis()))) {
-
-            Logger.i(TAG, "Px[%s]: Target time is not yet reached, widget is alive", widgetId);
-            return true;
-        } else {
-            Logger.i(TAG, "Px[%s]: Target time is already reached, widget is finished", widgetId);
-            return false;
-        }
+        return event.isAlive();
     }
 
     private PendingIntent getPendingIntent(Context context, int id) {
@@ -168,7 +156,7 @@ public abstract class WidgetProxy {
         long nextUpdateTimestamp = (System.currentTimeMillis() / MINUTE) * MINUTE; // rounded to minute
 
         if (isBlinking()) {
-            nextUpdateTimestamp += BLINKING_MILLS;
+            nextUpdateTimestamp = event.getPausedTill();
         } else {
             nextUpdateTimestamp += nextIncrement;
         }

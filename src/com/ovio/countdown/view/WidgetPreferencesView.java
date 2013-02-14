@@ -10,6 +10,7 @@ import com.ovio.countdown.event.CalendarData;
 import com.ovio.countdown.event.CalendarManager;
 import com.ovio.countdown.event.EventData;
 import com.ovio.countdown.log.Logger;
+import com.ovio.countdown.prefs.Recurring;
 
 import java.util.List;
 
@@ -34,6 +35,9 @@ public class WidgetPreferencesView {
     private boolean isCalendarCompatible;
 
     private boolean isManualTab = true;
+
+    private Recurring currentRecurring;
+
 
     private Button okButton;
 
@@ -85,8 +89,36 @@ public class WidgetPreferencesView {
 
         initTabHost();
         initCalendarPickers();
+        initSpinners();
 
         updateOkButton();
+    }
+
+    private void initSpinners() {
+
+        final Recurring[] recurs = Recurring.values();
+        String[] data = new String[recurs.length];
+
+        for (int i = 0; i < recurs.length; i++) {
+            data[i] = activity.getString(recurs[i].getTextResId());
+        }
+
+        ArrayAdapter<String> recurringAdapter = new ArrayAdapter<String>(activity, android.R.layout.simple_spinner_item, data);
+        recurringAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        recurringSpinner.setAdapter(recurringAdapter);
+
+        recurringSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int position, long l) {
+                currentRecurring = recurs[position];
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+                currentRecurring = null;
+            }
+        });
+
     }
 
     private void initCalendarPickers() {
@@ -164,19 +196,7 @@ public class WidgetPreferencesView {
     public String getTitle() {
         return titleEditText.getText().toString();
     }
-/*
 
-    public void setDate(Time time) {
-        datePicker.updateDate(time.year, time.month, time.monthDay);
-    }
-
-    public Time getDate() {
-        Time time = new Time();
-        time.set(datePicker.getYear(), datePicker.getMonth(), datePicker.getDayOfMonth());
-        return time;
-    }
-
-*/
     public void setTime(Time time) {
         timePicker.setCurrentHour(time.hour);
         timePicker.setCurrentMinute(time.minute);
@@ -247,6 +267,24 @@ public class WidgetPreferencesView {
         }
 
         return checked;
+    }
+
+    public void setRecurring(Recurring recurring) {
+
+        Recurring[] recurs = Recurring.values();
+        for (int i = 0; i < recurs.length; i++) {
+            if (recurs[i] == recurring) {
+                recurringSpinner.setSelection(i);
+            }
+        }
+        this.currentRecurring = recurring;
+    }
+
+    public Recurring getRecurring() {
+        if (currentRecurring == null) {
+            return Recurring.NONE;
+        }
+        return currentRecurring;
     }
 
     public void onTimeCheckBoxClick(View view) {

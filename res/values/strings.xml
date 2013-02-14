@@ -37,4 +37,10 @@
     <string name="calendar_pick_event_button">Pick event</string>
     <string name="calendar_nearest_event_prompt">Nearest event from calendar</string>
     <string name="event_picker_no_events">No events for selected day</string>
+    <string name="recurring_hourly">Every hour</string>
+    <string name="recurring_none">Never</string>
+    <string name="recurring_daily">Every day</string>
+    <string name="recurring_weekly">Every week</string>
+    <string name="recurring_yearly">Every year</string>
+    <string name="recurring_custom">Custom</string>
 </resources>

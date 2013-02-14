@@ -260,7 +260,7 @@ public class WidgetPreferencesActivity extends Activity {
 
         widgetOptions.enableTime = view.getEnableTime();
 
-        widgetOptions.repeatingPeriod = 0L;
+        widgetOptions.recurring = view.getRecurring();
 
         Logger.i(TAG, "Widget Options: %s", widgetOptions);
 
@@ -319,6 +319,7 @@ public class WidgetPreferencesActivity extends Activity {
             view.setCountSeconds(widgetOptions.enableSeconds);
             view.setEnableTime(widgetOptions.enableTime);
             view.setCountUp(widgetOptions.countUp);
+            view.setRecurring(widgetOptions.recurring);
         }
     }
 

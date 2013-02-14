@@ -1,6 +1,7 @@
 package com.ovio.countdown.preferences;
 
 import android.appwidget.AppWidgetManager;
+import com.ovio.countdown.prefs.Recurring;
 
 import java.io.Serializable;
 
@@ -26,13 +27,11 @@ public class WidgetOptions implements Serializable {
 
     //private boolean repeating;
 
-    public long repeatingPeriod;
+    public Recurring recurring;
 
     public String calendarEventUrl;
 
     public boolean enableTime;
-
-    public boolean isRepeating;
 
     public boolean isReloading;
 
@@ -48,7 +47,7 @@ public class WidgetOptions implements Serializable {
                 ", timestamp=" + timestamp +
                 ", countUp=" + countUp +
                 ", enableSeconds=" + enableSeconds +
-                ", repeatingPeriod=" + repeatingPeriod +
+                ", repeatingPeriod=" + recurring.toString() +
                 ", calendarEventUrl='" + calendarEventUrl + '\'' +
                 '}';
     }

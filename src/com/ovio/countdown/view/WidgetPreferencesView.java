@@ -100,7 +100,7 @@ public class WidgetPreferencesView {
         String[] data = new String[recurs.length];
 
         for (int i = 0; i < recurs.length; i++) {
-            data[i] = activity.getString(recurs[i].getTextResId());
+            data[i] = activity.getString(recurs[i].textId);
         }
 
         ArrayAdapter<String> recurringAdapter = new ArrayAdapter<String>(activity, android.R.layout.simple_spinner_item, data);

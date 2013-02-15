@@ -12,7 +12,7 @@ import android.widget.Toast;
 import com.ovio.countdown.R;
 import com.ovio.countdown.event.EventData;
 import com.ovio.countdown.log.Logger;
-import com.ovio.countdown.preferences.DefaultOptions;
+import com.ovio.countdown.preferences.GeneralOptions;
 import com.ovio.countdown.preferences.PreferencesManager;
 import com.ovio.countdown.preferences.WidgetOptions;
 import com.ovio.countdown.preferences.WidgetPreferencesManager;
@@ -46,7 +46,7 @@ public class WidgetPreferencesActivity extends Activity {
 
     private EventData widgetCalendarEvent;
 
-    private DefaultOptions options;
+    private GeneralOptions options;
 
     private boolean doForceRemoveOnCancel;
 
@@ -176,8 +176,7 @@ public class WidgetPreferencesActivity extends Activity {
 
         Intent widgetServiceIntent = new Intent(WidgetService.UPDATED);
 
-        Bundle extras = new Bundle();
-        extras.putSerializable(WidgetService.OPTIONS, widgetOptions);
+        Bundle extras = widgetOptions.getBundle();
 
         widgetServiceIntent.putExtras(extras);
         Logger.d(TAG, "Intent Extras: %s", widgetOptions);
@@ -260,7 +259,7 @@ public class WidgetPreferencesActivity extends Activity {
 
         widgetOptions.enableTime = view.getEnableTime();
 
-        widgetOptions.recurring = view.getRecurring();
+        widgetOptions.recurringInterval = view.getRecurring();
 
         Logger.i(TAG, "Widget Options: %s", widgetOptions);
 
@@ -288,22 +287,22 @@ public class WidgetPreferencesActivity extends Activity {
         Logger.d(TAG, "Finished saving Global Options");
     }
 
-    private DefaultOptions loadDefaultOptions() {
+    private GeneralOptions loadDefaultOptions() {
         Logger.i(TAG, "Loading Global Options");
 
-        DefaultOptions options = prefManager.loadDefaultPrefs();
+        GeneralOptions options = prefManager.loadDefaultPrefs();
 
         Logger.i(TAG, "Global Options: %s", options);
 
         return options;
     }
 
-    private void applyOptions(DefaultOptions options, WidgetOptions widgetOptions) {
+    private void applyOptions(GeneralOptions options, WidgetOptions widgetOptions) {
         Logger.i(TAG, "Applying Options");
 
         // Default first
         view.setCountSeconds(options.enableSeconds);
-        view.setCountUp(options.upward);
+        view.setCountUp(options.countUp);
         view.setEnableTime(options.enableTime);
 
         // Then basically override
@@ -319,7 +318,7 @@ public class WidgetPreferencesActivity extends Activity {
             view.setCountSeconds(widgetOptions.enableSeconds);
             view.setEnableTime(widgetOptions.enableTime);
             view.setCountUp(widgetOptions.countUp);
-            view.setRecurring(widgetOptions.recurring);
+            view.setRecurring(widgetOptions.recurringInterval);
         }
     }
 

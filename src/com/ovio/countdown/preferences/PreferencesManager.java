@@ -4,8 +4,6 @@ import android.appwidget.AppWidgetManager;
 import android.content.Context;
 import android.content.SharedPreferences;
 import com.ovio.countdown.log.Logger;
-import com.ovio.countdown.prefs.Recurring;
-import com.ovio.countdown.util.Util;
 
 /**
  * Countdown
@@ -39,18 +37,20 @@ public final class PreferencesManager {
         Logger.i(TAG, "Saving WidgetOptions with key '%s'", key);
         Logger.d(TAG, "WidgetOptions: %s", key, widgetOptions);
 
-        SharedPreferences.Editor editor = context.getSharedPreferences(key, Context.MODE_PRIVATE).edit();
+        SharedPreferences preferences = context.getSharedPreferences(key, Context.MODE_PRIVATE);
 
-        editor.putInt("widgetId", widgetOptions.widgetId);
-        editor.putString("title", widgetOptions.title);
-        editor.putLong("timestamp", widgetOptions.timestamp);
-        editor.putBoolean("countUp", widgetOptions.countUp);
-        editor.putBoolean("enableTime", widgetOptions.enableTime);
-        editor.putBoolean("enableSeconds", widgetOptions.enableSeconds);
-        editor.putLong("repeatingPeriod", widgetOptions.recurring.getMillis()) ;
-        editor.putString("calendarEventUrl", widgetOptions.calendarEventUrl);
+        widgetOptions.writeToPrefs(preferences);
 
-        editor.commit();
+//        editor.putInt("widgetId", widgetOptions.widgetId);
+//        editor.putString("title", widgetOptions.title);
+//        editor.putLong("timestamp", widgetOptions.timestamp);
+//        editor.putBoolean("countUp", widgetOptions.countUp);
+//        editor.putBoolean("enableTime", widgetOptions.enableTime);
+//        editor.putBoolean("enableSeconds", widgetOptions.enableSeconds);
+//        editor.putLong("recurringInterval", widgetOptions.recurringInterval.getMillis()) ;
+//        editor.putString("calendarEventUrl", widgetOptions.calendarEventUrl);
+//
+//        editor.commit();
         Logger.d(TAG, "Finished saving WidgetOptions");
     }
 
@@ -58,23 +58,25 @@ public final class PreferencesManager {
 
         Logger.i(TAG, "Loading WidgetOptions with key '%s'", key);
 
-        SharedPreferences prefs = context.getSharedPreferences(key, Context.MODE_PRIVATE);
+        SharedPreferences preferences = context.getSharedPreferences(key, Context.MODE_PRIVATE);
 
-        int id = prefs.getInt("widgetId", AppWidgetManager.INVALID_APPWIDGET_ID);
+        int id = preferences.getInt("widgetId", AppWidgetManager.INVALID_APPWIDGET_ID);
         if (id == AppWidgetManager.INVALID_APPWIDGET_ID) {
             return null;
         }
 
         WidgetOptions widgetOptions = new WidgetOptions();
 
-        widgetOptions.widgetId = id;
-        widgetOptions.title = prefs.getString("title", null);
-        widgetOptions.timestamp = prefs.getLong("timestamp", 0L);
-        widgetOptions.countUp = prefs.getBoolean("countUp", true);
-        widgetOptions.enableTime = prefs.getBoolean("enableTime", false);
-        widgetOptions.enableSeconds = prefs.getBoolean("enableSeconds", false);
-        widgetOptions.recurring = Recurring.getRecurringFor(prefs.getLong("repeatingPeriod", 0L));
-        widgetOptions.calendarEventUrl = prefs.getString("calendarEventUrl", null);
+        widgetOptions.readFromPrefs(preferences);
+
+//        widgetOptions.widgetId = id;
+//        widgetOptions.title = prefs.getString("title", null);
+//        widgetOptions.timestamp = prefs.getLong("timestamp", 0L);
+//        widgetOptions.countUp = prefs.getBoolean("countUp", true);
+//        widgetOptions.enableTime = prefs.getBoolean("enableTime", false);
+//        widgetOptions.enableSeconds = prefs.getBoolean("enableSeconds", false);
+//        widgetOptions.recurringInterval = Recurring.getRecurringFor(prefs.getLong("recurringInterval", 0L));
+//        widgetOptions.calendarEventUrl = prefs.getString("calendarEventUrl", null);
 
         Logger.d(TAG, "Finished loading WidgetOptions with key '%s': %s", key, widgetOptions);
         return widgetOptions;
@@ -92,43 +94,47 @@ public final class PreferencesManager {
         Logger.d(TAG, "Finished deleting WidgetOptions with key '%s'", key);
     }
 
-    public void saveDefaultPrefs(DefaultOptions defaultOptions) {
+    public void saveDefaultPrefs(GeneralOptions generalOptions) {
 
         Logger.i(TAG, "Updating Global options");
-        Logger.d(TAG, "New Global options: %s", defaultOptions);
+        Logger.d(TAG, "New Global options: %s", generalOptions);
 
-        SharedPreferences.Editor editor = context.getSharedPreferences(GLOBAL, Context.MODE_PRIVATE).edit();
+        SharedPreferences prefs = context.getSharedPreferences(GLOBAL, Context.MODE_PRIVATE);
 
-        editor.putBoolean("countUp", defaultOptions.upward);
-        editor.putBoolean("enableSeconds", defaultOptions.enableSeconds);
-        editor.putBoolean("enableTime", defaultOptions.enableTime);
-        editor.putBoolean("repeating", defaultOptions.repeating);
-        editor.putLong("repeatingPeriod", defaultOptions.repeatingPeriod);
+        generalOptions.writeToPrefs(prefs);
 
-        editor.putString("savedWidgetsString", Util.packIntArray(defaultOptions.savedWidgets));
-
-        editor.commit();
+//        editor.putBoolean("countUp", generalOptions.countUp);
+//        editor.putBoolean("enableSeconds", generalOptions.enableSeconds);
+//        editor.putBoolean("enableTime", generalOptions.enableTime);
+//        editor.putBoolean("recurring", generalOptions.recurring);
+//        editor.putLong("recurringInterval", generalOptions.recurringInterval);
+//
+//        editor.putString("savedWidgetsString", Util.packIntArray(generalOptions.savedWidgets));
+//
+//        editor.commit();
 
         Logger.d(TAG, "Finished updating Global options");
     }
 
-    public DefaultOptions loadDefaultPrefs() {
+    public GeneralOptions loadDefaultPrefs() {
 
         Logger.i(TAG, "Loading Global options");
 
-        DefaultOptions defaultOptions = new DefaultOptions();
+        GeneralOptions generalOptions = new GeneralOptions();
         SharedPreferences prefs = context.getSharedPreferences(GLOBAL, Context.MODE_PRIVATE);
 
-        defaultOptions.upward = prefs.getBoolean("countUp", true);
-        defaultOptions.enableSeconds = prefs.getBoolean("enableSeconds", true);
-        defaultOptions.enableTime = prefs.getBoolean("enableTime", false);
-        defaultOptions.repeating = prefs.getBoolean("repeating", false);
-        defaultOptions.repeatingPeriod = prefs.getLong("repeatingPeriod", 0L);
+        generalOptions.readFromPrefs(prefs);
 
-        defaultOptions.savedWidgets = Util.unpackIntArray(prefs.getString("savedWidgetsString", null));
+//        generalOptions.countUp = prefs.getBoolean("countUp", true);
+//        generalOptions.enableSeconds = prefs.getBoolean("enableSeconds", true);
+//        generalOptions.enableTime = prefs.getBoolean("enableTime", false);
+//        generalOptions.recurring = prefs.getBoolean("recurring", false);
+//        generalOptions.recurringInterval = prefs.getLong("recurringInterval", 0L);
+//
+//        generalOptions.savedWidgets = Util.unpackIntArray(prefs.getString("savedWidgetsString", null));
 
-        Logger.d(TAG, "Finished loading Global options: %s", defaultOptions);
-        return defaultOptions;
+        Logger.d(TAG, "Finished loading Global options: %s", generalOptions);
+        return generalOptions;
     }
 
 }

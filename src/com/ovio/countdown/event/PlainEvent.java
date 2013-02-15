@@ -22,7 +22,6 @@ public class PlainEvent implements Event {
 
     public PlainEvent(WidgetOptions options) {
         this.options = options;
-
         this.targetTimestamp = getRecurringTimestamp(options.timestamp);
     }
 
@@ -64,7 +63,7 @@ public class PlainEvent implements Event {
 
     @Override
     public boolean isRepeating() {
-        return (options.recurring != Recurring.NONE);
+        return (options.recurringInterval != Recurring.NONE);
     }
 
     @Override
@@ -108,7 +107,7 @@ public class PlainEvent implements Event {
             time.set(now);
             Logger.i(TAG, "Px[%s]: Now is: [%s]", options.widgetId, time.format(Util.TF));
         }
-        long incrementMills = options.recurring.getMillis();
+        long incrementMills = options.recurringInterval.millis;
         long periodsCount = (now - timestamp) / incrementMills;
         if (periodsCount < 0) {
             periodsCount--;
@@ -133,7 +132,7 @@ public class PlainEvent implements Event {
     }
 
     private long getNextTimestamp() {
-        return targetTimestamp + options.recurring.getMillis();
+        return targetTimestamp + options.recurringInterval.millis;
     }
 
     private void getNextEvent() {
@@ -147,7 +146,7 @@ public class PlainEvent implements Event {
     }
 
     private boolean isExpired() {
-        // Non-repeating events never expires
+        // Non-recurring events never expires
         if (!isRepeating()) {
             return false;
         }

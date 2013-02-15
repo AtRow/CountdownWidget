@@ -39,11 +39,11 @@ public class WidgetPreferencesManager {
         Logger.i(TAG, "Starting cleanup");
         Logger.i(TAG, "Valid widget ids are: %s", Util.getString(validWidgetIds));
 
-        DefaultOptions defaultOptions = prefManager.loadDefaultPrefs();
+        GeneralOptions generalOptions = prefManager.loadDefaultPrefs();
 
         List<Integer> deletedIds = new ArrayList<Integer>(validWidgetIds.size());
 
-        for (int id: defaultOptions.savedWidgets) {
+        for (int id: generalOptions.savedWidgets) {
 
             if (!validWidgetIds.contains(id)) {
                 delete(id);
@@ -51,12 +51,12 @@ public class WidgetPreferencesManager {
             }
         }
 
-        Logger.d(TAG, "Updating savedWidgets; Current content is: %s", Util.getString(defaultOptions.savedWidgets));
+        Logger.d(TAG, "Updating savedWidgets; Current content is: %s", Util.getString(generalOptions.savedWidgets));
 
-        defaultOptions.savedWidgets = Util.toIntArray(validWidgetIds);
-        prefManager.saveDefaultPrefs(defaultOptions);
+        generalOptions.savedWidgets = Util.toIntArray(validWidgetIds);
+        prefManager.saveDefaultPrefs(generalOptions);
 
-        Logger.d(TAG, "New content is: %s", Util.getString(defaultOptions.savedWidgets));
+        Logger.d(TAG, "New content is: %s", Util.getString(generalOptions.savedWidgets));
 
         Logger.d(TAG, "Finished cleanup");
         return deletedIds;
@@ -83,24 +83,24 @@ public class WidgetPreferencesManager {
             delete(id);
         }
 
-        DefaultOptions defaultOptions = prefManager.loadDefaultPrefs();
+        GeneralOptions generalOptions = prefManager.loadDefaultPrefs();
 
-        Logger.d(TAG, "Updating savedWidgets; Current content is: %s", Util.getString(defaultOptions.savedWidgets));
+        Logger.d(TAG, "Updating savedWidgets; Current content is: %s", Util.getString(generalOptions.savedWidgets));
 
-        List<Integer> list = Util.toIntegerList(defaultOptions.savedWidgets);
+        List<Integer> list = Util.toIntegerList(generalOptions.savedWidgets);
         list.removeAll(widgetIds);
-        defaultOptions.savedWidgets = Util.toIntArray(list);
+        generalOptions.savedWidgets = Util.toIntArray(list);
 
-        Logger.d(TAG, "Updated content is: %s", Util.getString(defaultOptions.savedWidgets));
+        Logger.d(TAG, "Updated content is: %s", Util.getString(generalOptions.savedWidgets));
 
-        prefManager.saveDefaultPrefs(defaultOptions);
+        prefManager.saveDefaultPrefs(generalOptions);
     }
 
     public List<Integer> getAllIds() {
         Logger.d(TAG, "Getting a list of all widget Ids");
 
-        DefaultOptions defaultOptions = prefManager.loadDefaultPrefs();
-        int[] alIds = defaultOptions.savedWidgets;
+        GeneralOptions generalOptions = prefManager.loadDefaultPrefs();
+        int[] alIds = generalOptions.savedWidgets;
 
         return Util.toIntegerList(alIds);
     }

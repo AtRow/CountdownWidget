@@ -75,7 +75,7 @@ public class CalendarEvent implements Event {
     }
 
     private boolean isReloading() {
-        return options.isReloading;
+        return options.recurring;
     }
 
     private long getNextTimestamp() {

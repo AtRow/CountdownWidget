@@ -16,8 +16,8 @@ public enum Recurring {
     YEARLY(R.string.recurring_yearly, DateUtils.YEAR_IN_MILLIS),
     CUSTOM(R.string.recurring_custom);
 
-    private final int textId;
-    private long millis;
+    public final int textId;
+    public long millis;
 
     Recurring(int textId, long millis) {
         this.textId = textId;
@@ -28,28 +28,20 @@ public enum Recurring {
         this.textId = textId;
     }
 
-    public int getTextResId() {
-        return textId;
-    }
-
-    public long getMillis() {
-        return millis;
-    }
-
     public static Recurring getRecurringFor(long millis) {
-        if (millis == NONE.getMillis()) {
+        if (millis == NONE.millis) {
             return NONE;
 
-        } else if (millis == HOURLY.getMillis()) {
+        } else if (millis == HOURLY.millis) {
             return HOURLY;
 
-        } else if (millis == DAILY.getMillis()) {
+        } else if (millis == DAILY.millis) {
             return DAILY;
 
-        } else if (millis == WEEKLY.getMillis()) {
+        } else if (millis == WEEKLY.millis) {
             return WEEKLY;
 
-        } else if (millis == YEARLY.getMillis()) {
+        } else if (millis == YEARLY.millis) {
             return YEARLY;
 
         } else {

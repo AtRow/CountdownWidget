@@ -207,28 +207,16 @@ public class WidgetService extends Service {
     private WidgetOptions getUpdateWidgetOptions(Intent updateIntent) {
         Logger.d(TAG, "Parsing update Intent");
 
-        WidgetOptions options;
-
         Bundle extras = updateIntent.getExtras();
         if (extras == null) {
             Logger.e(TAG, "Extras not found in UPDATE intent");
             return null;
         }
 
-        Object o = extras.getSerializable(OPTIONS);
-        if (o == null) {
-            Logger.e(TAG, "Got empty Options for UPDATE intent");
-            return null;
-        }
+        WidgetOptions options = new WidgetOptions();
+        options.setBundle(extras);
 
-        try {
-            options = (WidgetOptions)o;
-            Logger.d(TAG, "Got Options: %s", options);
-
-        } catch (Exception e) {
-            Logger.e(TAG, e, "Failed to cast UPDATE intent's Extras to WidgetOptions");
-            return null;
-        }
+        Logger.d(TAG, "Got Options: %s", options);
 
         return options;
     }

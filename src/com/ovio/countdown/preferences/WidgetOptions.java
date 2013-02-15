@@ -15,14 +15,6 @@ public class WidgetOptions extends AbstractOptions {
     public static final Field TITLE = Field.get("title", String.class);
     public static final Field TIMESTAMP = Field.get("timestamp", Long.class);
 
-    /*
-    public static final Field COUNT_UP = Field.get("countUp", Boolean.class);
-    public static final Field ENABLE_SECONDS = Field.get("enableSeconds", Boolean.class);
-    public static final Field ENABLE_TIME = Field.get("enableTime", Boolean.class);
-    public static final Field RECURRING = Field.get("recurring", Boolean.class);
-    public static final Field RECURRING_INTERVAL = Field.get("recurringInterval", Long.class);
-     */
-
     private final static Field[] fields = {
             WIDGET_ID,
             EVENT_ID,
@@ -64,89 +56,6 @@ public class WidgetOptions extends AbstractOptions {
     public boolean isValid() {
         return bundle.getInt(WIDGET_ID.name) != AppWidgetManager.INVALID_APPWIDGET_ID;
     }
-
-/*
-    public int getWidgetId() {
-        return bundle.getInt(WIDGET_ID.name);
-    }
-
-    public void setWidgetId(int widgetId) {
-        bundle.putInt(WIDGET_ID.name, widgetId);
-    }
-
-    public long getEventId() {
-        return bundle.getLong(EVENT_ID.name);
-    }
-
-    public void setEventId(long eventId) {
-        bundle.putLong(EVENT_ID.name, eventId);
-    }
-
-    public long getCalendarId() {
-        return bundle.getLong(CALENDAR_ID.name);
-    }
-
-    public void setCalendarId(long calendarId) {
-        bundle.putLong(CALENDAR_ID.name, calendarId);
-    }
-
-    public String getTitle() {
-        return bundle.getString(TITLE.name);
-    }
-
-    public void setTitle(String title) {
-        bundle.putString(TITLE.name, title);
-    }
-
-    public long getTimestamp() {
-        return bundle.getLong(TIMESTAMP.name);
-    }
-
-    public void setTimestamp(long timestamp) {
-        bundle.putLong(TIMESTAMP.name, timestamp);
-    }
-
-    public boolean isCountUp() {
-        return bundle.getBoolean(COUNT_UP.name);
-    }
-
-    public void setCountUp(boolean countUp) {
-        bundle.putBoolean(COUNT_UP.name, countUp);
-    }
-
-    public boolean isEnableSeconds() {
-        return bundle.getBoolean(ENABLE_SECONDS.name);
-    }
-
-    public void setEnableSeconds(boolean enableSeconds) {
-        bundle.putBoolean(ENABLE_SECONDS.name, enableSeconds);
-    }
-
-    public boolean isRecurring() {
-        return bundle.getBoolean(RECURRING.name);
-    }
-
-    public void setRecurring(boolean recurring) {
-        bundle.putBoolean(RECURRING.name, recurring);
-    }
-
-    public Recurring getRecurringInterval() {
-        long millis = bundle.getLong(RECURRING_INTERVAL.name);
-        return Recurring.getRecurringFor(millis);
-    }
-
-    public void setRecurringInterval(Recurring recurringInterval) {
-        bundle.putLong(RECURRING_INTERVAL.name, recurringInterval.millis);
-    }
-
-    public boolean isEnableTime() {
-        return bundle.getBoolean(ENABLE_TIME.name);
-    }
-
-    public void setEnableTime(boolean enableTime) {
-        bundle.putBoolean(ENABLE_TIME.name, enableTime);
-    }
-*/
 
     @Override
     protected void updateFields() {

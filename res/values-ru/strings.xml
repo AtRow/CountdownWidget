@@ -22,7 +22,7 @@
     <string name="google_calendar_prompt">Add from Google Calendar</string>
     <string name="repeat_prompt">Повторять</string>
     <string name="count_up_prompt">Считать после события</string>
-    <string name="notify_prompt">Напомнить</string>
+    <string name="notify_prompt">Напоминание</string>
     <string name="icon_prompt">Иконка</string>
     <string name="style_prompt">Стиль</string>
     <string name="choose_event_prompt">Выбрать событие</string>
@@ -43,4 +43,20 @@
     <string name="recurring_weekly">Каждую неделю</string>
     <string name="recurring_yearly">Каждый год</string>
     <string name="recurring_custom">Другой период</string>
+    <string name="notification_none">Не напоминать</string>
+    <string name="notification_1_min">1 минута</string>
+    <string name="notification_5_min">5 минут</string>
+    <string name="notification_10_min">10 минут</string>
+    <string name="notification_15_min">15 минут</string>
+    <string name="notification_20_min">20 минут</string>
+    <string name="notification_25_min">25 минут</string>
+    <string name="notification_30_min">30 минут</string>
+    <string name="notification_45_min">45 минут</string>
+    <string name="notification_1_hour">1 час</string>
+    <string name="notification_2_hour">2 часа</string>
+    <string name="notification_3_hour">3 часа</string>
+    <string name="notification_12_hour">12 часов</string>
+    <string name="notification_24_hour">24 часа</string>
+    <string name="notification_2_day">2 дня</string>
+    <string name="notification_1_week">1 неделя</string>
 </resources>

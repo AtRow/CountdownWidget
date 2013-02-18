@@ -43,6 +43,17 @@ public class Util {
         return array;
     }
 
+    public static int[] toIntArray(Collection<Integer> collection){
+        int[] array = new int[collection.size()];
+
+        int i = 0;
+        for (int val : collection) {
+            array[i] = val;
+            i++;
+        }
+        return array;
+    }
+
     public static List<Integer> toIntegerList(int[] array) {
         List<Integer> list = new ArrayList<Integer>();
 

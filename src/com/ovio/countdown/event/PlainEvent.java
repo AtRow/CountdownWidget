@@ -3,7 +3,6 @@ package com.ovio.countdown.event;
 import android.text.format.Time;
 import com.ovio.countdown.log.Logger;
 import com.ovio.countdown.preferences.WidgetOptions;
-import com.ovio.countdown.prefs.Recurring;
 import com.ovio.countdown.util.Util;
 
 /**
@@ -63,7 +62,7 @@ public class PlainEvent implements Event {
 
     @Override
     public boolean isRepeating() {
-        return (options.recurringInterval != Recurring.NONE);
+        return (options.recurringInterval != 0L);
     }
 
     @Override
@@ -112,7 +111,7 @@ public class PlainEvent implements Event {
             time.set(now);
             Logger.i(TAG, "Px[%s]: Now is: [%s]", options.widgetId, time.format(Util.TF));
         }
-        long incrementMills = options.recurringInterval.millis;
+        long incrementMills = options.recurringInterval;
         long periodsCount = (now - timestamp) / incrementMills;
 
         if (!isCountingUp()) {
@@ -135,7 +134,7 @@ public class PlainEvent implements Event {
     }
 
     private long getNextTimestamp() {
-        return targetTimestamp + options.recurringInterval.millis;
+        return targetTimestamp + options.recurringInterval;
     }
 
     private void getNextEvent() {

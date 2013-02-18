@@ -1,7 +1,6 @@
 package com.ovio.countdown.preferences;
 
 import android.appwidget.AppWidgetManager;
-import com.ovio.countdown.prefs.Recurring;
 
 /**
  * Countdown
@@ -14,6 +13,8 @@ public class WidgetOptions extends AbstractOptions {
     public static final Field CALENDAR_ID = Field.get("calendarId", Long.class);
     public static final Field TITLE = Field.get("title", String.class);
     public static final Field TIMESTAMP = Field.get("timestamp", Long.class);
+    public static final Field RECURRING_INTERVAL = Field.get("recurringInterval", Long.class);
+    public static final Field NOTIFICATION_INTERVAL = Field.get("notificationInterval", Long.class);
 
     private final static Field[] fields = {
             WIDGET_ID,
@@ -24,8 +25,8 @@ public class WidgetOptions extends AbstractOptions {
             GeneralOptions.COUNT_UP,
             GeneralOptions.ENABLE_TIME,
             GeneralOptions.ENABLE_SECONDS,
-            GeneralOptions.RECURRING_INTERVAL,
-            GeneralOptions.RECURRING
+            RECURRING_INTERVAL,
+            NOTIFICATION_INTERVAL
     };
 
     public int widgetId;
@@ -42,9 +43,9 @@ public class WidgetOptions extends AbstractOptions {
 
     public boolean enableSeconds;
 
-    public boolean recurring;
+    public long recurringInterval;
 
-    public Recurring recurringInterval;
+    public long notificationInterval;
 
     public boolean enableTime;
 
@@ -76,10 +77,9 @@ public class WidgetOptions extends AbstractOptions {
 
         enableSeconds = bundle.getBoolean(GeneralOptions.ENABLE_SECONDS.name);
 
-        recurring = bundle.getBoolean(GeneralOptions.RECURRING.name);
+        recurringInterval = bundle.getLong(RECURRING_INTERVAL.name);
 
-        long millis = bundle.getLong(GeneralOptions.RECURRING_INTERVAL.name);
-        recurringInterval = Recurring.getRecurringFor(millis);
+        notificationInterval = bundle.getLong(NOTIFICATION_INTERVAL.name);
 
     }
 
@@ -102,9 +102,9 @@ public class WidgetOptions extends AbstractOptions {
 
         bundle.putBoolean(GeneralOptions.ENABLE_SECONDS.name, enableSeconds);
 
-        bundle.putBoolean(GeneralOptions.RECURRING.name, recurring);
+        bundle.putLong(RECURRING_INTERVAL.name, recurringInterval);
 
-        bundle.putLong(GeneralOptions.RECURRING_INTERVAL.name, recurringInterval.millis);
+        bundle.putLong(NOTIFICATION_INTERVAL.name, notificationInterval);
 
     }
 }

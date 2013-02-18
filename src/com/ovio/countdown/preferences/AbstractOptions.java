@@ -2,7 +2,6 @@ package com.ovio.countdown.preferences;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import com.ovio.countdown.prefs.Recurring;
 import com.ovio.countdown.util.Util;
 
 import java.lang.reflect.Array;
@@ -61,10 +60,6 @@ public abstract class AbstractOptions {
                 int[] array = Util.unpackIntArray(preferences.getString(fieldName, null));
                 bundle.putIntArray(fieldName, array);
 
-            } else if (field.clazz.equals(Recurring.class)) {
-                long mills = preferences.getLong(fieldName, Recurring.NONE.millis);
-                bundle.putLong(fieldName, mills);
-
             } else {
                 throw new IllegalArgumentException("Don't know how to read class: " + field.clazz.getCanonicalName());
             }
@@ -98,10 +93,6 @@ public abstract class AbstractOptions {
             } else if (field.clazz.equals(Array.class)) {
                 String value = Util.packIntArray(bundle.getIntArray(field.name));
                 editor.putString(fieldName, value);
-
-            } else if (field.clazz.equals(Recurring.class)) {
-                long mills = bundle.getLong(field.name);
-                editor.putLong(fieldName, mills);
 
             } else {
                 throw new IllegalArgumentException("Don't know how to write class: " + field.clazz.getCanonicalName());

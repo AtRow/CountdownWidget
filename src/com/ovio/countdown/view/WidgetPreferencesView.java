@@ -10,7 +10,8 @@ import com.ovio.countdown.event.CalendarData;
 import com.ovio.countdown.event.CalendarManager;
 import com.ovio.countdown.event.EventData;
 import com.ovio.countdown.log.Logger;
-import com.ovio.countdown.prefs.Recurring;
+import com.ovio.countdown.prefs.NotificationSpinnerData;
+import com.ovio.countdown.prefs.RecurringSpinnerData;
 
 import java.util.List;
 
@@ -36,7 +37,13 @@ public class WidgetPreferencesView {
 
     private boolean isManualTab = true;
 
-    private Recurring currentRecurring;
+    RecurringSpinnerData recurringSpinnerData = new RecurringSpinnerData();
+
+    NotificationSpinnerData notificationSpinnerData = new NotificationSpinnerData();
+
+    private int currentRecurringId;
+
+    private int currentNotificationId;
 
 
     private Button okButton;
@@ -63,7 +70,7 @@ public class WidgetPreferencesView {
 
     private Spinner recurringSpinner;
 
-    private Spinner notifySpinner;
+    private Spinner notificationSpinner;
 
     private Spinner iconSpinner;
 
@@ -89,33 +96,61 @@ public class WidgetPreferencesView {
 
         initTabHost();
         initCalendarPickers();
-        initSpinners();
+        initRecurringSpinner();
+        initNotificationSpinner();
 
         updateOkButton();
     }
 
-    private void initSpinners() {
+    private void initNotificationSpinner() {
 
-        final Recurring[] recurs = Recurring.values();
-        String[] data = new String[recurs.length];
+        int size = notificationSpinnerData.getSize();
+        String[] data = new String[size];
 
-        for (int i = 0; i < recurs.length; i++) {
-            data[i] = activity.getString(recurs[i].textId);
+        for (int i = 0; i < size; i++) {
+            data[i] = activity.getString(notificationSpinnerData.getTextId(i));
         }
 
-        ArrayAdapter<String> recurringAdapter = new ArrayAdapter<String>(activity, android.R.layout.simple_spinner_item, data);
-        recurringAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        recurringSpinner.setAdapter(recurringAdapter);
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(activity, android.R.layout.simple_spinner_item, data);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        notificationSpinner.setAdapter(adapter);
 
-        recurringSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+        notificationSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int position, long l) {
-                currentRecurring = recurs[position];
+                currentNotificationId = position;
             }
 
             @Override
             public void onNothingSelected(AdapterView<?> adapterView) {
-                currentRecurring = null;
+                currentNotificationId = 0;
+            }
+        });
+
+    }
+
+    private void initRecurringSpinner() {
+
+        int size = recurringSpinnerData.getSize();
+        String[] data = new String[size];
+
+        for (int i = 0; i < size; i++) {
+            data[i] = activity.getString(recurringSpinnerData.getTextId(i));
+        }
+
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(activity, android.R.layout.simple_spinner_item, data);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        recurringSpinner.setAdapter(adapter);
+
+        recurringSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int position, long l) {
+                currentRecurringId = position;
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+                currentRecurringId = 0;
             }
         });
 
@@ -276,22 +311,22 @@ public class WidgetPreferencesView {
         return checked;
     }
 
-    public void setRecurring(Recurring recurring) {
-
-        Recurring[] recurs = Recurring.values();
-        for (int i = 0; i < recurs.length; i++) {
-            if (recurs[i] == recurring) {
-                recurringSpinner.setSelection(i);
-            }
-        }
-        this.currentRecurring = recurring;
+    public void setRecurringInterval(long interval) {
+        currentRecurringId = recurringSpinnerData.getIdForVal(interval);
+        recurringSpinner.setSelection(currentRecurringId);
     }
 
-    public Recurring getRecurring() {
-        if (currentRecurring == null) {
-            return Recurring.NONE;
-        }
-        return currentRecurring;
+    public long getRecurringInterval() {
+        return recurringSpinnerData.getValueForId(currentRecurringId);
+    }
+
+    public void setNotificationInterval(long interval) {
+        currentNotificationId = notificationSpinnerData.getIdForVal(interval);
+        notificationSpinner.setSelection(currentNotificationId);
+    }
+
+    public long getNotificationInterval() {
+        return notificationSpinnerData.getValueForId(currentNotificationId);
     }
 
     public void onTimeCheckBoxClick(View view) {
@@ -353,7 +388,7 @@ public class WidgetPreferencesView {
 
         recurringSpinner = (Spinner) activity.findViewById(R.id.recurringSpinner);
 
-        notifySpinner = (Spinner) activity.findViewById(R.id.notifySpinner);
+        notificationSpinner = (Spinner) activity.findViewById(R.id.notifySpinner);
 
         iconSpinner = (Spinner) activity.findViewById(R.id.iconSpinner);
 

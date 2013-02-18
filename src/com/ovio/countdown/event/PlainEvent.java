@@ -22,7 +22,7 @@ public class PlainEvent implements Event {
 
     public PlainEvent(WidgetOptions options) {
         this.options = options;
-        this.targetTimestamp = getRecurringTimestamp(options.timestamp);
+        this.targetTimestamp = getFastForward(options.timestamp);
     }
 
     @Override
@@ -95,7 +95,7 @@ public class PlainEvent implements Event {
         }
     }
 
-    private long getRecurringTimestamp(long timestamp) {
+    private long getFastForward(long timestamp) {
 
         if (!isRepeating()) {
             return timestamp;
@@ -109,9 +109,11 @@ public class PlainEvent implements Event {
         }
         long incrementMills = options.recurringInterval.millis;
         long periodsCount = (now - timestamp) / incrementMills;
-        if (periodsCount < 0) {
-            periodsCount--;
+
+        if (periodsCount <= 0) {
+            return timestamp;
         }
+
         if (!isCountingUp()) {
             periodsCount++;
         }
@@ -136,7 +138,7 @@ public class PlainEvent implements Event {
     }
 
     private void getNextEvent() {
-        targetTimestamp = getRecurringTimestamp(targetTimestamp);
+        targetTimestamp = getFastForward(targetTimestamp);
 
         if (Logger.DEBUG) {
             Time time = new Time();

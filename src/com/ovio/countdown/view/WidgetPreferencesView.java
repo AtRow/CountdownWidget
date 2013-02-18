@@ -200,8 +200,15 @@ public class WidgetPreferencesView {
     public void setTime(Time time) {
         timePicker.setCurrentHour(time.hour);
         timePicker.setCurrentMinute(time.minute);
+    }
 
+    public void setDate(Time time) {
         datePicker.updateDate(time.year, time.month, time.monthDay);
+    }
+
+    public void setDateTime(Time time) {
+        setDate(time);
+        setTime(time);
     }
 
     public Time getTime() {

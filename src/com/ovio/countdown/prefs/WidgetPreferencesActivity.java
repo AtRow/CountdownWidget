@@ -141,7 +141,7 @@ public class WidgetPreferencesActivity extends Activity {
                 case PICK_DATE_REQUEST:
                     date = DateHelper.getDateFromIntent(data);
                     if (date != null) {
-                        this.view.setTime(date);
+                        this.view.setDate(date);
                     }
                     break;
 
@@ -313,7 +313,7 @@ public class WidgetPreferencesActivity extends Activity {
             Time time = new Time();
             time.set(widgetOptions.timestamp);
 
-            view.setTime(time);
+            view.setDateTime(time);
 
             view.setCountSeconds(widgetOptions.enableSeconds);
             view.setEnableTime(widgetOptions.enableTime);

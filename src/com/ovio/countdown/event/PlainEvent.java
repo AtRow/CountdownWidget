@@ -102,6 +102,11 @@ public class PlainEvent implements Event {
         }
 
         long now = System.currentTimeMillis();
+
+        if (timestamp > now) {
+            return timestamp;
+        }
+
         if (Logger.DEBUG) {
             Time time = new Time();
             time.set(now);
@@ -109,10 +114,6 @@ public class PlainEvent implements Event {
         }
         long incrementMills = options.recurringInterval.millis;
         long periodsCount = (now - timestamp) / incrementMills;
-
-        if (periodsCount <= 0) {
-            return timestamp;
-        }
 
         if (!isCountingUp()) {
             periodsCount++;

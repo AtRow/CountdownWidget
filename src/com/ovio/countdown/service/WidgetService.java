@@ -28,6 +28,7 @@ public class WidgetService extends Service {
 
     public static final String START = "com.ovio.countdown.service.WidgetService.START";
     public static final String ALARM = "com.ovio.countdown.service.WidgetService.ALARM";
+    public static final String NOTIFY = "com.ovio.countdown.service.WidgetService.NOTIFY";
     public static final String UPDATED = "com.ovio.countdown.service.WidgetService.WIDGET_UPDATED";
     public static final String DELETED = "com.ovio.countdown.service.WidgetService.WIDGET_DELETED";
 
@@ -132,6 +133,9 @@ public class WidgetService extends Service {
         } else if (action.equals(ALARM)) {
             onAlarmIntent(intent);
 
+        } else if (action.equals(NOTIFY)) {
+            onNotifyIntent(intent);
+
         } else {
             Logger.e(TAG, "Received UNEXPECTED Intent with Action: %s", action);
         }
@@ -204,6 +208,13 @@ public class WidgetService extends Service {
         scheduleUpdate();
     }
 
+    private void onNotifyIntent(Intent intent) {
+        Logger.i(TAG, "Received NOTIFY Intent");
+
+        notifyWidgets();
+        scheduleUpdate();
+    }
+
     private WidgetOptions getUpdateWidgetOptions(Intent updateIntent) {
         Logger.d(TAG, "Parsing update Intent");
 
@@ -225,12 +236,10 @@ public class WidgetService extends Service {
         Collection<WidgetProxy> proxies = widgetProxies.values();
 
         long nextUpdate = scheduler.scheduleUpdate(proxies);
+        scheduler.scheduleNotify(proxies);
 
         // If no update needed or too long to wait for update
-        if (nextUpdate == -1) {
-            Logger.i(TAG, "No update needed, Forcing Service shutdown");
-            shutdownService();
-        } else if ((nextUpdate - System.currentTimeMillis()) > MAX_ACTIVE_WAIT_MILLS ) {
+        if ((nextUpdate - System.currentTimeMillis()) > MAX_ACTIVE_WAIT_MILLS ) {
             Logger.i(TAG, "To long to wait: %s ms, Forcing Service shutdown", nextUpdate - System.currentTimeMillis());
             shutdownService();
         } else {
@@ -289,6 +298,34 @@ public class WidgetService extends Service {
 
                 if (System.currentTimeMillis() >= next) {
                     Logger.i(TAG, "Widget will be updated now");
+                    proxy.updateWidget();
+                }
+            }
+        }
+    }
+
+    private void notifyWidgets() {
+        Logger.i(TAG, "Updating Widget Notifications");
+
+        for (WidgetProxy proxy: widgetProxies.values()) {
+            Logger.i(TAG, "Updating widget %s", proxy.getWidgetId());
+
+            if (proxy.isAlive()) {
+                Logger.i(TAG, "Widget %s is alive", proxy.getWidgetId());
+
+                long next = proxy.getNextNotifyTimestamp();
+
+                if (Logger.DEBUG) {
+                    Time time = new Time();
+                    time.setToNow();
+                    Time updTime = new Time();
+                    updTime.set(next);
+
+                    Logger.i(TAG, "Current time is [%s] and proxy.nextNotify is [%s]", time.format(Util.TF), updTime.format(Util.TF));
+                }
+
+                if (System.currentTimeMillis() >= next) {
+                    Logger.i(TAG, "Widget will be notified now");
                     proxy.updateWidget();
                 }
             }

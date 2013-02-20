@@ -21,4 +21,8 @@ public interface Event {
     boolean isPaused();
 
     long getPausedTill();
+
+    long getNotificationTimestamp();
+
+    boolean isNotifying();
 }

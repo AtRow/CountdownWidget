@@ -25,13 +25,18 @@ public final class Scheduler {
 
     private final PendingIntent updatingPendingIntent;
 
+    private final PendingIntent notifyingPendingIntent;
+
     private Scheduler(Context context) {
         Logger.d(TAG, "Instantiated Scheduler");
 
         alarmManager = (AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
 
-        Intent intent = new Intent(WidgetService.ALARM);
-        updatingPendingIntent = PendingIntent.getBroadcast(context, 0, intent, 0);
+        Intent alarmIntent = new Intent(WidgetService.ALARM);
+        updatingPendingIntent = PendingIntent.getBroadcast(context, 0, alarmIntent, 0);
+
+        Intent notifyIntent = new Intent(WidgetService.NOTIFY);
+        notifyingPendingIntent = PendingIntent.getBroadcast(context, 0, notifyIntent, 0);
     }
 
     public static synchronized Scheduler getInstance(Context context) {
@@ -45,22 +50,19 @@ public final class Scheduler {
     public long scheduleUpdate(Collection<WidgetProxy> widgetProxies) {
         Logger.i(TAG, "Scheduling next update alarm for one of %s proxies", widgetProxies.size());
 
-        long nearestUpdateTimestamp = -1;
-
         // Get minimum
-        long min = Long.MAX_VALUE;
+        long nearestUpdateTimestamp = Long.MAX_VALUE;
+
         for (WidgetProxy proxy: widgetProxies) {
             if (proxy.isAlive()) {
                 long next = proxy.getNextUpdateTimestamp();
-                if (next < min) {
-                    min = next;
+                if (next < nearestUpdateTimestamp) {
+                    nearestUpdateTimestamp = next;
                 }
             }
         }
 
-        if (min < Long.MAX_VALUE) {
-
-            nearestUpdateTimestamp = min;
+        if (nearestUpdateTimestamp < Long.MAX_VALUE) {
 
             if (Logger.DEBUG) {
                 Time time = new Time();
@@ -78,6 +80,40 @@ public final class Scheduler {
         Logger.d(TAG, "Finished Scheduling");
 
         return nearestUpdateTimestamp;
+    }
+
+    public long scheduleNotify(Collection<WidgetProxy> widgetProxies) {
+        Logger.i(TAG, "Scheduling next Notify alarm for one of %s proxies", widgetProxies.size());
+
+        // Get minimum
+        long nearestNotifyTimestamp = Long.MAX_VALUE;
+        for (WidgetProxy proxy: widgetProxies) {
+            if (proxy.isAlive() && proxy.isNotifying()) {
+                long next = proxy.getNextUpdateTimestamp();
+                if (next < nearestNotifyTimestamp) {
+                    nearestNotifyTimestamp = next;
+                }
+            }
+        }
+
+        if (nearestNotifyTimestamp < Long.MAX_VALUE) {
+
+            if (Logger.DEBUG) {
+                Time time = new Time();
+                time.set(nearestNotifyTimestamp);
+                Logger.i(TAG, "Next Notify at: %s", time.format(Util.TF));
+            }
+
+            alarmManager.set(AlarmManager.RTC_WAKEUP, nearestNotifyTimestamp, notifyingPendingIntent);
+
+        } else {
+            alarmManager.cancel(notifyingPendingIntent);
+            Logger.i(TAG, "Unscheduled all Notify alarms");
+        }
+
+        Logger.d(TAG, "Finished Scheduling");
+
+        return nearestNotifyTimestamp;
     }
 
 }

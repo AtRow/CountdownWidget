@@ -13,6 +13,7 @@ import com.ovio.countdown.date.TimeDifference;
 import com.ovio.countdown.event.Event;
 import com.ovio.countdown.log.Logger;
 import com.ovio.countdown.prefs.WidgetPreferencesActivity;
+import com.ovio.countdown.service.NotifyManager;
 import com.ovio.countdown.util.Util;
 
 /**
@@ -25,7 +26,7 @@ public abstract class WidgetProxy {
 
     private boolean showText = true;
 
-    protected Event event;
+    protected final Event event;
 
     protected int maxCountingVal;
 
@@ -50,6 +51,7 @@ public abstract class WidgetProxy {
 
     private final int widgetId;
 
+    private long currentNotifyTimestamp;
 
     public WidgetProxy(Context context, int layout, int widgetId, Event event) {
         Logger.d(TAG, "Instantiated WidgetProxy for widget %s, event '%s'", widgetId, event.getTitle());
@@ -73,6 +75,24 @@ public abstract class WidgetProxy {
         if (event.isPaused()) {
             now = target;
         }
+
+        if (event.isNotifying()) {
+            Logger.i(TAG, "Px[%s]: Event has notification", widgetId);
+
+            long timestamp = event.getNotificationTimestamp();
+
+            if ((currentNotifyTimestamp != timestamp) && (timestamp > System.currentTimeMillis())) {
+                currentNotifyTimestamp = timestamp;
+            }
+
+            if ((currentNotifyTimestamp != 0) && (currentNotifyTimestamp <= System.currentTimeMillis())) {
+
+                NotifyManager manager = NotifyManager.getInstance(context);
+                manager.show(widgetId, currentNotifyTimestamp, event.getTitle());
+                currentNotifyTimestamp = 0;
+            }
+        }
+
         updateWidgetTime(now, target);
     }
 
@@ -172,5 +192,13 @@ public abstract class WidgetProxy {
 
     public int getWidgetId() {
         return widgetId;
+    }
+
+    public long getNextNotifyTimestamp() {
+        return event.getNotificationTimestamp();
+    }
+
+    public boolean isNotifying() {
+        return event.isNotifying() && (event.getNotificationTimestamp() > System.currentTimeMillis());
     }
 }

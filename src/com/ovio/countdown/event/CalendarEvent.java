@@ -74,6 +74,16 @@ public class CalendarEvent implements Event {
         return System.currentTimeMillis() + DateUtils.SECOND_IN_MILLIS;
     }
 
+    @Override
+    public long getNotificationTimestamp() {
+        return 0;
+    }
+
+    @Override
+    public boolean isNotifying() {
+        return false;
+    }
+
     private boolean isReloading() {
         return options.recurringInterval > 0;
     }

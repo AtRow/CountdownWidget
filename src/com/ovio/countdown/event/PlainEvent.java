@@ -84,6 +84,16 @@ public class PlainEvent implements Event {
         return pause;
     }
 
+    @Override
+    public boolean isNotifying() {
+        return options.notificationInterval > 0;
+    }
+
+    @Override
+    public long getNotificationTimestamp() {
+        return targetTimestamp - options.notificationInterval;
+    }
+
     private void pause() {
         pause = System.currentTimeMillis() + PAUSE;
 

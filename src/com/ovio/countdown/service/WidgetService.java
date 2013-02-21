@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.widget.Toast;
 import com.ovio.countdown.log.Logger;
 import com.ovio.countdown.preferences.PreferencesManager;
 import com.ovio.countdown.preferences.WidgetOptions;
@@ -74,7 +73,7 @@ public class WidgetService extends Service {
         notifyScheduler = NotifyScheduler.getInstance(context);
 
         // TODO: remove
-        Toast.makeText(this, "Service created", Toast.LENGTH_LONG).show();
+        //Toast.makeText(this, "Service created", Toast.LENGTH_LONG).show();
 
         int[] ids = preferencesManager.loadDefaultPrefs().savedWidgets;
 
@@ -127,12 +126,23 @@ public class WidgetService extends Service {
         } else if (action.equals(NotifyScheduler.NOTIFY)) {
             notifyScheduler.onNotify(intent);
 
+        } else if (action.equals(ALARM)) {
+            onAlarm(intent);
+
         } else {
             Logger.e(TAG, "Received UNEXPECTED Intent with Action: %s", action);
         }
 
         Logger.i(TAG, "Leaving Service in START_REDELIVER_INTENT mode");
         return Service.START_REDELIVER_INTENT;
+    }
+
+    private void onAlarm(Intent intent) {
+        long now = System.currentTimeMillis();
+        for (WidgetProxy proxy: widgetProxies.values()) {
+            proxy.onUpdate(now);
+        }
+
     }
 
     private void onUpdatedIntent(Intent intent) {
@@ -205,107 +215,5 @@ public class WidgetService extends Service {
 
         return options;
     }
-
-/*
-    private void scheduleUpdate() {
-        Collection<WidgetProxy> proxies = widgetProxies.values();
-
-        long nextUpdate = scheduler.scheduleUpdate(proxies);
-        scheduler.scheduleNotify(proxies);
-
-        // If no update needed or too long to wait for update
-        if ((nextUpdate - System.currentTimeMillis()) > MAX_ACTIVE_WAIT_MILLS ) {
-            Logger.i(TAG, "To long to wait: %s ms, Forcing Service shutdown", nextUpdate - System.currentTimeMillis());
-            shutdownService();
-        } else {
-            startCountingSeconds();
-            startBlinking();
-        }
-    }
-*/
-
-/*    private void shutdownService() {
-        stopSelf();
-    }
-
-    private void startBlinking() {
-
-        for (WidgetProxy proxy: widgetProxies.values()) {
-            if (proxy.isBlinking()) {
-                Logger.i(TAG, "Proxy %s is blinking, starting Blinker", proxy.getWidgetId());
-                blinker.start();
-                break;
-            }
-            blinker.stop();
-        }
-    }
-
-    private void startCountingSeconds() {
-
-        for (WidgetProxy proxy: widgetProxies.values()) {
-            if (proxy.isCountingSeconds()) {
-                Logger.i(TAG, "Proxy %s is counting seconds, starting Second counter", proxy.getWidgetId());
-                secondCounter.start();
-                break;
-            }
-            secondCounter.stop();
-        }
-    }
-
-    private void updateWidgets() {
-        Logger.i(TAG, "Updating Widget Proxies");
-
-        for (WidgetProxy proxy: widgetProxies.values()) {
-            Logger.i(TAG, "Updating widget %s", proxy.getWidgetId());
-
-            if (proxy.isAlive()) {
-                Logger.i(TAG, "Widget %s is alive", proxy.getWidgetId());
-
-                long next = proxy.getNextUpdateTimestamp();
-
-                if (Logger.DEBUG) {
-                    Time time = new Time();
-                    time.setToNow();
-                    Time updTime = new Time();
-                    updTime.set(next);
-
-                    Logger.i(TAG, "Current time is [%s] and proxy.nextUpdate is [%s]", time.format(Util.TF), updTime.format(Util.TF));
-                }
-
-                if (System.currentTimeMillis() >= next) {
-                    Logger.i(TAG, "Widget will be updated now");
-                    proxy.updateWidget();
-                }
-            }
-        }
-    }
-
-    private void notifyWidgets() {
-        Logger.i(TAG, "Updating Widget Notifications");
-
-        for (WidgetProxy proxy: widgetProxies.values()) {
-            Logger.i(TAG, "Updating widget %s", proxy.getWidgetId());
-
-            if (proxy.isAlive()) {
-                Logger.i(TAG, "Widget %s is alive", proxy.getWidgetId());
-
-                long next = proxy.getNextNotifyTimestamp();
-
-                if (Logger.DEBUG) {
-                    Time time = new Time();
-                    time.setToNow();
-                    Time updTime = new Time();
-                    updTime.set(next);
-
-                    Logger.i(TAG, "Current time is [%s] and proxy.nextNotify is [%s]", time.format(Util.TF), updTime.format(Util.TF));
-                }
-
-                if (System.currentTimeMillis() >= next) {
-                    Logger.i(TAG, "Widget will be notified now");
-                    proxy.updateWidget();
-                }
-            }
-        }
-    }*/
 
 }

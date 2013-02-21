@@ -73,7 +73,7 @@ public abstract class WidgetProxy implements Blinking, Notifying, SecondsCountin
 
         scheduler = Scheduler.getInstance(context);
         notifyScheduler = NotifyScheduler.getInstance(context);
-        secondCounter = new SecondCounter(context);
+        secondCounter = SecondCounter.getInstance(context);
         blinker = new Blinker(context);
     }
 
@@ -88,6 +88,9 @@ public abstract class WidgetProxy implements Blinking, Notifying, SecondsCountin
             notifyScheduler.register(widgetId, this);
         }
 
+        if (isCountingSeconds()) {
+            secondCounter.register(widgetId, this);
+        }
     }
 
     private void updateWidget() {
@@ -97,12 +100,18 @@ public abstract class WidgetProxy implements Blinking, Notifying, SecondsCountin
     public void onDelete() {
         scheduler.unRegister(widgetId);
         notifyScheduler.unRegister(widgetId);
-
+        secondCounter.unRegister(widgetId);
     }
 
     @Override
     public void onUpdate(long timestamp) {
         updateWidget(timestamp);
+
+        if (isCountingSeconds()) {
+            secondCounter.register(widgetId, this);
+        } else {
+            secondCounter.unRegister(widgetId);
+        }
 
         if (!isAlive()) {
             scheduler.unRegister(widgetId);
@@ -119,8 +128,8 @@ public abstract class WidgetProxy implements Blinking, Notifying, SecondsCountin
     }
 
     @Override
-    public void onNextSecond() {
-        // TODO
+    public void onNextSecond(long timestamp) {
+        updateWidget(timestamp);
     }
 
     private void notifyWidget() {

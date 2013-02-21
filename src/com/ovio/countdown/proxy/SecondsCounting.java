@@ -6,6 +6,6 @@ package com.ovio.countdown.proxy;
  */
 public interface SecondsCounting {
 
-    void onNextSecond();
+    void onNextSecond(long timestamp);
 
 }

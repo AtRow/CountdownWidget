@@ -42,8 +42,6 @@ public class WidgetService extends Service {
 
     private NotifyScheduler notifyScheduler;
 
-    private SecondCounter secondCounter;
-
     private Blinker blinker;
 
     private PreferencesManager preferencesManager;
@@ -77,7 +75,6 @@ public class WidgetService extends Service {
         scheduler = Scheduler.getInstance(context);
         notifyScheduler = NotifyScheduler.getInstance(context);
 
-        secondCounter = new SecondCounter(context);
         blinker = new Blinker(context);
 
         // TODO: remove
@@ -109,7 +106,6 @@ public class WidgetService extends Service {
     public void onDestroy() {
         Logger.i(TAG, "Stopping WidgetService");
 
-        secondCounter.stop();
         blinker.stop();
 
         widgetPreferencesManager = null;
@@ -153,13 +149,21 @@ public class WidgetService extends Service {
         if (options != null) {
             int id = options.widgetId;
 
-            Logger.d(TAG, "Creating new Proxy with id %s", id);
-
-            WidgetProxy proxy = widgetProxyFactory.getWidgetProxy(options);
+            WidgetProxy proxy = widgetProxies.get(id);
             if (proxy != null) {
-                proxy.onCreate();
+                Logger.i(TAG, "Removing existing Proxy with id %s", id);
 
-                widgetProxies.put(id, proxy);
+                proxy.onDelete();
+                widgetProxies.remove(id);
+            }
+
+            Logger.i(TAG, "Creating new Proxy with id %s", id);
+
+            WidgetProxy newProxy = widgetProxyFactory.getWidgetProxy(options);
+            if (newProxy != null) {
+                newProxy.onCreate();
+
+                widgetProxies.put(id, newProxy);
             }
 
             if (Logger.DEBUG) {

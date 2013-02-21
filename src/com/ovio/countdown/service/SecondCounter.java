@@ -4,9 +4,9 @@ import android.content.Context;
 import android.os.PowerManager;
 import android.util.Log;
 import com.ovio.countdown.log.Logger;
-import com.ovio.countdown.proxy.WidgetProxy;
+import com.ovio.countdown.proxy.SecondsCounting;
 
-import java.util.ArrayList;
+import java.util.TreeMap;
 
 /**
  * Countdown
@@ -22,16 +22,43 @@ public class SecondCounter {
 
     private SecondCounterRunnable secondCounterRunnable;
 
-    private final ArrayList<WidgetProxy> widgetProxies;
+    private final TreeMap<Integer, SecondsCounting> countingMap = new TreeMap<Integer, SecondsCounting>();
 
     private final PowerManager powerManager;
 
+    private static SecondCounter instance;
 
-    public SecondCounter(Context context) {
+
+    private SecondCounter(Context context) {
+        Logger.d(TAG, "Instantiated SecondCounter");
 
         powerManager = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
-        widgetProxies = new ArrayList<WidgetProxy>();
     }
+
+    public static synchronized SecondCounter getInstance(Context context) {
+        if (instance == null) {
+            instance = new SecondCounter(context);
+        }
+        Logger.d(TAG, "Returning SecondCounter instance");
+        return instance;
+    }
+
+    public synchronized void register(int id, SecondsCounting secondsCounting) {
+        Logger.i(TAG, "Registering new SecondsCounting widget with id: %s", id);
+
+        countingMap.put(id, secondsCounting);
+        start();
+    }
+
+    public synchronized void unRegister(int id) {
+        Logger.i(TAG, "UnRegistering new SecondsCounting widget with id: %s", id);
+
+        countingMap.remove(id);
+        if (countingMap.isEmpty()) {
+            stop();
+        }
+    }
+
 
     public void start() {
         if (powerManager.isScreenOn() && (secondCounterThread == null || !secondCounterThread.isAlive())) {
@@ -95,15 +122,16 @@ public class SecondCounter {
         }
 
         private void updateWidgetSeconds() {
-            if (Logger.DEBUG) {
-                Logger.i(TAG, "Starting updating widget Seconds");
-            }
+            Logger.i(TAG, "Starting updating widget Seconds");
 
-            for (WidgetProxy proxy: widgetProxies) {
+            long now = System.currentTimeMillis();
 
-                //if (proxy.isCountingSeconds()) {
-                    proxy.updateWidget(System.currentTimeMillis());
-                //}
+            for (Integer id: countingMap.keySet()) {
+                SecondsCounting secondsCounting = countingMap.get(id);
+
+                if (secondsCounting != null) {
+                    secondsCounting.onNextSecond(now);
+                }
             }
         }
     }

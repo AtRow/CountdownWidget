@@ -52,7 +52,11 @@ public class Blinker {
     public synchronized void unRegister(int id) {
         Logger.i(TAG, "UnRegistering Blinking widget with id: %s", id);
 
-        blinkingMap.remove(id);
+        Blinking blinking = blinkingMap.remove(id);
+
+        if (blinking != null) {
+            blinking.onBlink(true);
+        }
         if (blinkingMap.isEmpty()) {
             stop();
         }

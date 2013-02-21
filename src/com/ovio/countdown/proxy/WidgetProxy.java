@@ -118,7 +118,6 @@ public abstract class WidgetProxy implements Blinking, Notifying, SecondsCountin
             blinker.register(widgetId, this);
         } else {
             blinker.unRegister(widgetId);
-            onBlink(true);
         }
 
         if (!isAlive()) {

@@ -18,10 +18,6 @@ public interface Event {
 
     boolean isAlive();
 
-    boolean isPaused();
-
-    long getPausedTill();
-
     long getNotificationTimestamp();
 
     boolean isNotifying();

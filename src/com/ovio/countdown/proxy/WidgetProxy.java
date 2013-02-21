@@ -5,6 +5,7 @@ import android.appwidget.AppWidgetManager;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.format.DateUtils;
 import android.text.format.Time;
 import android.view.View;
 import android.widget.RemoteViews;
@@ -39,6 +40,8 @@ public abstract class WidgetProxy implements Blinking, Notifying, SecondsCountin
     protected final static int HOUR = (MINUTE * 60);
     protected final static int DAY = (HOUR * 24);
 
+    private static final long PAUSE = DateUtils.SECOND_IN_MILLIS * 10;
+
     private final static String TAG = Logger.PREFIX + "proxy";
 
     private Context context;
@@ -51,6 +54,10 @@ public abstract class WidgetProxy implements Blinking, Notifying, SecondsCountin
 
     private long currentNotifyTimestamp;
 
+    private long currentTargetTimestamp;
+
+    private long pauseTimestamp;
+
     private final Scheduler scheduler;
 
     private final NotifyScheduler notifyScheduler;
@@ -58,6 +65,9 @@ public abstract class WidgetProxy implements Blinking, Notifying, SecondsCountin
     private final SecondCounter secondCounter;
 
     private final Blinker blinker;
+
+    private boolean reachedTarget = false;
+
 
     public WidgetProxy(Context context, int layout, int widgetId, Event event) {
         Logger.d(TAG, "Instantiated WidgetProxy for widget %s, event '%s'", widgetId, event.getTitle());
@@ -70,6 +80,7 @@ public abstract class WidgetProxy implements Blinking, Notifying, SecondsCountin
         preferencesIntent = getPreferencesIntent(context, widgetId);
 
         currentNotifyTimestamp = getNextNotifyTimestamp();
+        currentTargetTimestamp = event.getTargetTimestamp();
 
         scheduler = Scheduler.getInstance(context);
         notifyScheduler = NotifyScheduler.getInstance(context);
@@ -106,6 +117,11 @@ public abstract class WidgetProxy implements Blinking, Notifying, SecondsCountin
 
     @Override
     public void onUpdate(long timestamp) {
+
+        if (isTargetReached()) {
+            pause();
+        }
+
         updateWidget(timestamp);
 
         if (isCountingSeconds() && !isBlinking()) {
@@ -136,6 +152,11 @@ public abstract class WidgetProxy implements Blinking, Notifying, SecondsCountin
 
     @Override
     public void onNextSecond(long timestamp) {
+
+        if (isTargetReached()) {
+            pause();
+        }
+
         updateWidget(timestamp);
     }
 
@@ -143,6 +164,10 @@ public abstract class WidgetProxy implements Blinking, Notifying, SecondsCountin
     public void onBlink(boolean show) {
         this.showText = show;
         updateWidget();
+
+        if (!isBlinking()) {
+            blinker.unRegister(widgetId);
+        }
     }
 
     @Override
@@ -153,7 +178,7 @@ public abstract class WidgetProxy implements Blinking, Notifying, SecondsCountin
         long nextUpdateTimestamp = (System.currentTimeMillis() / MINUTE) * MINUTE; // rounded to minute
 
         if (isBlinking()) {
-            nextUpdateTimestamp = event.getPausedTill();
+            nextUpdateTimestamp = pauseTimestamp;
         } else {
             nextUpdateTimestamp += nextIncrement;
         }
@@ -178,7 +203,7 @@ public abstract class WidgetProxy implements Blinking, Notifying, SecondsCountin
         //long now = System.currentTimeMillis();
         long target = event.getTargetTimestamp();
 
-        if (event.isPaused() || !isAlive()) {
+        if (isBlinking() || !isAlive()) {
             now = target;
         }
 
@@ -250,17 +275,36 @@ public abstract class WidgetProxy implements Blinking, Notifying, SecondsCountin
         return event.isAlive();
     }
 
-    private boolean isBlinking() {
+    private boolean isTargetReached() {
 
-        if (event.isPaused()) {
-            Logger.i(TAG, "Px[%s]: Blinking", widgetId);
-            return true;
-        } else {
-            Logger.i(TAG, "Px[%s]: No blinking", widgetId);
-            return false;
+        if (!reachedTarget && (System.currentTimeMillis() >= currentTargetTimestamp)) {
+            long newTimestamp = event.getTargetTimestamp();
+            if (newTimestamp > currentTargetTimestamp) {
+                currentTargetTimestamp = newTimestamp;
+                reachedTarget = false;
+                return true;
+
+            } else {
+                reachedTarget = true;
+                return true;
+            }
         }
+        return false;
     }
 
+    private boolean isBlinking() {
+        return System.currentTimeMillis() < pauseTimestamp;
+    }
+
+    private void pause() {
+        pauseTimestamp = System.currentTimeMillis() + PAUSE;
+
+        if (Logger.DEBUG) {
+            Time time = new Time();
+            time.set(pauseTimestamp);
+            Logger.i(TAG, "Px[%s]: Widget will be paused till: %s", widgetId, time.format(Util.TF));
+        }
+    }
 
     private PendingIntent getPreferencesIntent(Context context, int id) {
         Logger.d(TAG, "Px[%s]: Creating PendingIntent", id);

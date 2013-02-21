@@ -16,26 +16,20 @@ public class PlainEvent implements Event {
 
     private final WidgetOptions options;
 
-    private long targetTimestamp;
     private long pause;
 
     public PlainEvent(WidgetOptions options) {
         this.options = options;
-        this.targetTimestamp = getFastForward(options.timestamp);
     }
 
     @Override
     public long getTargetTimestamp() {
-        Logger.i(TAG, "Pe[%s]: Getting target timestamp for widget", options.widgetId);
-        if (isExpired()) {
-            getNextEvent();
-            pause();
-        }
+        long targetTimestamp = getFastForward(options.timestamp);
 
         if (Logger.DEBUG) {
             Time time = new Time();
             time.set(targetTimestamp);
-            Logger.i(TAG, "Px[%s]: Target timestamp for widget: [%s]", options.widgetId, time.format(Util.TF));
+            Logger.i(TAG, "Pe[%s]: Target timestamp for widget: [%s]", options.widgetId, time.format(Util.TF));
         }
 
         return targetTimestamp;
@@ -53,10 +47,6 @@ public class PlainEvent implements Event {
 
     @Override
     public boolean isCountingUp() {
-        if (Logger.DEBUG) {
-            Logger.i(TAG, "Px[%s]: Counting up: %s", options.widgetId, options.countUp);
-        }
-
         return options.countUp;
     }
 
@@ -67,21 +57,8 @@ public class PlainEvent implements Event {
 
     @Override
     public boolean isAlive() {
-        return isCountingUp() || isRepeating() || isPaused() ||
+        return isCountingUp() || isRepeating() ||
                 (!isCountingUp() && (getTargetTimestamp() > System.currentTimeMillis()));
-    }
-
-    @Override
-    public boolean isPaused() {
-        return System.currentTimeMillis() < pause;
-    }
-
-    @Override
-    public long getPausedTill() {
-        if (Logger.DEBUG) {
-            Logger.i(TAG, "Px[%s]: Seconds till unPause: %s", options.widgetId, (System.currentTimeMillis() - pause)/1000);
-        }
-        return pause;
     }
 
     @Override
@@ -94,21 +71,12 @@ public class PlainEvent implements Event {
         getTargetTimestamp();
 
         long now = System.currentTimeMillis();
+        long targetTimestamp = getFastForward(options.timestamp);
 
         if (now > (targetTimestamp - options.notificationInterval)) {
             return targetTimestamp + options.recurringInterval - options.notificationInterval;
         } else {
             return targetTimestamp - options.notificationInterval;
-        }
-    }
-
-    private void pause() {
-        pause = System.currentTimeMillis() + PAUSE;
-
-        if (Logger.DEBUG) {
-            Time time = new Time();
-            time.set(pause);
-            Logger.i(TAG, "Px[%s]: Widget will be paused till: %s", options.widgetId, time.format(Util.TF));
         }
     }
 
@@ -150,32 +118,4 @@ public class PlainEvent implements Event {
 
         return timestamp + delta;
     }
-
-    private long getNextTimestamp() {
-        return targetTimestamp + options.recurringInterval;
-    }
-
-    private void getNextEvent() {
-        targetTimestamp = getFastForward(targetTimestamp);
-
-        if (Logger.DEBUG) {
-            Time time = new Time();
-            time.set(targetTimestamp);
-            Logger.i(TAG, "Px[%s]: New Target timestamp: [%s]", options.widgetId, time.format(Util.TF));
-        }
-    }
-
-    private boolean isExpired() {
-        // Non-recurring events never expires
-        if (!isRepeating()) {
-            return false;
-        }
-
-        if (isCountingUp()) {
-            return (System.currentTimeMillis() >= (getNextTimestamp()));
-        } else {
-            return (System.currentTimeMillis() >= (targetTimestamp));
-        }
-    }
-
 }

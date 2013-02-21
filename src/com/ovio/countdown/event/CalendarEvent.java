@@ -1,7 +1,6 @@
 package com.ovio.countdown.event;
 
 import android.content.Context;
-import android.text.format.DateUtils;
 import com.ovio.countdown.preferences.WidgetOptions;
 
 /**
@@ -62,16 +61,6 @@ public class CalendarEvent implements Event {
         } else {
             return false;
         }
-    }
-
-    @Override
-    public boolean isPaused() {
-        return false;
-    }
-
-    @Override
-    public long getPausedTill() {
-        return System.currentTimeMillis() + DateUtils.SECOND_IN_MILLIS;
     }
 
     @Override

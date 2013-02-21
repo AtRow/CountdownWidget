@@ -46,8 +46,10 @@ public class SecondCounter {
     public synchronized void register(int id, SecondsCounting secondsCounting) {
         Logger.i(TAG, "Registering new SecondsCounting widget with id: %s", id);
 
-        countingMap.put(id, secondsCounting);
-        start();
+        if (!countingMap.containsKey(id)) {
+            countingMap.put(id, secondsCounting);
+            start();
+        }
     }
 
     public synchronized void unRegister(int id) {
@@ -126,12 +128,8 @@ public class SecondCounter {
 
             long now = System.currentTimeMillis();
 
-            for (Integer id: countingMap.keySet()) {
-                SecondsCounting secondsCounting = countingMap.get(id);
-
-                if (secondsCounting != null) {
-                    secondsCounting.onNextSecond(now);
-                }
+            for (SecondsCounting secondsCounting: countingMap.values()) {
+                secondsCounting.onNextSecond(now);
             }
         }
     }

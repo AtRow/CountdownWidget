@@ -42,8 +42,6 @@ public class WidgetService extends Service {
 
     private NotifyScheduler notifyScheduler;
 
-    private Blinker blinker;
-
     private PreferencesManager preferencesManager;
 
     private WidgetPreferencesManager widgetPreferencesManager;
@@ -75,8 +73,6 @@ public class WidgetService extends Service {
         scheduler = Scheduler.getInstance(context);
         notifyScheduler = NotifyScheduler.getInstance(context);
 
-        blinker = new Blinker(context);
-
         // TODO: remove
         Toast.makeText(this, "Service created", Toast.LENGTH_LONG).show();
 
@@ -105,8 +101,6 @@ public class WidgetService extends Service {
     @Override
     public void onDestroy() {
         Logger.i(TAG, "Stopping WidgetService");
-
-        blinker.stop();
 
         widgetPreferencesManager = null;
         widgetProxyFactory = null;

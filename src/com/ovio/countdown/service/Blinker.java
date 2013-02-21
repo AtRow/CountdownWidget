@@ -3,9 +3,9 @@ package com.ovio.countdown.service;
 import android.content.Context;
 import android.os.PowerManager;
 import com.ovio.countdown.log.Logger;
-import com.ovio.countdown.proxy.WidgetProxy;
+import com.ovio.countdown.proxy.Blinking;
 
-import java.util.ArrayList;
+import java.util.TreeMap;
 
 /**
  * Countdown
@@ -22,16 +22,42 @@ public class Blinker {
 
     private BlinkerRunnable blinkerRunnable;
 
-    private final ArrayList<WidgetProxy> widgetProxies;
+    private final TreeMap<Integer, Blinking> blinkingMap = new TreeMap<Integer, Blinking>();
 
     private final PowerManager powerManager;
 
+    private static Blinker instance;
 
-    public Blinker(Context context) {
-
+    private Blinker(Context context) {
         powerManager = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
-        widgetProxies = new ArrayList<WidgetProxy>();
     }
+
+    public static synchronized Blinker getInstance(Context context) {
+        if (instance == null) {
+            instance = new Blinker(context);
+        }
+        Logger.d(TAG, "Returning Blinker instance");
+        return instance;
+    }
+
+    public synchronized void register(int id, Blinking blinking) {
+        Logger.i(TAG, "Registering new Blinking widget with id: %s", id);
+
+        if (!blinkingMap.containsKey(id)) {
+            blinkingMap.put(id, blinking);
+            start();
+        }
+    }
+
+    public synchronized void unRegister(int id) {
+        Logger.i(TAG, "UnRegistering Blinking widget with id: %s", id);
+
+        blinkingMap.remove(id);
+        if (blinkingMap.isEmpty()) {
+            stop();
+        }
+    }
+
 
     public void start() {
         if (powerManager.isScreenOn() && (blinkerThread == null || !blinkerThread.isAlive())) {
@@ -79,16 +105,14 @@ public class Blinker {
         }
 
         private void blink(boolean show) {
-            for (WidgetProxy proxy: widgetProxies) {
-                //if (proxy.isBlinking()) {
-                    proxy.onBlink(show);
-                //}
+            for (Blinking blinking: blinkingMap.values()) {
+                blinking.onBlink(show);
             }
         }
 
         private void unBlink() {
-            for (WidgetProxy proxy: widgetProxies) {
-                proxy.onBlink(true);
+            for (Blinking blinking: blinkingMap.values()) {
+                blinking.onBlink(true);
             }
         }
 

@@ -74,7 +74,7 @@ public abstract class WidgetProxy implements Blinking, Notifying, SecondsCountin
         scheduler = Scheduler.getInstance(context);
         notifyScheduler = NotifyScheduler.getInstance(context);
         secondCounter = SecondCounter.getInstance(context);
-        blinker = new Blinker(context);
+        blinker = Blinker.getInstance(context);
     }
 
     public void onCreate() {
@@ -91,26 +91,34 @@ public abstract class WidgetProxy implements Blinking, Notifying, SecondsCountin
         if (isCountingSeconds()) {
             secondCounter.register(widgetId, this);
         }
-    }
 
-    private void updateWidget() {
-        updateWidget(System.currentTimeMillis());
+        if (isBlinking()) {
+            blinker.register(widgetId, this);
+        }
     }
 
     public void onDelete() {
         scheduler.unRegister(widgetId);
         notifyScheduler.unRegister(widgetId);
         secondCounter.unRegister(widgetId);
+        blinker.unRegister(widgetId);
     }
 
     @Override
     public void onUpdate(long timestamp) {
         updateWidget(timestamp);
 
-        if (isCountingSeconds()) {
+        if (isCountingSeconds() && !isBlinking()) {
             secondCounter.register(widgetId, this);
         } else {
             secondCounter.unRegister(widgetId);
+        }
+
+        if (isBlinking()) {
+            blinker.register(widgetId, this);
+        } else {
+            blinker.unRegister(widgetId);
+            onBlink(true);
         }
 
         if (!isAlive()) {
@@ -130,66 +138,6 @@ public abstract class WidgetProxy implements Blinking, Notifying, SecondsCountin
     @Override
     public void onNextSecond(long timestamp) {
         updateWidget(timestamp);
-    }
-
-    private void notifyWidget() {
-
-        if (event.isNotifying()) {
-            Logger.i(TAG, "Px[%s]: Event has notification", widgetId);
-
-            NotifyManager manager = NotifyManager.getInstance(context);
-            manager.show(widgetId, currentNotifyTimestamp, event.getTitle());
-            currentNotifyTimestamp = getNextNotifyTimestamp();
-        }
-    }
-
-    public synchronized void updateWidget(long now) {
-        Logger.i(TAG, "Px[%s]: Updating widget", widgetId);
-
-        //long now = System.currentTimeMillis();
-        long target = event.getTargetTimestamp();
-
-        if (event.isPaused()) {
-            now = target;
-        }
-
-        updateWidgetTime(now, target);
-    }
-
-    private synchronized void updateWidgetTime(long now, long target) {
-        Logger.i(TAG, "Px[%s]: Updating widget Time only", widgetId);
-
-        // I don't know why, but instantiating new RemoteViews works A LOT FASTER then reusing existing!
-        AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
-        RemoteViews views = new RemoteViews(context.getPackageName(), layout);
-
-        views.setTextViewText(R.id.titleTextView, event.getTitle());
-        views.setOnClickPendingIntent(R.id.widgetLayout, preferencesIntent);
-
-        TimeDifference diff = TimeDifference.between(now, target);
-        updateCounters(diff);
-        String text = getTimeText(diff);
-
-        Logger.i(TAG, "Px[%s]: Setting text: '%s'", widgetId, text);
-
-        views.setTextViewText(R.id.counterTextView, text);
-
-        if (showText) {
-            views.setInt(R.id.counterTextView, "setVisibility", View.VISIBLE);
-        } else {
-            views.setInt(R.id.counterTextView, "setVisibility", View.INVISIBLE);
-        }
-
-        appWidgetManager.updateAppWidget(widgetId, views);
-
-    }
-
-    protected abstract void updateCounters(TimeDifference diff);
-
-    protected abstract String getTimeText(TimeDifference diff);
-
-    void setCountSeconds(boolean doCount) {
-        this.doCountSeconds = doCount;
     }
 
     @Override
@@ -224,6 +172,71 @@ public abstract class WidgetProxy implements Blinking, Notifying, SecondsCountin
     public long getNextNotifyTimestamp() {
         return event.getNotificationTimestamp();
     }
+
+    private synchronized void updateWidget(long now) {
+        Logger.i(TAG, "Px[%s]: Updating widget", widgetId);
+
+        //long now = System.currentTimeMillis();
+        long target = event.getTargetTimestamp();
+
+        if (event.isPaused() || !isAlive()) {
+            now = target;
+        }
+
+        updateWidgetTime(now, target);
+    }
+
+    private void updateWidget() {
+        updateWidget(System.currentTimeMillis());
+    }
+
+    private synchronized void updateWidgetTime(long now, long target) {
+        Logger.i(TAG, "Px[%s]: Updating widget Time only", widgetId);
+
+        // I don't know why, but instantiating new RemoteViews works A LOT FASTER then reusing existing!
+        AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
+        RemoteViews views = new RemoteViews(context.getPackageName(), layout);
+
+        views.setTextViewText(R.id.titleTextView, event.getTitle());
+        views.setOnClickPendingIntent(R.id.widgetLayout, preferencesIntent);
+
+        TimeDifference diff = TimeDifference.between(now, target);
+        updateCounters(diff);
+        String text = getTimeText(diff);
+
+        Logger.i(TAG, "Px[%s]: Setting text: '%s'", widgetId, text);
+
+        views.setTextViewText(R.id.counterTextView, text);
+
+        if (showText) {
+            views.setInt(R.id.counterTextView, "setVisibility", View.VISIBLE);
+        } else {
+            views.setInt(R.id.counterTextView, "setVisibility", View.INVISIBLE);
+        }
+
+        appWidgetManager.updateAppWidget(widgetId, views);
+
+    }
+
+    private void notifyWidget() {
+
+        if (event.isNotifying()) {
+            Logger.i(TAG, "Px[%s]: Event has notification", widgetId);
+
+            NotifyManager manager = NotifyManager.getInstance(context);
+            manager.show(widgetId, currentNotifyTimestamp, event.getTitle());
+            currentNotifyTimestamp = getNextNotifyTimestamp();
+        }
+    }
+
+    protected abstract void updateCounters(TimeDifference diff);
+
+    protected abstract String getTimeText(TimeDifference diff);
+
+    void setCountSeconds(boolean doCount) {
+        this.doCountSeconds = doCount;
+    }
+
 
     private boolean isCountingSeconds() {
         return event.isCountingSeconds() && doCountSeconds && event.isAlive();

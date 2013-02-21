@@ -120,14 +120,28 @@
             </intent-filter>
         </receiver>
 
+        <receiver android:name=".service.Scheduler">
+            <intent-filter>
+                <action android:name="com.ovio.countdown.service.Scheduler.UPDATE"/>
+            </intent-filter>
+        </receiver>
+
+        <receiver android:name=".service.NotifyScheduler">
+            <intent-filter>
+                <action android:name="com.ovio.countdown.service.NotifyScheduler.NOTIFY"/>
+            </intent-filter>
+        </receiver>
+
         <service android:name=".service.WidgetService">
                  <!-- TODO: android:permission="com.ovio.countdown.service.WidgetService.PERMISSION" -->
             <intent-filter>
                 <action android:name="com.ovio.countdown.service.WidgetService.START"/>
                 <action android:name="com.ovio.countdown.service.WidgetService.ALARM"/>
-                <action android:name="com.ovio.countdown.service.WidgetService.NOTIFY"/>
                 <action android:name="com.ovio.countdown.service.WidgetService.WIDGET_UPDATED"/>
                 <action android:name="com.ovio.countdown.service.WidgetService.WIDGET_DELETED"/>
+
+                <action android:name="com.ovio.countdown.service.Scheduler.UPDATE"/>
+                <action android:name="com.ovio.countdown.service.NotifyScheduler.NOTIFY"/>
             </intent-filter>
         </service>
 

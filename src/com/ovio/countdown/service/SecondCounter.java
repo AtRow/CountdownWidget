@@ -6,7 +6,7 @@ import android.util.Log;
 import com.ovio.countdown.log.Logger;
 import com.ovio.countdown.proxy.WidgetProxy;
 
-import java.util.Collection;
+import java.util.ArrayList;
 
 /**
  * Countdown
@@ -22,15 +22,15 @@ public class SecondCounter {
 
     private SecondCounterRunnable secondCounterRunnable;
 
-    private final Collection<WidgetProxy> widgetProxies;
+    private final ArrayList<WidgetProxy> widgetProxies;
 
     private final PowerManager powerManager;
 
 
-    public SecondCounter(Context context, Collection<WidgetProxy> widgetProxies) {
+    public SecondCounter(Context context) {
 
         powerManager = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
-        this.widgetProxies = widgetProxies;
+        widgetProxies = new ArrayList<WidgetProxy>();
     }
 
     public void start() {
@@ -101,13 +101,9 @@ public class SecondCounter {
 
             for (WidgetProxy proxy: widgetProxies) {
 
-                if (Logger.DEBUG) {
-                    Logger.i(TAG, "Walking trough widget %s to update seconds only", proxy.getWidgetId());
-            }
-
-                if (proxy.isCountingSeconds()) {
-                    proxy.updateWidget();
-                }
+                //if (proxy.isCountingSeconds()) {
+                    proxy.updateWidget(System.currentTimeMillis());
+                //}
             }
         }
     }

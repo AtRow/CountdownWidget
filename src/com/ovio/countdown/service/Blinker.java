@@ -5,7 +5,7 @@ import android.os.PowerManager;
 import com.ovio.countdown.log.Logger;
 import com.ovio.countdown.proxy.WidgetProxy;
 
-import java.util.Collection;
+import java.util.ArrayList;
 
 /**
  * Countdown
@@ -22,15 +22,15 @@ public class Blinker {
 
     private BlinkerRunnable blinkerRunnable;
 
-    private final Collection<WidgetProxy> widgetProxies;
+    private final ArrayList<WidgetProxy> widgetProxies;
 
     private final PowerManager powerManager;
 
 
-    public Blinker(Context context, Collection<WidgetProxy> widgetProxies) {
+    public Blinker(Context context) {
 
         powerManager = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
-        this.widgetProxies = widgetProxies;
+        widgetProxies = new ArrayList<WidgetProxy>();
     }
 
     public void start() {
@@ -80,15 +80,15 @@ public class Blinker {
 
         private void blink(boolean show) {
             for (WidgetProxy proxy: widgetProxies) {
-                if (proxy.isBlinking()) {
-                    proxy.blink(show);
-                }
+                //if (proxy.isBlinking()) {
+                    proxy.onBlink(show);
+                //}
             }
         }
 
         private void unBlink() {
             for (WidgetProxy proxy: widgetProxies) {
-                proxy.blink(true);
+                proxy.onBlink(true);
             }
         }
 

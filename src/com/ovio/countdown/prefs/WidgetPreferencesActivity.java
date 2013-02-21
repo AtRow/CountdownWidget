@@ -172,9 +172,9 @@ public class WidgetPreferencesActivity extends Activity {
     }
 
     private void sendToWidgetService() {
-        Logger.i(TAG, "Sending UPDATED intent to Service");
+        Logger.i(TAG, "Sending WIDGET_UPDATED intent to Service");
 
-        Intent widgetServiceIntent = new Intent(WidgetService.UPDATED);
+        Intent widgetServiceIntent = new Intent(WidgetService.WIDGET_UPDATED);
 
         Bundle extras = widgetOptions.getBundle();
 

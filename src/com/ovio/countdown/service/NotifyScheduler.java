@@ -8,7 +8,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.format.Time;
 import com.ovio.countdown.log.Logger;
-import com.ovio.countdown.proxy.Updating;
+import com.ovio.countdown.proxy.Notifying;
 import com.ovio.countdown.util.Util;
 
 import java.util.ArrayList;
@@ -20,69 +20,68 @@ import java.util.TreeMap;
  * Countdown
  * com.ovio.countdown
  */
-public final class Scheduler extends BroadcastReceiver {
+public final class NotifyScheduler extends BroadcastReceiver {
 
-    public static final String UPDATE = "com.ovio.countdown.service.Scheduler.UPDATE";
+    public static final String NOTIFY = "com.ovio.countdown.service.NotifyScheduler.NOTIFY";
 
-    private static final String TAG = Logger.PREFIX + "Scheduler";
+    private static final String TAG = Logger.PREFIX + "NotifyScheduler";
 
-    private static Scheduler instance;
+    private static NotifyScheduler instance;
 
     private static final String IDS = "IDS";
 
-    private final TreeMap<Integer, Updating> updatingMap = new TreeMap<Integer, Updating>();
+    private final TreeMap<Integer, Notifying> updatingMap = new TreeMap<Integer, Notifying>();
 
     private Context context;
 
 
-    public Scheduler() {
-        Logger.d(TAG, "Instantiated Scheduler");
+    public NotifyScheduler() {
+        Logger.d(TAG, "Instantiated NotifyScheduler");
     }
 
-    public static synchronized Scheduler getInstance(Context context) {
+    public static synchronized NotifyScheduler getInstance(Context context) {
         if (instance == null) {
-            instance = new Scheduler();
+            instance = new NotifyScheduler();
         }
-        Logger.d(TAG, "Returning Scheduler instance");
+        Logger.d(TAG, "Returning NotifyScheduler instance");
 
         instance.context = context;
         return instance;
     }
 
-    public synchronized void register(int id, Updating updating) {
-        Logger.i(TAG, "Registering new Updating widget with id: %s", id);
+    public synchronized void register(int id, Notifying notifying) {
+        Logger.i(TAG, "Registering new Notifying widget with id: %s", id);
 
-        updatingMap.put(id, updating);
+        updatingMap.put(id, notifying);
         scheduleUpdate();
     }
 
     public synchronized void unRegister(int id) {
-        Logger.i(TAG, "UnRegistering new Updating widget with id: %s", id);
+        Logger.i(TAG, "UnRegistering new Notifying widget with id: %s", id);
 
         updatingMap.remove(id);
         scheduleUpdate();
     }
 
-    public synchronized void onUpdate(Intent intent) {
-        Logger.i(TAG, "Starting onUpdate");
+    public synchronized void onNotify(Intent intent) {
+        Logger.i(TAG, "Starting onNotify");
 
         int[] ids = getIds(intent);
-        Logger.i(TAG, "Will update widgets: %s", Arrays.toString(ids));
-        long now = System.currentTimeMillis();
+        Logger.i(TAG, "Will notify widgets: %s", Arrays.toString(ids));
 
         if (ids != null) {
 
             for (int i = 0; i < ids.length; i++) {
-                Updating updating = updatingMap.get(ids[i]);
-                if (updating != null) {
-                    Logger.i(TAG, "Updating widget [%s]", ids[i]);
-                    updating.onUpdate(now);
+                Notifying notifying = updatingMap.get(ids[i]);
+                if (notifying != null) {
+                    Logger.i(TAG, "Notifying widget [%s]", ids[i]);
+                    notifying.onNotify();
                 }
             }
 
             scheduleUpdate();
         }
-        Logger.i(TAG, "Finished onUpdate");
+        Logger.i(TAG, "Finished onNotify");
     }
 
     @Override
@@ -90,10 +89,10 @@ public final class Scheduler extends BroadcastReceiver {
         String action = intent.getAction();
         Logger.i(TAG, "Received %s Intent", action);
 
-        if (action.equals(UPDATE)) {
-            Logger.i(TAG, "Sending UPDATE intent to Service");
+        if (action.equals(NOTIFY)) {
+            Logger.i(TAG, "Sending NOTIFY intent to Service");
 
-            Intent serviceIntent = new Intent(UPDATE);
+            Intent serviceIntent = new Intent(NOTIFY);
             serviceIntent.putExtras(intent.getExtras());
             context.startService(serviceIntent);
         }
@@ -102,7 +101,7 @@ public final class Scheduler extends BroadcastReceiver {
     }
 
     private void scheduleUpdate() {
-        Logger.i(TAG, "Scheduling next update alarm for one of %s proxies", updatingMap.size());
+        Logger.i(TAG, "Scheduling next notify alarm for one of %s proxies", updatingMap.size());
 
         AlarmManager alarmManager = (AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
         long now = System.currentTimeMillis();
@@ -110,9 +109,9 @@ public final class Scheduler extends BroadcastReceiver {
         TreeMap<Long, List<Integer>> timestampMap = new TreeMap<Long, List<Integer>>();
 
         for (Integer id: updatingMap.keySet()) {
-            Updating updating = updatingMap.get(id);
+            Notifying notifying = updatingMap.get(id);
 
-            long timestamp = updating.getNextUpdateTimestamp();
+            long timestamp = notifying.getNextNotifyTimestamp();
 
             // Event expired
             if (timestamp <= now) {
@@ -132,9 +131,9 @@ public final class Scheduler extends BroadcastReceiver {
             if (Logger.DEBUG) {
                 Time time = new Time();
                 time.set(nearestUpdateTimestamp);
-                Logger.i(TAG, "Next update at: %s", time.format(Util.TF));
+                Logger.i(TAG, "Next notify at: %s", time.format(Util.TF));
             }
-            Logger.i(TAG, "Ids to update: %s", Arrays.toString(ids));
+            Logger.i(TAG, "Ids to notify: %s", Arrays.toString(ids));
 
             PendingIntent pendingIntent = getPendingIntent(ids);
             alarmManager.set(AlarmManager.RTC, nearestUpdateTimestamp, pendingIntent);
@@ -154,10 +153,10 @@ public final class Scheduler extends BroadcastReceiver {
 
     private PendingIntent getPendingIntent(int[] ids) {
 
-        Intent alarmIntent = new Intent(UPDATE);
+        Intent alarmIntent = new Intent(NOTIFY);
 
         if (ids != null) {
-            Bundle extras = new Bundle();
+            Bundle extras = new Bundle(1);
             extras.putIntArray(IDS, ids);
             alarmIntent.putExtras(extras);
         }

@@ -91,7 +91,15 @@ public class PlainEvent implements Event {
 
     @Override
     public long getNotificationTimestamp() {
-        return targetTimestamp - options.notificationInterval;
+        getTargetTimestamp();
+
+        long now = System.currentTimeMillis();
+
+        if (now > (targetTimestamp - options.notificationInterval)) {
+            return targetTimestamp + options.recurringInterval - options.notificationInterval;
+        } else {
+            return targetTimestamp - options.notificationInterval;
+        }
     }
 
     private void pause() {

@@ -13,14 +13,14 @@ import com.ovio.countdown.date.TimeDifference;
 import com.ovio.countdown.event.Event;
 import com.ovio.countdown.log.Logger;
 import com.ovio.countdown.prefs.WidgetPreferencesActivity;
-import com.ovio.countdown.service.NotifyManager;
+import com.ovio.countdown.service.*;
 import com.ovio.countdown.util.Util;
 
 /**
  * Countdown
  * com.ovio.countdown
  */
-public abstract class WidgetProxy {
+public abstract class WidgetProxy implements Blinking, Notifying, SecondsCounting, Updating {
 
     private boolean doCountSeconds = false;
 
@@ -39,19 +39,25 @@ public abstract class WidgetProxy {
     protected final static int HOUR = (MINUTE * 60);
     protected final static int DAY = (HOUR * 24);
 
-    private static final long BLINKING_MILLS = 15 * SECOND;
-
     private final static String TAG = Logger.PREFIX + "proxy";
 
     private Context context;
 
     private int layout;
 
-    private final PendingIntent pendingIntent;
+    private final PendingIntent preferencesIntent;
 
     private final int widgetId;
 
     private long currentNotifyTimestamp;
+
+    private final Scheduler scheduler;
+
+    private final NotifyScheduler notifyScheduler;
+
+    private final SecondCounter secondCounter;
+
+    private final Blinker blinker;
 
     public WidgetProxy(Context context, int layout, int widgetId, Event event) {
         Logger.d(TAG, "Instantiated WidgetProxy for widget %s, event '%s'", widgetId, event.getTitle());
@@ -61,36 +67,81 @@ public abstract class WidgetProxy {
         this.widgetId = widgetId;
         this.event = event;
 
-        pendingIntent = getPendingIntent(context, widgetId);
+        preferencesIntent = getPreferencesIntent(context, widgetId);
 
-        updateWidget();
+        currentNotifyTimestamp = getNextNotifyTimestamp();
+
+        scheduler = Scheduler.getInstance(context);
+        notifyScheduler = NotifyScheduler.getInstance(context);
+        secondCounter = new SecondCounter(context);
+        blinker = new Blinker(context);
     }
 
-    public synchronized void updateWidget() {
-        Logger.i(TAG, "Px[%s]: Updating widget", widgetId);
+    public void onCreate() {
+        updateWidget();
 
-        long now = System.currentTimeMillis();
-        long target = event.getTargetTimestamp();
-
-        if (event.isPaused()) {
-            now = target;
+        if (isAlive()) {
+            scheduler.register(widgetId, this);
         }
+
+        if (isNotifying()) {
+            notifyScheduler.register(widgetId, this);
+        }
+
+    }
+
+    private void updateWidget() {
+        updateWidget(System.currentTimeMillis());
+    }
+
+    public void onDelete() {
+        scheduler.unRegister(widgetId);
+        notifyScheduler.unRegister(widgetId);
+
+    }
+
+    @Override
+    public void onUpdate(long timestamp) {
+        updateWidget(timestamp);
+
+        if (!isAlive()) {
+            scheduler.unRegister(widgetId);
+        }
+    }
+
+    @Override
+    public void onNotify() {
+        notifyWidget();
+
+        if (!isNotifying()) {
+            notifyScheduler.unRegister(widgetId);
+        }
+    }
+
+    @Override
+    public void onNextSecond() {
+        // TODO
+    }
+
+    private void notifyWidget() {
 
         if (event.isNotifying()) {
             Logger.i(TAG, "Px[%s]: Event has notification", widgetId);
 
-            long timestamp = event.getNotificationTimestamp();
+            NotifyManager manager = NotifyManager.getInstance(context);
+            manager.show(widgetId, currentNotifyTimestamp, event.getTitle());
+            currentNotifyTimestamp = getNextNotifyTimestamp();
+        }
+    }
 
-            if ((currentNotifyTimestamp != timestamp) && (timestamp > System.currentTimeMillis())) {
-                currentNotifyTimestamp = timestamp;
-            }
+    public synchronized void updateWidget(long now) {
+        Logger.i(TAG, "Px[%s]: Updating widget", widgetId);
 
-            if ((currentNotifyTimestamp != 0) && (currentNotifyTimestamp <= System.currentTimeMillis())) {
+        //long now = System.currentTimeMillis();
+        long target = event.getTargetTimestamp();
 
-                NotifyManager manager = NotifyManager.getInstance(context);
-                manager.show(widgetId, currentNotifyTimestamp, event.getTitle());
-                currentNotifyTimestamp = 0;
-            }
+        if (event.isPaused()) {
+            now = target;
         }
 
         updateWidgetTime(now, target);
@@ -104,7 +155,7 @@ public abstract class WidgetProxy {
         RemoteViews views = new RemoteViews(context.getPackageName(), layout);
 
         views.setTextViewText(R.id.titleTextView, event.getTitle());
-        views.setOnClickPendingIntent(R.id.widgetLayout, pendingIntent);
+        views.setOnClickPendingIntent(R.id.widgetLayout, preferencesIntent);
 
         TimeDifference diff = TimeDifference.between(now, target);
         updateCounters(diff);
@@ -132,46 +183,16 @@ public abstract class WidgetProxy {
         this.doCountSeconds = doCount;
     }
 
-    public boolean isCountingSeconds() {
-        return event.isCountingSeconds() && doCountSeconds && event.isAlive();
-    }
-
-    public boolean isBlinking() {
-
-        if (event.isPaused()) {
-            Logger.i(TAG, "Px[%s]: Blinking", widgetId);
-            return true;
-        } else {
-            Logger.i(TAG, "Px[%s]: No blinking", widgetId);
-            return false;
-        }
-    }
-
-    public void blink(boolean show) {
+    @Override
+    public void onBlink(boolean show) {
         this.showText = show;
         updateWidget();
     }
 
-    public boolean isAlive() {
-        return event.isAlive();
-    }
-
-    private PendingIntent getPendingIntent(Context context, int id) {
-        Logger.d(TAG, "Px[%s]: Creating PendingIntent", id);
-
-        Bundle extras = new Bundle();
-        extras.putInt(AppWidgetManager.EXTRA_APPWIDGET_ID, id);
-
-        Intent prefIntent = new Intent(context, WidgetPreferencesActivity.class);
-        prefIntent.putExtras(extras);
-
-        return PendingIntent.getActivity(context, id, prefIntent, Intent.FLAG_ACTIVITY_NEW_TASK);
-    }
-
+    @Override
     public long getNextUpdateTimestamp() {
 
-        // TODO: updating methods in Service and Scheduler rely on Widget's isAlive state,
-        // TODO: but it could be better to return something like -1 for nextUpdateTimestamp is widget ain't going to update
+        // TODO: Return time in past if expired
 
         long nextUpdateTimestamp = (System.currentTimeMillis() / MINUTE) * MINUTE; // rounded to minute
 
@@ -190,15 +211,46 @@ public abstract class WidgetProxy {
         return nextUpdateTimestamp;
     }
 
-    public int getWidgetId() {
-        return widgetId;
-    }
-
+    @Override
     public long getNextNotifyTimestamp() {
         return event.getNotificationTimestamp();
     }
 
-    public boolean isNotifying() {
+    private boolean isCountingSeconds() {
+        return event.isCountingSeconds() && doCountSeconds && event.isAlive();
+    }
+
+    private boolean isNotifying() {
         return event.isNotifying() && (event.getNotificationTimestamp() > System.currentTimeMillis());
     }
+
+
+    private boolean isAlive() {
+        return event.isAlive();
+    }
+
+    private boolean isBlinking() {
+
+        if (event.isPaused()) {
+            Logger.i(TAG, "Px[%s]: Blinking", widgetId);
+            return true;
+        } else {
+            Logger.i(TAG, "Px[%s]: No blinking", widgetId);
+            return false;
+        }
+    }
+
+
+    private PendingIntent getPreferencesIntent(Context context, int id) {
+        Logger.d(TAG, "Px[%s]: Creating PendingIntent", id);
+
+        Bundle extras = new Bundle();
+        extras.putInt(AppWidgetManager.EXTRA_APPWIDGET_ID, id);
+
+        Intent prefIntent = new Intent(context, WidgetPreferencesActivity.class);
+        prefIntent.putExtras(extras);
+
+        return PendingIntent.getActivity(context, id, prefIntent, Intent.FLAG_ACTIVITY_NEW_TASK);
+    }
+
 }

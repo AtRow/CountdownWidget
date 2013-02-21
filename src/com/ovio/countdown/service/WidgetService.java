@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.text.format.Time;
 import android.widget.Toast;
 import com.ovio.countdown.log.Logger;
 import com.ovio.countdown.preferences.PreferencesManager;
@@ -15,8 +14,6 @@ import com.ovio.countdown.proxy.WidgetProxy;
 import com.ovio.countdown.proxy.WidgetProxyFactory;
 import com.ovio.countdown.util.Util;
 
-import java.util.Collection;
-import java.util.Collections;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -28,9 +25,8 @@ public class WidgetService extends Service {
 
     public static final String START = "com.ovio.countdown.service.WidgetService.START";
     public static final String ALARM = "com.ovio.countdown.service.WidgetService.ALARM";
-    public static final String NOTIFY = "com.ovio.countdown.service.WidgetService.NOTIFY";
-    public static final String UPDATED = "com.ovio.countdown.service.WidgetService.WIDGET_UPDATED";
-    public static final String DELETED = "com.ovio.countdown.service.WidgetService.WIDGET_DELETED";
+    public static final String WIDGET_UPDATED = "com.ovio.countdown.service.WidgetService.WIDGET_UPDATED";
+    public static final String WIDGET_DELETED = "com.ovio.countdown.service.WidgetService.WIDGET_DELETED";
 
     public static final String PERMISSION = "com.ovio.countdown.service.WidgetService.PERMISSION";
 
@@ -44,7 +40,10 @@ public class WidgetService extends Service {
 
     private Scheduler scheduler;
 
+    private NotifyScheduler notifyScheduler;
+
     private SecondCounter secondCounter;
+
     private Blinker blinker;
 
     private PreferencesManager preferencesManager;
@@ -52,6 +51,7 @@ public class WidgetService extends Service {
     private WidgetPreferencesManager widgetPreferencesManager;
 
     private WidgetProxyFactory widgetProxyFactory;
+
 
     public WidgetService() {
         super();
@@ -75,8 +75,10 @@ public class WidgetService extends Service {
         widgetProxyFactory = WidgetProxyFactory.getInstance(context);
         preferencesManager = PreferencesManager.getInstance(context);
         scheduler = Scheduler.getInstance(context);
-        secondCounter = new SecondCounter(context, Collections.unmodifiableCollection(widgetProxies.values()));
-        blinker = new Blinker(context, Collections.unmodifiableCollection(widgetProxies.values()));
+        notifyScheduler = NotifyScheduler.getInstance(context);
+
+        secondCounter = new SecondCounter(context);
+        blinker = new Blinker(context);
 
         // TODO: remove
         Toast.makeText(this, "Service created", Toast.LENGTH_LONG).show();
@@ -94,6 +96,8 @@ public class WidgetService extends Service {
                 if (proxy != null) {
                     Logger.i(TAG, "Created [%s] Proxy with id: %s", i, ids[i]);
                     widgetProxies.put(ids[i], proxy);
+
+                    proxy.onCreate();
                 }
             } else {
                 Logger.i(TAG, "Got null Options, probably the Widget is new");
@@ -119,22 +123,19 @@ public class WidgetService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         String action = intent.getAction();
-        Logger.d(TAG, "Received new Intent %s", action);
+        Logger.i(TAG, "Received new Intent %s", action);
 
-        if (action.equals(START)) {
-            onStartIntent(intent);
-
-        } else if (action.equals(UPDATED)) {
+        if (action.equals(WIDGET_UPDATED)) {
             onUpdatedIntent(intent);
 
-        } else if (action.equals(DELETED)) {
+        } else if (action.equals(WIDGET_DELETED)) {
             onDeletedIntent(intent);
 
-        } else if (action.equals(ALARM)) {
-            onAlarmIntent(intent);
+        } else if (action.equals(Scheduler.UPDATE)) {
+            scheduler.onUpdate(intent);
 
-        } else if (action.equals(NOTIFY)) {
-            onNotifyIntent(intent);
+        } else if (action.equals(NotifyScheduler.NOTIFY)) {
+            notifyScheduler.onNotify(intent);
 
         } else {
             Logger.e(TAG, "Received UNEXPECTED Intent with Action: %s", action);
@@ -144,41 +145,27 @@ public class WidgetService extends Service {
         return Service.START_REDELIVER_INTENT;
     }
 
-    private void onStartIntent(Intent intent) {
-        Logger.i(TAG, "Received START Intent");
-
-        scheduleUpdate();
-    }
-
     private void onUpdatedIntent(Intent intent) {
-        Logger.i(TAG, "Received UPDATED Intent");
+        Logger.i(TAG, "Received WIDGET_UPDATED Intent");
 
         WidgetOptions options = getUpdateWidgetOptions(intent);
 
         if (options != null) {
             int id = options.widgetId;
 
-            WidgetProxy proxy;
-//            if (widgetProxies.containsKey(id)) {
-//                Logger.d(TAG, "Updating existing Proxy with id %s", id);
-//
-//                proxy = widgetProxies.get(id);
-//                proxy.setOptions(options);
-//            } else {
-                Logger.d(TAG, "Creating new Proxy with id %s", id);
+            Logger.d(TAG, "Creating new Proxy with id %s", id);
 
-                proxy = widgetProxyFactory.getWidgetProxy(options);
-                if (proxy != null) {
-                    widgetProxies.put(id, proxy);
-                }
-//            }
+            WidgetProxy proxy = widgetProxyFactory.getWidgetProxy(options);
+            if (proxy != null) {
+                proxy.onCreate();
+
+                widgetProxies.put(id, proxy);
+            }
 
             if (Logger.DEBUG) {
                 Logger.d(TAG, "Current active Widgets in widgetProxies Map: %s",
                         Util.getString(widgetProxies.keySet()));
             }
-
-            scheduleUpdate();
 
         } else {
             Logger.e(TAG, "Got null Options for UPDATE intent, no WidgetProxies will be created");
@@ -186,33 +173,22 @@ public class WidgetService extends Service {
     }
 
     private void onDeletedIntent(Intent intent) {
-        Logger.i(TAG, "Received DELETED Intent");
+        Logger.i(TAG, "Received WIDGET_DELETED Intent");
 
         int[] ids = intent.getIntArrayExtra(WIDGET_IDS);
 
         if (ids != null) {
             for (int i = 0; i < ids.length; i++) {
+                WidgetProxy proxy = widgetProxies.get(ids[i]);
+                if (proxy != null) {
+                    proxy.onDelete();
+                }
+
                 widgetProxies.remove(ids[i]);
             }
-            scheduleUpdate();
-
         } else {
-            Logger.e(TAG, "Got null Ids for DELETED intent, no WidgetProxies will be deleted");
+            Logger.e(TAG, "Got null Ids for WIDGET_DELETED intent, no WidgetProxies will be deleted");
         }
-    }
-
-    private void onAlarmIntent(Intent intent) {
-        Logger.i(TAG, "Received ALARM Intent");
-
-        updateWidgets();
-        scheduleUpdate();
-    }
-
-    private void onNotifyIntent(Intent intent) {
-        Logger.i(TAG, "Received NOTIFY Intent");
-
-        notifyWidgets();
-        scheduleUpdate();
     }
 
     private WidgetOptions getUpdateWidgetOptions(Intent updateIntent) {
@@ -232,6 +208,7 @@ public class WidgetService extends Service {
         return options;
     }
 
+/*
     private void scheduleUpdate() {
         Collection<WidgetProxy> proxies = widgetProxies.values();
 
@@ -247,8 +224,9 @@ public class WidgetService extends Service {
             startBlinking();
         }
     }
+*/
 
-    private void shutdownService() {
+/*    private void shutdownService() {
         stopSelf();
     }
 
@@ -330,6 +308,6 @@ public class WidgetService extends Service {
                 }
             }
         }
-    }
+    }*/
 
 }

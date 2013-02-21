@@ -58,9 +58,9 @@ public class CleanupWidgetTask extends AsyncTask<List<Integer>, Void, Void> {
             int[] deletedArray = Util.toIntArray(deletedIds);
 
             Logger.i(TAG, "Widgets to be deleted: %s", Arrays.toString(deletedArray));
-            Logger.i(TAG, "Sending DELETED intent to Service");
+            Logger.i(TAG, "Sending WIDGET_DELETED intent to Service");
 
-            Intent widgetServiceIntent = new Intent(WidgetService.DELETED);
+            Intent widgetServiceIntent = new Intent(WidgetService.WIDGET_DELETED);
             Bundle extras = new Bundle();
             extras.putIntArray(WidgetService.WIDGET_IDS, deletedArray);
 

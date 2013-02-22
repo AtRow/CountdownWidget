@@ -5,8 +5,11 @@ import android.content.ContentUris;
 import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
+import android.text.format.DateFormat;
+import android.text.format.Time;
 import com.ovio.countdown.R;
 import com.ovio.countdown.log.Logger;
+import com.ovio.countdown.util.Util;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -22,11 +25,20 @@ public final class CalendarManager {
 
     private static final String CALENDARS = "calendars";
 
-    private static final String EVENTS = "instances/when";
+    private static final String INSTANCES = "instances/when";
+
+    private static final long[] QUERY_TIMESTAMP_ITERATIONS = {
+            DateFormat.DAY,
+            DateFormat.MONTH,
+            DateFormat.YEAR,
+            DateFormat.YEAR * 10
+    };
 
     private static CalendarManager instance;
 
     private final Context context;
+
+
 
     private Uri baseUri;
 
@@ -112,26 +124,32 @@ public final class CalendarManager {
     }
 
     public List<EventData> getEvents(long startMills, long endMills) {
+        if (Logger.DEBUG) {
+            Time time1 = new Time();
+            time1.set(startMills);
+            Time time2 = new Time();
+            time2.set(endMills);
+            Logger.i(TAG, "Getting events between %s and %s", time1.format(Util.TF), time2.format(Util.TF));
+        }
 
-        ContentResolver contentResolver = context.getContentResolver();
-
-        List<EventData> list = new ArrayList<EventData>();
-
-//        CalendarEvent nearestCalendarEvent = new CalendarEvent();
-//        nearestCalendarEvent.id = NEAREST_EVENT;
-//        nearestCalendarEvent.title = context.getString(R.string.event_nearest_title);
-        // TODO list.save(nearestCalendarEvent);
-
-        Uri.Builder builder = Uri.withAppendedPath(baseUri, EVENTS).buildUpon();
-        ContentUris.appendId(builder, startMills);
-        ContentUris.appendId(builder, endMills);
-
-        Uri eventUri = builder.build();
+        Uri eventUri = getUriBetween(startMills, endMills);
 
         String[] projection = EventData.COLUMNS;
         String selection = null;
 
-        Cursor cursor = contentResolver.query(eventUri, projection, selection, null, null);
+        return queryEvents(eventUri, projection, selection);
+    }
+
+    private ArrayList<EventData> queryEvents(Uri eventUri, String[] projection, String selection) {
+
+        Logger.i(TAG, "Querying events for selection: %s", selection);
+
+        ArrayList<EventData> list = new ArrayList<EventData>();
+        ContentResolver contentResolver = context.getContentResolver();
+
+        String orderBy = EventData.DTSTART + " asc";
+
+        Cursor cursor = contentResolver.query(eventUri, projection, selection, null, orderBy);
         if (cursor != null && cursor.moveToFirst()) {
 
             do {
@@ -156,6 +174,7 @@ public final class CalendarManager {
 
             cursor.close();
         }
+        Logger.i(TAG, "Got %s entries", list.size());
 
         return list;
     }
@@ -222,10 +241,90 @@ public final class CalendarManager {
     }
 
     public EventData getEvent(long timestamp, long eventId) {
+
+        Logger.i(TAG, "Getting exact event for id: %s", eventId);
+
+        Uri eventUri = getUriBetween(timestamp, timestamp);
+
+        String[] projection = EventData.COLUMNS;
+        String selection = EventData.EVENT_ID + " = " + eventId;
+
+        ArrayList<EventData> events = queryEvents(eventUri, projection, selection);
+        Logger.i(TAG, "Got %s events", events.size());
+
+        if (events.size() == 1) {
+            return events.get(0);
+        }
+
+        Logger.w(TAG, "Exact event not found");
         return null;
     }
 
-    public EventData getNextEvent(long timestamp, long eventId) {
+    public EventData getNextEvent(long eventId, long after) {
+
+        if (Logger.DEBUG) {
+            Time time = new Time();
+            time.set(after);
+            Logger.i(TAG, "Getting next event with id %s after %s", eventId, time.format(Util.TF));
+        }
+
+        String[] projection = EventData.COLUMNS;
+        String selection = EventData.EVENT_ID + " = " + eventId;
+        long start = after + 1000L;
+
+        for (int i = 0; i < QUERY_TIMESTAMP_ITERATIONS.length; i++) {
+
+            Logger.i(TAG, "Running %s search query iteration", i);
+
+            Uri eventUri = getUriBetween(start, start + QUERY_TIMESTAMP_ITERATIONS[i]);
+            ArrayList<EventData> events = queryEvents(eventUri, projection, selection);
+            Logger.i(TAG, "Got %s events", events.size());
+
+            if (!events.isEmpty()) {
+                return events.get(0);
+            }
+        }
+
+        Logger.w(TAG, "Next Event not found");
         return null;
     }
+
+
+    public EventData getPreviousEvent(long eventId, long before) {
+
+        if (Logger.DEBUG) {
+            Time time = new Time();
+            time.set(before);
+            Logger.i(TAG, "Getting previous event with id %s before %s", eventId, time.format(Util.TF));
+        }
+
+        String[] projection = EventData.COLUMNS;
+        String selection = EventData.EVENT_ID + " = " + eventId;
+        long end = before - 1000L;
+
+        for (int i = 0; i < QUERY_TIMESTAMP_ITERATIONS.length; i++) {
+
+            Logger.i(TAG, "Running %s search query iteration", i);
+
+            Uri eventUri = getUriBetween(end - QUERY_TIMESTAMP_ITERATIONS[i], end);
+            ArrayList<EventData> events = queryEvents(eventUri, projection, selection);
+            Logger.i(TAG, "Got %s events", events.size());
+
+            if (!events.isEmpty()) {
+                return events.get(events.size() - 1);
+            }
+        }
+
+        Logger.w(TAG, "Previous Event not found");
+        return null;
+    }
+
+    private Uri getUriBetween(long startMills, long endMills) {
+        Uri.Builder builder = Uri.withAppendedPath(baseUri, INSTANCES).buildUpon();
+        ContentUris.appendId(builder, startMills);
+        ContentUris.appendId(builder, endMills);
+
+        return builder.build();
+    }
+
 }

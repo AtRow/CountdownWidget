@@ -82,6 +82,8 @@ public abstract class WidgetProxy implements Blinking, Notifying, SecondsCountin
         currentNotifyTimestamp = getNextNotifyTimestamp();
         currentTargetTimestamp = event.getTargetTimestamp();
 
+        isTargetReached();
+
         scheduler = Scheduler.getInstance(context);
         notifyScheduler = NotifyScheduler.getInstance(context);
         secondCounter = SecondCounter.getInstance(context);

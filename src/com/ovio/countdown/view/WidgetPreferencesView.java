@@ -200,6 +200,11 @@ public class WidgetPreferencesView {
     }
 
     public void setEventData(EventData eventData) {
+
+        if (isManualTab) {
+            tabHost.setCurrentTabByTag(TAB_GOOGLE);
+        }
+
         if (eventData != null) {
             this.eventData = eventData;
             // TODO
@@ -360,7 +365,6 @@ public class WidgetPreferencesView {
 
         //tabHost.setCurrentTabByTag("tag1");
 
-        // обработчик переключения вкладок
         tabHost.setOnTabChangedListener(new TabListener());
     }
 
@@ -408,6 +412,14 @@ public class WidgetPreferencesView {
 
         cancelButton = (Button) activity.findViewById(R.id.cancelButton);
 
+    }
+
+    public boolean isConfigManual() {
+        return isManualTab;
+    }
+
+    public EventData getEventData() {
+        return eventData;
     }
 
     protected class TabListener implements TabHost.OnTabChangeListener {

@@ -10,6 +10,7 @@ import android.text.format.Time;
 import android.view.View;
 import android.widget.Toast;
 import com.ovio.countdown.R;
+import com.ovio.countdown.event.CalendarManager;
 import com.ovio.countdown.event.EventData;
 import com.ovio.countdown.log.Logger;
 import com.ovio.countdown.preferences.GeneralOptions;
@@ -244,24 +245,43 @@ public class WidgetPreferencesActivity extends Activity {
     private void saveWidgetOptions() {
         Logger.i(TAG, "Saving Widget Options");
 
-        //TODO
+        widgetOptions = new WidgetOptions();
 
         widgetOptions.widgetId = getAppWidgetId();
-        widgetOptions.title = view.getTitle();
 
-        Time time = view.getTime();
+        if (view.isConfigManual()) {
 
-        widgetOptions.timestamp = time.toMillis(false);
+            widgetOptions.title = view.getTitle();
 
-        widgetOptions.countUp = view.getCountUp();
+            Time time = view.getTime();
+            widgetOptions.timestamp = time.toMillis(false);
 
-        widgetOptions.enableSeconds = view.getCountSeconds();
+            widgetOptions.countUp = view.getCountUp();
 
-        widgetOptions.enableTime = view.getEnableTime();
+            widgetOptions.enableSeconds = view.getCountSeconds();
 
-        widgetOptions.recurringInterval = view.getRecurringInterval();
+            widgetOptions.enableTime = view.getEnableTime();
 
-        widgetOptions.notificationInterval = view.getNotificationInterval();
+            widgetOptions.recurringInterval = view.getRecurringInterval();
+
+            widgetOptions.notificationInterval = view.getNotificationInterval();
+
+        } else {
+
+            EventData eventData = view.getEventData();
+
+            if (eventData != null) {
+                widgetOptions.eventId = eventData.eventId;
+                widgetOptions.timestamp = eventData.start;
+            }
+
+            widgetOptions.enableSeconds = view.getCountSeconds();
+
+            widgetOptions.countUp = view.getCountUp();
+
+        }
+
+
 
         Logger.i(TAG, "Widget Options: %s", widgetOptions);
 
@@ -310,22 +330,37 @@ public class WidgetPreferencesActivity extends Activity {
         // Then basically override
         if (widgetOptions.isValid()) {
 
-            view.setTitle(widgetOptions.title);
+            if (widgetOptions.eventId == 0) {
 
-            Time time = new Time();
-            time.set(widgetOptions.timestamp);
+                view.setTitle(widgetOptions.title);
 
-            view.setDateTime(time);
+                Time time = new Time();
+                time.set(widgetOptions.timestamp);
 
-            view.setCountSeconds(widgetOptions.enableSeconds);
+                view.setDateTime(time);
 
-            view.setEnableTime(widgetOptions.enableTime);
+                view.setCountSeconds(widgetOptions.enableSeconds);
 
-            view.setCountUp(widgetOptions.countUp);
+                view.setEnableTime(widgetOptions.enableTime);
 
-            view.setRecurringInterval(widgetOptions.recurringInterval);
+                view.setCountUp(widgetOptions.countUp);
 
-            view.setNotificationInterval(widgetOptions.notificationInterval);
+                view.setRecurringInterval(widgetOptions.recurringInterval);
+
+                view.setNotificationInterval(widgetOptions.notificationInterval);
+
+            } else {
+
+                CalendarManager calendarManager = CalendarManager.getInstance(getApplicationContext());
+                EventData eventData = calendarManager.getEvent(widgetOptions.timestamp, widgetOptions.eventId);
+
+                view.setEventData(eventData);
+
+                view.setCountSeconds(widgetOptions.enableSeconds);
+
+                view.setCountUp(widgetOptions.countUp);
+
+            }
         }
     }
 

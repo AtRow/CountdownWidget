@@ -1,6 +1,7 @@
 package com.ovio.countdown.event;
 
 import android.content.Context;
+import com.ovio.countdown.log.Logger;
 import com.ovio.countdown.preferences.WidgetOptions;
 
 /**
@@ -9,11 +10,15 @@ import com.ovio.countdown.preferences.WidgetOptions;
  */
 public class CalendarEvent implements Event {
 
+    private final static String TAG = Logger.PREFIX + "CalendarEvent";
+
     private final CalendarManager manager;
 
     private EventData eventData;
-    private long nextTimestamp;
+
     private final WidgetOptions options;
+
+    private boolean isValid;
 
     public CalendarEvent(Context context, WidgetOptions options) {
         this.options = options;
@@ -21,8 +26,10 @@ public class CalendarEvent implements Event {
 
         if (options.eventId > 0) {
             eventData = manager.getEvent(options.timestamp, options.eventId);
+            isValid = true;
         } else {
             eventData = new EventData();
+            isValid = false;
         }
     }
 
@@ -34,7 +41,7 @@ public class CalendarEvent implements Event {
 
     @Override
     public long getTargetTimestamp() {
-        return eventData.start;
+        return getFastForward();
     }
 
     @Override
@@ -49,45 +56,56 @@ public class CalendarEvent implements Event {
 
     @Override
     public boolean isRepeating() {
-        return (eventData != null) || isReloading();
+        return ((eventData.duration != null) || (eventData.rdate != null) || (eventData.rrule != null));
     }
 
     @Override
     public boolean isAlive() {
-        if (isCountingUp() || isRepeating() ||
-           (!isCountingUp() && (getTargetTimestamp() > System.currentTimeMillis()))) {
-
-            return true;
-        } else {
-            return false;
-        }
+        return isValid && (isCountingUp() || isRepeating() ||
+                (!isCountingUp() && (getTargetTimestamp() > System.currentTimeMillis())));
     }
 
     @Override
     public long getNotificationTimestamp() {
+        // No notifications
         return 0;
     }
 
     @Override
     public boolean isNotifying() {
+        // No notifications
         return false;
     }
 
-    private boolean isReloading() {
-        return options.recurringInterval > 0;
-    }
+    private long getFastForward() {
 
-    private long getNextTimestamp() {
-        if (nextTimestamp == 0) {
-            EventData data = manager.getNextEvent(options.timestamp, options.eventId);
-            nextTimestamp = data.start;
+        long now = System.currentTimeMillis();
+
+        if (!isRepeating() || (eventData.start > now)) {
+            return eventData.start;
         }
-        return nextTimestamp;
+
+        EventData newData = null;
+
+        if (isCountingUp()) {
+            newData = getPreviousEvent(options.eventId, now);
+        } else {
+            newData = getNextEvent(options.eventId, now);
+        }
+
+        if (newData != null) {
+            eventData = newData;
+        }
+
+        return eventData.start;
     }
 
-    private void getNextEvent() {
-        eventData = manager.getNextEvent(options.timestamp, options.eventId);
+    private EventData getPreviousEvent(long eventId, long before) {
+        return manager.getPreviousEvent(eventId, before);
     }
 
+    private EventData getNextEvent(long eventId, long after) {
+        return manager.getNextEvent(eventId, after);
+    }
 
 }

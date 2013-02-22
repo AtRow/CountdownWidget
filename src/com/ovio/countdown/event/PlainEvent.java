@@ -12,11 +12,8 @@ import com.ovio.countdown.util.Util;
 public class PlainEvent implements Event {
 
     private final static String TAG = Logger.PREFIX + "plainEvent";
-    private final static int PAUSE = 10000; // 10 sec
 
     private final WidgetOptions options;
-
-    private long pause;
 
     public PlainEvent(WidgetOptions options) {
         this.options = options;

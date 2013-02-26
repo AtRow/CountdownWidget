@@ -6,6 +6,8 @@ import com.ovio.countdown.R;
 import com.ovio.countdown.date.TimeDifference;
 import com.ovio.countdown.event.Event;
 import com.ovio.countdown.log.Logger;
+import com.ovio.countdown.proxy.painter.SmallWidgetPainter;
+import com.ovio.countdown.proxy.painter.WidgetPainter;
 
 /**
  * Countdown
@@ -28,45 +30,10 @@ public class SmallWidgetProxy extends WidgetProxy {
         super(context, LAYOUT, widgetId, event);
     }
 
+
     @Override
-    protected String getTimeText(TimeDifference diff) {
-
-        String text;
-
-        switch (maxCountingVal) {
-            case Time.YEAR:
-                text = getTextY(diff);
-                break;
-
-            case Time.MONTH:
-                text = getTextMon(diff);
-                break;
-
-            case Time.MONTH_DAY:
-                text = getTextD(diff);
-                break;
-
-            case Time.HOUR:
-                text = getTextH(diff);
-                break;
-
-            case Time.MINUTE:
-                text = getTextMin(diff);
-                break;
-
-            case Time.SECOND:
-                text = getTextS(diff);
-                break;
-
-            default:
-                text = "Error";
-        }
-
-        if (!diff.positive) {
-            text = "+ " + text;
-        }
-
-        return text;
+    protected WidgetPainter getWidgetPainter() {
+        return SmallWidgetPainter.getInstance(context);
     }
 
     @Override
@@ -135,64 +102,6 @@ public class SmallWidgetProxy extends WidgetProxy {
             nextIncrement = MINUTE;
             setCountSeconds(true);
         }
-    }
-
-    private String getTextY(TimeDifference diff) {
-        StringBuilder sb = new StringBuilder();
-
-        sb.append(diff.years);
-        if (diff.months >= 6) sb.append(",5");
-        sb.append("y");
-
-        return sb.toString();
-    }
-
-    private String getTextMon(TimeDifference diff) {
-        StringBuilder sb = new StringBuilder();
-
-        sb.append(diff.months);
-        if (diff.days >= 15) sb.append(",5");
-        sb.append("m");
-
-        return sb.toString();
-    }
-
-    private String getTextD(TimeDifference diff) {
-        StringBuilder sb = new StringBuilder();
-
-        sb.append(diff.days);
-        if (diff.hours >= 12) sb.append(",5");
-        sb.append("d");
-
-        return sb.toString();
-    }
-
-    private String getTextH(TimeDifference diff) {
-        StringBuilder sb = new StringBuilder();
-
-        sb.append(diff.hours);
-        if (diff.mins >= 30) sb.append(",5");
-        sb.append("h");
-
-        return sb.toString();
-    }
-
-    private String getTextMin(TimeDifference diff) {
-        StringBuilder sb = new StringBuilder();
-
-        sb.append(diff.mins);
-        if (diff.secs >= 30) sb.append(",5");
-        sb.append("m");
-
-        return sb.toString();
-    }
-
-    private String getTextS(TimeDifference diff) {
-        StringBuilder sb = new StringBuilder();
-
-        sb.append(diff.secs).append("s");
-
-        return sb.toString();
     }
 
 }

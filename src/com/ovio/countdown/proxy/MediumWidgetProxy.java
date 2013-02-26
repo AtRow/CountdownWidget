@@ -6,6 +6,8 @@ import com.ovio.countdown.R;
 import com.ovio.countdown.date.TimeDifference;
 import com.ovio.countdown.event.Event;
 import com.ovio.countdown.log.Logger;
+import com.ovio.countdown.proxy.painter.MediumWidgetPainter;
+import com.ovio.countdown.proxy.painter.WidgetPainter;
 
 /**
  * Countdown
@@ -22,40 +24,8 @@ public class MediumWidgetProxy extends WidgetProxy {
     }
 
     @Override
-    protected String getTimeText(TimeDifference diff) {
-
-        String text;
-
-        switch (maxCountingVal) {
-            case Time.YEAR:
-                text = getTextY2M(diff);
-                break;
-
-            case Time.MONTH:
-                text = getTextM2D(diff);
-                break;
-
-            case Time.MONTH_DAY:
-                text = getTextD2H(diff);
-                break;
-
-            case Time.HOUR:
-                text = getTextH2M(diff);
-                break;
-
-            case Time.MINUTE:
-                text = getTextM2S(diff);
-                break;
-
-            default:
-                text = "Error";
-        }
-
-        if (!diff.positive) {
-            text = "+ " + text;
-        }
-
-        return text;
+    protected WidgetPainter getWidgetPainter() {
+        return MediumWidgetPainter.getInstance(context);
     }
 
     @Override
@@ -118,56 +88,4 @@ public class MediumWidgetProxy extends WidgetProxy {
             setCountSeconds(true);
         }
     }
-
-
-    private String getTextY2M(TimeDifference diff) {
-        StringBuilder sb = new StringBuilder();
-
-        sb.append(diff.years).append("y ")
-                .append(diff.months).append("m ");
-
-        return sb.toString();
-    }
-
-    private String getTextM2D(TimeDifference diff) {
-        StringBuilder sb = new StringBuilder();
-
-        sb.append(diff.months).append("m ")
-                .append(diff.days).append("d");
-
-        return sb.toString();
-    }
-
-    private String getTextD2H(TimeDifference diff) {
-        StringBuilder sb = new StringBuilder();
-
-        sb.append(diff.days).append("d ");
-        if (diff.hours < 10) sb.append(0);
-        sb.append(diff.hours).append("h");
-
-        return sb.toString();
-    }
-
-    private String getTextH2M(TimeDifference diff) {
-        StringBuilder sb = new StringBuilder();
-
-        if (diff.hours < 10) sb.append(0);
-        sb.append(diff.hours).append(":");
-        if (diff.mins < 10) sb.append(0);
-        sb.append(diff.mins);
-
-        return sb.toString();
-    }
-
-    private String getTextM2S(TimeDifference diff) {
-        StringBuilder sb = new StringBuilder();
-
-        if (diff.mins < 10) sb.append(0);
-        sb.append(diff.mins).append(":");
-        if (diff.secs < 10) sb.append(0);
-        sb.append(diff.secs);
-
-        return sb.toString();
-    }
-
 }

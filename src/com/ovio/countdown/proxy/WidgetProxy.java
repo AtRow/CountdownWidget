@@ -4,16 +4,17 @@ import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.*;
 import android.os.Bundle;
 import android.text.format.DateUtils;
 import android.text.format.Time;
-import android.view.View;
 import android.widget.RemoteViews;
 import com.ovio.countdown.R;
 import com.ovio.countdown.date.TimeDifference;
 import com.ovio.countdown.event.Event;
 import com.ovio.countdown.log.Logger;
 import com.ovio.countdown.prefs.WidgetPreferencesActivity;
+import com.ovio.countdown.proxy.painter.WidgetPainter;
 import com.ovio.countdown.service.*;
 import com.ovio.countdown.util.Util;
 
@@ -33,7 +34,9 @@ public abstract class WidgetProxy implements Blinking, Notifying, SecondsCountin
 
     protected int minCountingVal;
 
-    protected int nextIncrement;
+    protected long nextIncrement;
+
+    protected Context context;
 
     protected final static int SECOND = 1000;
     protected final static int MINUTE = (SECOND * 60);
@@ -43,8 +46,6 @@ public abstract class WidgetProxy implements Blinking, Notifying, SecondsCountin
     private static final long PAUSE = DateUtils.SECOND_IN_MILLIS * 10;
 
     private final static String TAG = Logger.PREFIX + "proxy";
-
-    private Context context;
 
     private int layout;
 
@@ -67,6 +68,8 @@ public abstract class WidgetProxy implements Blinking, Notifying, SecondsCountin
     private final Blinker blinker;
 
     private boolean reachedTarget = false;
+
+    private Bitmap currentBitmap;
 
 
     public WidgetProxy(Context context, int layout, int widgetId, Event event) {
@@ -159,7 +162,7 @@ public abstract class WidgetProxy implements Blinking, Notifying, SecondsCountin
             pause();
         }
 
-        updateWidget(timestamp);
+        updateWidgetSeconds(timestamp);
     }
 
     @Override
@@ -199,6 +202,17 @@ public abstract class WidgetProxy implements Blinking, Notifying, SecondsCountin
         return event.getNotificationTimestamp();
     }
 
+    private void updateWidgetSeconds(long now) {
+
+        long target = currentTargetTimestamp;
+
+        if (isBlinking() || !isAlive()) {
+            now = target;
+        }
+
+        updateWidgetTime(now, target);
+    }
+
     private synchronized void updateWidget(long now) {
         Logger.i(TAG, "Px[%s]: Updating widget", widgetId);
 
@@ -223,22 +237,35 @@ public abstract class WidgetProxy implements Blinking, Notifying, SecondsCountin
         AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
         RemoteViews views = new RemoteViews(context.getPackageName(), layout);
 
-        views.setTextViewText(R.id.titleTextView, event.getTitle());
         views.setOnClickPendingIntent(R.id.widgetLayout, preferencesIntent);
 
         TimeDifference diff = TimeDifference.between(now, target);
+
         updateCounters(diff);
-        String text = getTimeText(diff);
 
-        Logger.i(TAG, "Px[%s]: Setting text: '%s'", widgetId, text);
+        WidgetPainter painter = getWidgetPainter();
 
-        views.setTextViewText(R.id.counterTextView, text);
+        // TODO:
 
-        if (showText) {
-            views.setInt(R.id.counterTextView, "setVisibility", View.VISIBLE);
-        } else {
-            views.setInt(R.id.counterTextView, "setVisibility", View.INVISIBLE);
-        }
+        Bitmap bitmap = null;
+        //if ((currentBitmap == null) || !secondsOnly || (diff.secs == 0)) {
+            bitmap = painter.getNewBitmap();
+            bitmap = painter.drawTime(bitmap, diff, maxCountingVal);
+            //currentBitmap = Bitmap.createBitmap(bitmap);
+        //}
+
+        //if (doCountSeconds) {
+        //    bitmap = painter.drawSeconds(Bitmap.createBitmap(currentBitmap), diff.secs);
+        //}
+
+        views.setImageViewBitmap(R.id.imageView, bitmap);
+
+        // TODO:
+//        if (showText) {
+//            views.setInt(R.id.counterTextView, "setVisibility", View.VISIBLE);
+//        } else {
+//            views.setInt(R.id.counterTextView, "setVisibility", View.INVISIBLE);
+//        }
 
         appWidgetManager.updateAppWidget(widgetId, views);
 
@@ -257,7 +284,7 @@ public abstract class WidgetProxy implements Blinking, Notifying, SecondsCountin
 
     protected abstract void updateCounters(TimeDifference diff);
 
-    protected abstract String getTimeText(TimeDifference diff);
+    protected abstract WidgetPainter getWidgetPainter();
 
     void setCountSeconds(boolean doCount) {
         this.doCountSeconds = doCount;

@@ -2,8 +2,8 @@
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
               android:orientation="vertical"
-              android:layout_width="150dp"
-              android:layout_height="50dp"
+              android:layout_width="130dp"
+              android:layout_height="72dp"
               android:background="#6ec1ff"
               android:id="@+id/widgetLayout">
 
@@ -24,6 +24,7 @@
         android:layout_gravity="center"
         style="@style/TextWidgetTime2x1"
         android:layout_margin="5dp"
-        android:textColor="#ffffff"/>
+        android:textColor="#ffffff"
+        />
 
 </LinearLayout>

@@ -1,29 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
               android:orientation="vertical"
-              android:layout_width="260dp"
-              android:layout_height="65dp"
-              android:background="#6ec1ff"
-              android:id="@+id/widgetLayout">
+              android:layout_width="290dp"
+              android:layout_height="72dp"
+              android:id="@+id/widgetLayout"
+              android:baselineAligned="false"
+              android:background="@drawable/turquoise4x1">
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/titleTextView"
-                android:layout_gravity="center_horizontal|top"
-                android:visibility="visible"
-                android:text="Empty"
-                android:textColor="#ffffff"/>
+    <ImageView
+        android:layout_width="283dp"
+        android:layout_height="64dp"
+        android:id="@+id/imageView"
+        />
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="319y 10m 26d"
-        android:id="@+id/counterTextView"
-        android:layout_gravity="center"
-        style="@style/TextWidgetTime4x1"
-        android:layout_margin="5dp"
-        android:textColor="#ffffff"/>
-
-</LinearLayout>
+</FrameLayout>

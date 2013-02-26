@@ -5,7 +5,7 @@ import android.content.ContentUris;
 import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
-import android.text.format.DateFormat;
+import android.text.format.DateUtils;
 import android.text.format.Time;
 import com.ovio.countdown.R;
 import com.ovio.countdown.log.Logger;
@@ -28,10 +28,10 @@ public final class CalendarManager {
     private static final String INSTANCES = "instances/when";
 
     private static final long[] QUERY_TIMESTAMP_ITERATIONS = {
-            DateFormat.DAY,
-            DateFormat.MONTH,
-            DateFormat.YEAR,
-            DateFormat.YEAR * 10
+            DateUtils.DAY_IN_MILLIS,
+            DateUtils.DAY_IN_MILLIS * 30,
+            DateUtils.YEAR_IN_MILLIS,
+            DateUtils.YEAR_IN_MILLIS * 10
     };
 
     private static CalendarManager instance;
@@ -275,6 +275,7 @@ public final class CalendarManager {
         for (int i = 0; i < QUERY_TIMESTAMP_ITERATIONS.length; i++) {
 
             Logger.i(TAG, "Running %s search query iteration", i);
+            Logger.i(TAG, "Looking between %s and %s", start, start + QUERY_TIMESTAMP_ITERATIONS[i]);
 
             Uri eventUri = getUriBetween(start, start + QUERY_TIMESTAMP_ITERATIONS[i]);
             ArrayList<EventData> events = queryEvents(eventUri, projection, selection);
@@ -305,6 +306,7 @@ public final class CalendarManager {
         for (int i = 0; i < QUERY_TIMESTAMP_ITERATIONS.length; i++) {
 
             Logger.i(TAG, "Running %s search query iteration", i);
+            Logger.i(TAG, "Looking between %s and %s", end - QUERY_TIMESTAMP_ITERATIONS[i], end);
 
             Uri eventUri = getUriBetween(end - QUERY_TIMESTAMP_ITERATIONS[i], end);
             ArrayList<EventData> events = queryEvents(eventUri, projection, selection);

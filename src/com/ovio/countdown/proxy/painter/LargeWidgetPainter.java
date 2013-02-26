@@ -16,9 +16,18 @@ public class LargeWidgetPainter extends AbstractWidgetPainter {
 
     private static final float PLUS_SIZE = 33;
     private static final float DIGIT_SIZE = 50;
+    private static final float TITLE_SIZE = 14;
 
     private static final float PLUS_V_OFFSET = 55;
     private static final float DIGIT_V_OFFSET = 61;
+
+    private static final float TITLE_H_OFFSET = 6;
+    private static final float TITLE_V_OFFSET = 14;
+    private static final int TITLE_WIDTH = 276;
+
+    private static final float ICON_H_OFFSET = 249;
+    private static final float ICON_V_OFFSET = 5;
+    private static final float ICON_SIZE = 28;
 
     private static final String PLUS_SYM = "+";
     private static final String OFFSET_DIGIT = "0";
@@ -35,6 +44,7 @@ public class LargeWidgetPainter extends AbstractWidgetPainter {
 
 
     private static LargeWidgetPainter instance;
+
 
     private LargeWidgetPainter(Context context) {
         super(context);
@@ -105,7 +115,7 @@ public class LargeWidgetPainter extends AbstractWidgetPainter {
     }
 
     @Override
-    public Bitmap drawSeconds(Bitmap bitmap, int seconds) {
+    public Bitmap drawHeader(Bitmap bitmap, String title, Bitmap icon) {
 
         Canvas canvas = new Canvas(bitmap);
 
@@ -116,7 +126,20 @@ public class LargeWidgetPainter extends AbstractWidgetPainter {
         paint.setTextAlign(Paint.Align.LEFT);
         paint.setLinearText(true);
 
-        drawSecond(canvas, paint, seconds, THIRD_H_OFFSET);
+        paint.setTextSize(toPx(TITLE_SIZE));
+        paint.setTypeface(condensedTf);
+
+        int titleWidth = toPx(TITLE_WIDTH);
+
+        if (icon != null) {
+            titleWidth -= toPx(ICON_SIZE + 5);
+            Bitmap scaledIcon = Bitmap.createScaledBitmap(icon, toPx(ICON_SIZE), toPx(ICON_SIZE), false);
+            canvas.drawBitmap(scaledIcon, toPx(ICON_H_OFFSET), toPx(ICON_V_OFFSET), paint);
+        }
+
+        String text = truncateText(title, paint, titleWidth);
+        
+        canvas.drawText(text, toPx(TITLE_H_OFFSET), toPx(TITLE_V_OFFSET), paint);
 
         return bitmap;
     }

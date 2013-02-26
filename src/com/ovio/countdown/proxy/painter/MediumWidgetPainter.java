@@ -102,7 +102,7 @@ public class MediumWidgetPainter extends AbstractWidgetPainter {
 
                 drawHour(canvas, paint, diff.hours, false, FIRST_H_OFFSET);
                 drawMinute(canvas, paint, diff.mins, SECOND_H_OFFSET);
-                //drawSecond(canvas, paint, diff.secs, THIRD_H_OFFSET);
+                drawSecond(canvas, paint, diff.secs, THIRD_H_OFFSET);
                 break;
         }
 
@@ -110,20 +110,8 @@ public class MediumWidgetPainter extends AbstractWidgetPainter {
     }
 
     @Override
-    public Bitmap drawSeconds(Bitmap bitmap, int seconds) {
-
-        Canvas canvas = new Canvas(bitmap);
-
-        Paint paint = new Paint();
-        paint.setAntiAlias(true);
-        paint.setColor(Color.WHITE);
-        paint.setSubpixelText(true);
-        paint.setTextAlign(Paint.Align.LEFT);
-        paint.setLinearText(true);
-
-        drawSecond(canvas, paint, seconds, THIRD_H_OFFSET);
-
-        return bitmap;
+    public Bitmap drawHeader(Bitmap bitmap, String title, Bitmap icon) {
+        return null;
     }
 
     private void drawYear(Canvas canvas, Paint paint, int value, float xOffset) {

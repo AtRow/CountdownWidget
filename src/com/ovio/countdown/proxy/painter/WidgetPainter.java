@@ -11,7 +11,7 @@ public interface WidgetPainter {
 
     Bitmap getNewBitmap();
 
-    Bitmap drawSeconds(Bitmap bitmap, int seconds);
-
     Bitmap drawTime(Bitmap bitmap, TimeDifference diff, int maxCountingVal);
+
+    Bitmap drawHeader(Bitmap bitmap, String title, Bitmap icon);
 }

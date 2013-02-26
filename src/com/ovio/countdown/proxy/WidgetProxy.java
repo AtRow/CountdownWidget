@@ -4,7 +4,8 @@ import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.*;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.text.format.DateUtils;
 import android.text.format.Time;
@@ -210,7 +211,7 @@ public abstract class WidgetProxy implements Blinking, Notifying, SecondsCountin
             now = target;
         }
 
-        updateWidgetTime(now, target);
+        drawWidget(now, target, true);
     }
 
     private synchronized void updateWidget(long now) {
@@ -223,15 +224,18 @@ public abstract class WidgetProxy implements Blinking, Notifying, SecondsCountin
             now = target;
         }
 
-        updateWidgetTime(now, target);
+        drawWidget(now, target, false);
     }
 
     private void updateWidget() {
         updateWidget(System.currentTimeMillis());
     }
 
-    private synchronized void updateWidgetTime(long now, long target) {
-        Logger.i(TAG, "Px[%s]: Updating widget Time only", widgetId);
+    private synchronized void drawWidget(long now, long target, boolean timeOnly) {
+        Logger.i(TAG, "Px[%s]: Updating widget", widgetId);
+        if (timeOnly) {
+            Logger.i(TAG, "Px[%s]: Time only", widgetId);
+        }
 
         // I don't know why, but instantiating new RemoteViews works A LOT FASTER then reusing existing!
         AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
@@ -240,35 +244,25 @@ public abstract class WidgetProxy implements Blinking, Notifying, SecondsCountin
         views.setOnClickPendingIntent(R.id.widgetLayout, preferencesIntent);
 
         TimeDifference diff = TimeDifference.between(now, target);
-
         updateCounters(diff);
 
-        WidgetPainter painter = getWidgetPainter();
+        WidgetPainter widgetPainter = getWidgetPainter();
 
-        // TODO:
+        if ((currentBitmap == null) || !timeOnly) {
+            currentBitmap = widgetPainter.getNewBitmap();
 
-        Bitmap bitmap = null;
-        //if ((currentBitmap == null) || !secondsOnly || (diff.secs == 0)) {
-            bitmap = painter.getNewBitmap();
-            bitmap = painter.drawTime(bitmap, diff, maxCountingVal);
-            //currentBitmap = Bitmap.createBitmap(bitmap);
-        //}
+            Bitmap icon = BitmapFactory.decodeResource(context.getResources(), R.drawable.icon);
+            widgetPainter.drawHeader(currentBitmap, event.getTitle(), icon);
+        }
 
-        //if (doCountSeconds) {
-        //    bitmap = painter.drawSeconds(Bitmap.createBitmap(currentBitmap), diff.secs);
-        //}
+        Bitmap bitmap = currentBitmap.copy(currentBitmap.getConfig(), true);
+
+        if (showText) {
+            widgetPainter.drawTime(bitmap, diff, maxCountingVal);
+        }
 
         views.setImageViewBitmap(R.id.imageView, bitmap);
-
-        // TODO:
-//        if (showText) {
-//            views.setInt(R.id.counterTextView, "setVisibility", View.VISIBLE);
-//        } else {
-//            views.setInt(R.id.counterTextView, "setVisibility", View.INVISIBLE);
-//        }
-
         appWidgetManager.updateAppWidget(widgetId, views);
-
     }
 
     private void notifyWidget() {

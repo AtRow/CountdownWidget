@@ -5,26 +5,26 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewGroup.LayoutParams;
 import android.widget.*;
 import com.ovio.countdown.R;
 import com.ovio.countdown.log.Logger;
 import com.ovio.countdown.util.Util;
-import android.view.ViewGroup.LayoutParams;
 
 /**
  * Countdown
  * com.ovio.countdown.prefs
  */
-public class IconPickerActivity extends Activity {
+public class StylePickerActivity extends Activity {
 
     public static final String ID = "id";
 
-    private static final String TAG = Logger.PREFIX + "IconPicker";
+    private static final String TAG = Logger.PREFIX + "StylePicker";
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        Logger.i(TAG, "Created Icon Picker Activity");
+        Logger.i(TAG, "Created StylePicker Activity");
 
         setContentView(R.layout.image_grid);
 
@@ -52,7 +52,7 @@ public class IconPickerActivity extends Activity {
 
     private BaseAdapter adapter = new BaseAdapter() {
 
-        private IconData data = IconData.getInstance();
+        private StyleData data = StyleData.getInstance();
 
         @Override
         public int getCount() {
@@ -76,7 +76,7 @@ public class IconPickerActivity extends Activity {
             }
             ImageView imageView = (ImageView)view;
 
-            imageView.setImageResource(data.getResource(position));
+            imageView.setBackgroundResource(data.getResource(position));
             imageView.setLayoutParams(new AbsListView.LayoutParams(AbsListView.LayoutParams.WRAP_CONTENT, AbsListView.LayoutParams.WRAP_CONTENT));
 
             int pd = Util.toPx(getApplicationContext(), 10);

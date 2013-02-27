@@ -139,6 +139,11 @@ public class WidgetPreferencesActivity extends Activity {
         startActivityForResult(intent, PICK_ICON_REQUEST);
     }
 
+    public void onStyleButtonClick(View view) {
+        Intent intent = new Intent(getApplicationContext(), StylePickerActivity.class);
+        startActivityForResult(intent, PICK_STYLE_REQUEST);
+    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -171,8 +176,14 @@ public class WidgetPreferencesActivity extends Activity {
                     break;
 
                 case PICK_ICON_REQUEST:
-                    int id = data.getIntExtra(IconPickerActivity.ID, IconData.NONE);
-                    this.view.setIcon(id);
+                    int iconId = data.getIntExtra(IconPickerActivity.ID, IconData.NONE);
+                    this.view.setIcon(iconId);
+
+                    break;
+
+                case PICK_STYLE_REQUEST:
+                    int styleId = data.getIntExtra(StylePickerActivity.ID, StyleData.DEFAULT);
+                    this.view.setStyle(styleId);
 
                     break;
             }

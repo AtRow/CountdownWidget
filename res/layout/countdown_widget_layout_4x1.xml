@@ -1,16 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:orientation="vertical"
               android:layout_width="290dp"
               android:layout_height="72dp"
               android:id="@+id/widgetLayout"
-              android:baselineAligned="false"
-              android:background="@drawable/turquoise4x1">
+    >
 
     <ImageView
-        android:layout_width="283dp"
-        android:layout_height="64dp"
+        android:layout_width="290dp"
+        android:layout_height="72dp"
         android:id="@+id/imageView"
         />
 

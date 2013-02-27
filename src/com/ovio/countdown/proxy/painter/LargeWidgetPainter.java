@@ -2,6 +2,7 @@ package com.ovio.countdown.proxy.painter;
 
 import android.content.Context;
 import android.graphics.*;
+import android.graphics.drawable.NinePatchDrawable;
 import android.text.format.Time;
 import com.ovio.countdown.date.TimeDifference;
 import com.ovio.countdown.log.Logger;
@@ -14,33 +15,33 @@ public class LargeWidgetPainter extends AbstractWidgetPainter {
 
     private static final String TAG = Logger.PREFIX + "LargePainter";
 
-    private static final float PLUS_SIZE = 33;
-    private static final float DIGIT_SIZE = 50;
-    private static final float TITLE_SIZE = 14;
+    private static final int PLUS_SIZE = 33;
+    private static final int DIGIT_SIZE = 50;
+    private static final int TITLE_SIZE = 14;
 
-    private static final float PLUS_V_OFFSET = 55;
-    private static final float DIGIT_V_OFFSET = 61;
+    private static final int PLUS_V_OFFSET = 59;
+    private static final int DIGIT_V_OFFSET = 65;
 
-    private static final float TITLE_H_OFFSET = 6;
-    private static final float TITLE_V_OFFSET = 14;
+    private static final int TITLE_H_OFFSET = 10;
+    private static final int TITLE_V_OFFSET = 18;
     private static final int TITLE_WIDTH = 276;
 
-    private static final float ICON_H_OFFSET = 249;
-    private static final float ICON_V_OFFSET = 5;
-    private static final float ICON_SIZE = 28;
+    private static final int ICON_H_OFFSET = 253;
+    private static final int ICON_V_OFFSET = 9;
+    private static final int ICON_SIZE = 28;
 
     private static final String PLUS_SYM = "+";
     private static final String OFFSET_DIGIT = "0";
 
-    private static final float SUB_SIZE = 11f;
+    private static final int SUB_SIZE = 11;
 
-    private static final float PLUS_H_OFFSET = 6;
-    private static final float FIRST_H_OFFSET = 76;
-    private static final float SECOND_H_OFFSET = 160;
-    private static final float THIRD_H_OFFSET = 245;
+    private static final int PLUS_H_OFFSET = 10;
+    private static final int FIRST_H_OFFSET = 80;
+    private static final int SECOND_H_OFFSET = 164;
+    private static final int THIRD_H_OFFSET = 249;
 
-    private static final int BITMAP_WIDTH = 283;
-    private static final int BITMAP_HEIGHT = 64;
+    private static final int BITMAP_WIDTH = 290;
+    private static final int BITMAP_HEIGHT = 72;
 
 
     private static LargeWidgetPainter instance;
@@ -61,8 +62,19 @@ public class LargeWidgetPainter extends AbstractWidgetPainter {
 
 
     @Override
-    public Bitmap getNewBitmap() {
-        return Bitmap.createBitmap(toPx(BITMAP_WIDTH), toPx(BITMAP_HEIGHT), Bitmap.Config.ARGB_8888);
+    public Bitmap getNewBitmap(Context context, int resource) {
+
+        Bitmap bitmap = BitmapFactory.decodeResource(context.getResources(), resource);
+
+        byte[] chunk = bitmap.getNinePatchChunk();
+        NinePatchDrawable npDrawable = new NinePatchDrawable(bitmap, chunk, new Rect(), null);
+        npDrawable.setBounds(0, 0, toPx(BITMAP_WIDTH), toPx(BITMAP_HEIGHT));
+
+        Bitmap outputBitmap = Bitmap.createBitmap(toPx(BITMAP_WIDTH), toPx(BITMAP_HEIGHT), Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(outputBitmap);
+        npDrawable.draw(canvas);
+
+        return outputBitmap;
     }
 
     @Override
@@ -144,37 +156,37 @@ public class LargeWidgetPainter extends AbstractWidgetPainter {
         return bitmap;
     }
 
-    private void drawYear(Canvas canvas, Paint paint, int value, float xOffset) {
+    private void drawYear(Canvas canvas, Paint paint, int value, int xOffset) {
 
         drawDigit(canvas, paint, value, false, xOffset);
         drawSub(canvas, paint, getYearSub(value), xOffset);
     }
 
-    private void drawMonth(Canvas canvas, Paint paint, int value, boolean drawZero, float xOffset) {
+    private void drawMonth(Canvas canvas, Paint paint, int value, boolean drawZero, int xOffset) {
 
         drawDigit(canvas, paint, value, drawZero, xOffset);
         drawSub(canvas, paint, getMonthSub(value), xOffset);
     }
 
-    private void drawDay(Canvas canvas, Paint paint, int value, boolean drawZero, float xOffset) {
+    private void drawDay(Canvas canvas, Paint paint, int value, boolean drawZero, int xOffset) {
 
         drawDigit(canvas, paint, value, drawZero, xOffset);
         drawSub(canvas, paint, getDaySub(value), xOffset);
     }
 
-    private void drawHour(Canvas canvas, Paint paint, int value, boolean drawZero, float xOffset) {
+    private void drawHour(Canvas canvas, Paint paint, int value, boolean drawZero, int xOffset) {
 
         drawDigit(canvas, paint, value, drawZero, xOffset);
         drawSub(canvas, paint, getHourSub(value), xOffset);
     }
 
-    private void drawMinute(Canvas canvas, Paint paint, int value, float xOffset) {
+    private void drawMinute(Canvas canvas, Paint paint, int value, int xOffset) {
 
         drawDigit(canvas, paint, value, true, xOffset);
         drawSub(canvas, paint, getMinuteSub(value), xOffset);
     }
 
-    private void drawSecond(Canvas canvas, Paint paint, int value, float xOffset) {
+    private void drawSecond(Canvas canvas, Paint paint, int value, int xOffset) {
 
         drawDigit(canvas, paint, value, true, xOffset);
         drawSub(canvas, paint, getSecondSub(value), xOffset);
@@ -196,7 +208,7 @@ public class LargeWidgetPainter extends AbstractWidgetPainter {
         canvas.drawText(PLUS_SYM, offset, toPx(PLUS_V_OFFSET), paint);
     }
 
-    private void drawDigit(Canvas canvas, Paint paint, int value, boolean drawZero, float xOffset) {
+    private void drawDigit(Canvas canvas, Paint paint, int value, boolean drawZero, int xOffset) {
         paint.setTextSize(toPx(DIGIT_SIZE));
         paint.setTypeface(thinTf);
         paint.setTextAlign(Paint.Align.RIGHT);
@@ -209,7 +221,7 @@ public class LargeWidgetPainter extends AbstractWidgetPainter {
         canvas.drawText(text, toPx(xOffset), toPx(DIGIT_V_OFFSET), paint);
     }
 
-    private void drawSub(Canvas canvas, Paint paint, String text, float xOffset) {
+    private void drawSub(Canvas canvas, Paint paint, String text, int xOffset) {
         paint.setTextSize(toPx(SUB_SIZE));
         paint.setTypeface(lightTf);
         paint.setTextAlign(Paint.Align.LEFT);

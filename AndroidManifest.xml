@@ -66,6 +66,12 @@
             android:excludeFromRecents="true">
         </activity>
 
+        <activity
+            android:name=".prefs.StylePickerActivity"
+            android:theme="@android:style/Theme.Dialog"
+            android:excludeFromRecents="true">
+        </activity>
+
         <!-- //////////// WIDGETS \\\\\\\\\\\\ -->
 
         <receiver

@@ -1,5 +1,6 @@
 package com.ovio.countdown.proxy.painter;
 
+import android.content.Context;
 import android.graphics.Bitmap;
 import com.ovio.countdown.date.TimeDifference;
 
@@ -9,7 +10,7 @@ import com.ovio.countdown.date.TimeDifference;
  */
 public interface WidgetPainter {
 
-    Bitmap getNewBitmap();
+    Bitmap getNewBitmap(Context context, int resource);
 
     Bitmap drawTime(Bitmap bitmap, TimeDifference diff, int maxCountingVal);
 

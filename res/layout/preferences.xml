@@ -222,7 +222,6 @@
                                                 android:layout_height="42dp"
                                                 android:id="@+id/iconImageView"
                                                 android:layout_margin="5dp"
-                                                android:background="@color/white"
                                                 android:focusableInTouchMode="false"/>
 
                                             <Button
@@ -242,7 +241,7 @@
                                                 android:layout_height="42dp"
                                                 android:id="@+id/styleImageView"
                                                 android:layout_margin="5dp"
-                                                android:background="@color/white"/>
+                                                />
 
                                             <Button
                                                 android:layout_width="wrap_content"
@@ -251,7 +250,8 @@
                                                 android:id="@+id/styleButton"
                                                 android:layout_gravity="center"
                                                 android:layout_marginTop="3dp"
-                                                android:layout_weight="1"/>
+                                                android:layout_weight="1"
+                                                android:onClick="onStyleButtonClick"/>
                                         </LinearLayout>
 
                                     </LinearLayout>
@@ -411,7 +411,6 @@
                                                     android:layout_height="42dp"
                                                     android:id="@+id/iconImageViewG"
                                                     android:layout_margin="5dp"
-                                                    android:background="@color/white"
                                                     android:focusableInTouchMode="true"/>
 
                                                 <Button
@@ -431,8 +430,7 @@
                                                     android:layout_height="42dp"
                                                     android:id="@+id/styleImageViewG"
                                                     android:layout_margin="5dp"
-                                                    android:background="@color/white"
-                                                    />
+                                                    android:onClick="onStyleButtonClick"/>
 
                                                 <Button
                                                     android:layout_width="wrap_content"

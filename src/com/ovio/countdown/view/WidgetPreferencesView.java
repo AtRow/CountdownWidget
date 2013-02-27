@@ -13,6 +13,7 @@ import com.ovio.countdown.log.Logger;
 import com.ovio.countdown.prefs.IconData;
 import com.ovio.countdown.prefs.NotificationSpinnerData;
 import com.ovio.countdown.prefs.RecurringSpinnerData;
+import com.ovio.countdown.prefs.StyleData;
 
 import java.util.List;
 
@@ -46,9 +47,9 @@ public class WidgetPreferencesView {
 
     private int currentNotificationId;
 
-    private int currentIcon;
+    private int currentIconId;
 
-    private int currentStyle;
+    private int currentStyleId;
 
 
     private Button okButton;
@@ -350,21 +351,21 @@ public class WidgetPreferencesView {
     }
 
     public int getIcon() {
-        return currentIcon;
+        return currentIconId;
     }
 
     public int getStyle() {
-        return currentStyle;
+        return currentStyleId;
     }
 
-    public void setIcon(int icon) {
-        currentIcon = icon;
+    public void setIcon(int iconId) {
+        currentIconId = iconId;
 
-        if (icon != IconData.NONE) {
-            int id = IconData.getInstance().getResource(icon);
+        if (iconId != IconData.NONE) {
+            int resId = IconData.getInstance().getResource(iconId);
 
-            iconImageView.setImageResource(id);
-            iconImageViewG.setImageResource(id);
+            iconImageView.setImageResource(resId);
+            iconImageViewG.setImageResource(resId);
 
         } else {
             iconImageView.setImageDrawable(null);
@@ -372,10 +373,13 @@ public class WidgetPreferencesView {
         }
     }
 
-    public void setStyle(int style) {
-        currentStyle = style;
+    public void setStyle(int styleId) {
+        currentStyleId = styleId;
 
-        // TODO
+        int resId = StyleData.getInstance().getResource(styleId);
+
+        styleImageView.setBackgroundResource(resId);
+        styleImageViewG.setBackgroundResource(resId);
     }
 
     private void initTabHost() {

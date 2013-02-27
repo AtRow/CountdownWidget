@@ -1,5 +1,7 @@
 package com.ovio.countdown.util;
 
+import android.content.Context;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -113,5 +115,10 @@ public class Util {
         }
 
         return toIntArray(list);
+    }
+
+    public static int toPx(Context context, int dps) {
+        final float scale = context.getResources().getDisplayMetrics().density;
+        return (int) (dps * scale + 0.5f);
     }
 }

@@ -65,4 +65,5 @@
     <string name="sub_hour">час.</string>
     <string name="sub_minute">мин.</string>
     <string name="sub_second">сек.</string>
+    <string name="icon_button_prompt">Выбрать...</string>
 </resources>

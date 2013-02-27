@@ -3,7 +3,9 @@ package com.ovio.countdown.proxy.painter;
 import android.content.Context;
 import android.graphics.Paint;
 import android.graphics.Typeface;
+import android.util.Pair;
 import com.ovio.countdown.R;
+import com.ovio.countdown.util.Util;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -14,9 +16,8 @@ public abstract class AbstractWidgetPainter implements WidgetPainter {
     protected Typeface lightTf;
     protected Typeface condensedTf;
     protected Context context;
-    protected float density;
 
-    private Map<String, String> truncatedMap = new HashMap<String, String>();
+    private Map<String, Pair<String, Integer>> truncatedMap = new HashMap<String, Pair<String, Integer>>();
 
     AbstractWidgetPainter(Context context) {
         this.context = context;
@@ -24,12 +25,10 @@ public abstract class AbstractWidgetPainter implements WidgetPainter {
         thinTf = Typeface.createFromAsset(context.getAssets(), "fonts/roboto-thin-reduced.ttf");
         lightTf = Typeface.createFromAsset(context.getAssets(), "fonts/roboto-light-reduced.ttf");
         condensedTf = Typeface.createFromAsset(context.getAssets(), "fonts/robotocondensed-regular-reduced.ttf");
-
-        density = context.getResources().getDisplayMetrics().density;
     }
 
-    protected int toPx(float dp) {
-        return (int) ((dp * density) + 0.5);
+    protected int toPx(int dp) {
+        return Util.toPx(context, dp);
     }
 
     protected String getYearSub(int value) {
@@ -62,14 +61,14 @@ public abstract class AbstractWidgetPainter implements WidgetPainter {
         return context.getString(R.string.sub_second);
     }
 
-    protected String truncateText(String text, Paint paint, float width) {
+    protected String truncateText(String text, Paint paint, int width) {
 
         if (paint.measureText(text) <= width) {
             return text;
         }
 
-        if (truncatedMap.containsKey(text)) {
-            return truncatedMap.get(text);
+        if (truncatedMap.containsKey(text) && truncatedMap.get(text).second.equals(width)) {
+            return truncatedMap.get(text).first;
         }
 
         int pos = text.length() - 1;
@@ -85,7 +84,7 @@ public abstract class AbstractWidgetPainter implements WidgetPainter {
             truncatedMap.clear();
         }
 
-        truncatedMap.put(text, truncatedText);
+        truncatedMap.put(text, new Pair<String, Integer>(truncatedText, width));
 
         return truncatedText;
     }

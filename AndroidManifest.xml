@@ -60,6 +60,12 @@
             android:excludeFromRecents="true">
         </activity>
 
+        <activity
+            android:name=".prefs.IconPickerActivity"
+            android:theme="@android:style/Theme.Dialog"
+            android:excludeFromRecents="true">
+        </activity>
+
         <!-- //////////// WIDGETS \\\\\\\\\\\\ -->
 
         <receiver

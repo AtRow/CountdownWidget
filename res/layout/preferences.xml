@@ -85,7 +85,7 @@
                                                 android:id="@+id/datePicker"
                                                 android:layout_marginLeft="5dp"
                                                 android:layout_gravity="center"
-                                                android:visibility="visible"/>
+                                                />
 
                                             <ImageButton
                                                 android:layout_width="wrap_content"
@@ -114,7 +114,7 @@
                                             android:layout_height="wrap_content"
                                             android:id="@+id/timePicker"
                                             android:layout_gravity="center"
-                                            android:visibility="visible"/>
+                                            />
 
                                         <CheckBox
                                             android:layout_width="wrap_content"
@@ -183,58 +183,75 @@
                                             android:layout_weight="1"
                                             android:baselineAligned="false"
                                             android:layout_alignParentBottom="true"
+                                            android:layout_marginLeft="5dp"
+                                            android:layout_marginTop="5dp"
+                                            android:layout_marginRight="5dp"
                                             >
 
-                                            <LinearLayout
-                                                android:orientation="vertical"
-                                                android:layout_width="fill_parent"
-                                                android:layout_height="fill_parent"
-                                                android:layout_weight="1">
+                                            <TextView
+                                                style="@style/TextSettings"
+                                                android:layout_width="wrap_content"
+                                                android:layout_height="wrap_content"
+                                                android:text="@string/icon_prompt"
+                                                android:layout_weight="1"
+                                                android:layout_marginLeft="5dp"/>
 
-                                                <TextView
-                                                    style="@style/TextSettings"
-                                                    android:layout_width="wrap_content"
-                                                    android:layout_height="wrap_content"
-                                                    android:text="@string/icon_prompt"
-                                                    android:layout_marginTop="5dp"
-                                                    android:layout_marginLeft="5dp"
-                                                    android:layout_marginRight="5dp"/>
+                                            <TextView
+                                                style="@style/TextSettings"
+                                                android:layout_width="wrap_content"
+                                                android:layout_height="wrap_content"
+                                                android:text="@string/style_prompt"
+                                                android:layout_weight="1"
+                                                android:layout_marginRight="5dp"/>
+                                        </LinearLayout>
 
-                                                <Spinner
-                                                    style="@style/TextSettings"
-                                                    android:layout_width="fill_parent"
-                                                    android:layout_height="wrap_content"
-                                                    android:id="@+id/iconSpinner"
-                                                    android:drawSelectorOnTop="false"
-                                                    android:layout_marginLeft="5dp"
-                                                    android:layout_marginRight="5dp"/>
-                                            </LinearLayout>
+                                        <LinearLayout
+                                            android:orientation="horizontal"
+                                            android:layout_width="fill_parent"
+                                            android:layout_height="wrap_content"
+                                            android:weightSum="2"
+                                            android:layout_weight="1"
+                                            android:baselineAligned="false"
+                                            android:layout_alignParentBottom="true"
+                                            android:paddingLeft="5dp"
+                                            android:paddingRight="5dp"
+                                            >
 
-                                            <LinearLayout
-                                                android:orientation="vertical"
-                                                android:layout_width="fill_parent"
-                                                android:layout_height="fill_parent"
-                                                android:layout_weight="1">
+                                            <ImageView
+                                                android:layout_width="42dp"
+                                                android:layout_height="42dp"
+                                                android:id="@+id/iconImageView"
+                                                android:layout_margin="5dp"
+                                                android:background="@color/white"
+                                                android:focusableInTouchMode="false"/>
 
-                                                <TextView
-                                                    style="@style/TextSettings"
-                                                    android:layout_width="wrap_content"
-                                                    android:layout_height="wrap_content"
-                                                    android:text="@string/style_prompt"
-                                                    android:layout_marginTop="5dp"
-                                                    android:layout_marginLeft="5dp"
-                                                    android:layout_marginRight="5dp"/>
+                                            <Button
+                                                android:layout_width="wrap_content"
+                                                android:layout_height="wrap_content"
+                                                android:text="@string/icon_button_prompt"
+                                                android:id="@+id/iconButton"
+                                                android:layout_gravity="center"
+                                                android:layout_marginTop="3dp"
+                                                android:layout_weight="1"
+                                                android:singleLine="false"
+                                                android:layout_marginRight="6dp"
+                                                android:onClick="onIconButtonClick"/>
 
-                                                <Spinner
-                                                    style="@style/TextSettings"
-                                                    android:layout_width="fill_parent"
-                                                    android:layout_height="wrap_content"
-                                                    android:id="@+id/styleSpinner"
-                                                    android:drawSelectorOnTop="false"
-                                                    android:layout_marginLeft="5dp"
-                                                    android:layout_marginRight="5dp"/>
-                                            </LinearLayout>
+                                            <ImageView
+                                                android:layout_width="42dp"
+                                                android:layout_height="42dp"
+                                                android:id="@+id/styleImageView"
+                                                android:layout_margin="5dp"
+                                                android:background="@color/white"/>
 
+                                            <Button
+                                                android:layout_width="wrap_content"
+                                                android:layout_height="wrap_content"
+                                                android:text="@string/icon_button_prompt"
+                                                android:id="@+id/styleButton"
+                                                android:layout_gravity="center"
+                                                android:layout_marginTop="3dp"
+                                                android:layout_weight="1"/>
                                         </LinearLayout>
 
                                     </LinearLayout>
@@ -355,57 +372,77 @@
                                                 android:weightSum="2"
                                                 android:layout_weight="1"
                                                 android:baselineAligned="false"
-                                                android:layout_alignParentBottom="true">
+                                                android:layout_alignParentBottom="true"
+                                                android:layout_marginLeft="5dp"
+                                                android:layout_marginTop="5dp"
+                                                android:layout_marginRight="5dp">
 
-                                                <LinearLayout
-                                                    android:orientation="vertical"
-                                                    android:layout_width="fill_parent"
-                                                    android:layout_height="fill_parent"
-                                                    android:layout_weight="1">
+                                                <TextView
+                                                    style="@style/TextSettings"
+                                                    android:layout_width="wrap_content"
+                                                    android:layout_height="wrap_content"
+                                                    android:text="@string/icon_prompt"
+                                                    android:layout_weight="1"
+                                                    android:layout_marginLeft="5dp"/>
 
-                                                    <TextView
-                                                        style="@style/TextSettings"
-                                                        android:layout_width="wrap_content"
-                                                        android:layout_height="wrap_content"
-                                                        android:text="@string/icon_prompt"
-                                                        android:layout_marginTop="5dp"
-                                                        android:layout_marginLeft="5dp"
-                                                        android:layout_marginRight="5dp"/>
+                                                <TextView
+                                                    style="@style/TextSettings"
+                                                    android:layout_width="wrap_content"
+                                                    android:layout_height="wrap_content"
+                                                    android:text="@string/style_prompt"
+                                                    android:layout_weight="1"
+                                                    android:layout_marginRight="5dp"/>
 
-                                                    <Spinner
-                                                        style="@style/TextSettings"
-                                                        android:layout_width="fill_parent"
-                                                        android:layout_height="wrap_content"
-                                                        android:id="@+id/iconSpinnerG"
-                                                        android:drawSelectorOnTop="false"
-                                                        android:layout_marginLeft="5dp"
-                                                        android:layout_marginRight="5dp"/>
-                                                </LinearLayout>
+                                            </LinearLayout>
 
-                                                <LinearLayout
-                                                    android:orientation="vertical"
-                                                    android:layout_width="fill_parent"
-                                                    android:layout_height="fill_parent"
-                                                    android:layout_weight="1">
+                                            <LinearLayout
+                                                android:orientation="horizontal"
+                                                android:layout_width="fill_parent"
+                                                android:layout_height="wrap_content"
+                                                android:weightSum="2"
+                                                android:layout_weight="1"
+                                                android:baselineAligned="false"
+                                                android:layout_alignParentBottom="true"
+                                                android:paddingLeft="5dp"
+                                                android:paddingRight="5dp">
 
-                                                    <TextView
-                                                        style="@style/TextSettings"
-                                                        android:layout_width="wrap_content"
-                                                        android:layout_height="wrap_content"
-                                                        android:text="@string/style_prompt"
-                                                        android:layout_marginTop="5dp"
-                                                        android:layout_marginLeft="5dp"
-                                                        android:layout_marginRight="5dp"/>
+                                                <ImageView
+                                                    android:layout_width="42dp"
+                                                    android:layout_height="42dp"
+                                                    android:id="@+id/iconImageViewG"
+                                                    android:layout_margin="5dp"
+                                                    android:background="@color/white"
+                                                    android:focusableInTouchMode="true"/>
 
-                                                    <Spinner
-                                                        style="@style/TextSettings"
-                                                        android:layout_width="fill_parent"
-                                                        android:layout_height="wrap_content"
-                                                        android:id="@+id/styleSpinnerG"
-                                                        android:drawSelectorOnTop="false"
-                                                        android:layout_marginLeft="5dp"
-                                                        android:layout_marginRight="5dp"/>
-                                                </LinearLayout>
+                                                <Button
+                                                    android:layout_width="wrap_content"
+                                                    android:layout_height="wrap_content"
+                                                    android:text="@string/icon_button_prompt"
+                                                    android:id="@+id/iconButtonG"
+                                                    android:layout_gravity="center"
+                                                    android:layout_marginTop="3dp"
+                                                    android:layout_weight="1"
+                                                    android:singleLine="false"
+                                                    android:layout_marginRight="6dp"
+                                                    android:onClick="onIconButtonClick"/>
+
+                                                <ImageView
+                                                    android:layout_width="42dp"
+                                                    android:layout_height="42dp"
+                                                    android:id="@+id/styleImageViewG"
+                                                    android:layout_margin="5dp"
+                                                    android:background="@color/white"
+                                                    />
+
+                                                <Button
+                                                    android:layout_width="wrap_content"
+                                                    android:layout_height="wrap_content"
+                                                    android:text="@string/icon_button_prompt"
+                                                    android:id="@+id/styleButtonG"
+                                                    android:layout_gravity="center"
+                                                    android:layout_marginTop="3dp"
+                                                    android:layout_weight="1"/>
+
                                             </LinearLayout>
                                         </LinearLayout>
 

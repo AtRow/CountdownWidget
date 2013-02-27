@@ -21,4 +21,8 @@ public interface Event {
     long getNotificationTimestamp();
 
     boolean isNotifying();
+
+    int getIcon();
+
+    int getStyle();
 }

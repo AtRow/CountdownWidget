@@ -9,14 +9,12 @@ import com.ovio.countdown.util.Util;
  * Countdown
  * com.ovio.countdown.event
  */
-public class PlainEvent implements Event {
+public class PlainEvent extends AbstractEvent {
 
     private final static String TAG = Logger.PREFIX + "plainEvent";
 
-    private final WidgetOptions options;
-
     public PlainEvent(WidgetOptions options) {
-        this.options = options;
+        super(options);
     }
 
     @Override

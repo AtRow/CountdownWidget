@@ -14,6 +14,7 @@ import com.ovio.countdown.R;
 import com.ovio.countdown.date.TimeDifference;
 import com.ovio.countdown.event.Event;
 import com.ovio.countdown.log.Logger;
+import com.ovio.countdown.prefs.IconData;
 import com.ovio.countdown.prefs.WidgetPreferencesActivity;
 import com.ovio.countdown.proxy.painter.WidgetPainter;
 import com.ovio.countdown.service.*;
@@ -251,7 +252,12 @@ public abstract class WidgetProxy implements Blinking, Notifying, SecondsCountin
         if ((currentBitmap == null) || !timeOnly) {
             currentBitmap = widgetPainter.getNewBitmap();
 
-            Bitmap icon = BitmapFactory.decodeResource(context.getResources(), R.drawable.icon);
+            Bitmap icon = null;
+
+            int iconRes = IconData.getInstance().getResource(event.getIcon());
+            if (iconRes != IconData.NONE) {
+                icon = BitmapFactory.decodeResource(context.getResources(), iconRes);
+            }
             widgetPainter.drawHeader(currentBitmap, event.getTitle(), icon);
         }
 

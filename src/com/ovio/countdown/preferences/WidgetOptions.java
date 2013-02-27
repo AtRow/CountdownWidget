@@ -15,6 +15,9 @@ public class WidgetOptions extends AbstractOptions {
     public static final Field TIMESTAMP = Field.get("timestamp", Long.class);
     public static final Field RECURRING_INTERVAL = Field.get("recurringInterval", Long.class);
     public static final Field NOTIFICATION_INTERVAL = Field.get("notificationInterval", Long.class);
+    public static final Field ICON = Field.get("icon", Integer.class);
+    public static final Field STYLE = Field.get("style", Integer.class);
+
 
     private final static Field[] fields = {
             WIDGET_ID,
@@ -26,7 +29,9 @@ public class WidgetOptions extends AbstractOptions {
             GeneralOptions.ENABLE_TIME,
             GeneralOptions.ENABLE_SECONDS,
             RECURRING_INTERVAL,
-            NOTIFICATION_INTERVAL
+            NOTIFICATION_INTERVAL,
+            ICON,
+            STYLE
     };
 
     public int widgetId;
@@ -48,6 +53,10 @@ public class WidgetOptions extends AbstractOptions {
     public long notificationInterval;
 
     public boolean enableTime;
+
+    public int icon;
+
+    public int style;
 
     public WidgetOptions() {
         super(fields);
@@ -81,6 +90,10 @@ public class WidgetOptions extends AbstractOptions {
 
         notificationInterval = bundle.getLong(NOTIFICATION_INTERVAL.name);
 
+        icon = bundle.getInt(ICON.name);
+
+        style = bundle.getInt(STYLE.name);
+
     }
 
     @Override
@@ -105,6 +118,10 @@ public class WidgetOptions extends AbstractOptions {
         bundle.putLong(RECURRING_INTERVAL.name, recurringInterval);
 
         bundle.putLong(NOTIFICATION_INTERVAL.name, notificationInterval);
+
+        bundle.putInt(ICON.name, icon);
+
+        bundle.putInt(STYLE.name, style);
 
     }
 }

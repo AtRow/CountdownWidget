@@ -36,6 +36,8 @@ public class WidgetPreferencesActivity extends Activity {
     private static final int PICK_DATE_REQUEST = 1;
     private static final int PICK_EVENTS_DATE_REQUEST = 2;
     private static final int PICK_EVENT_REQUEST = 3;
+    private static final int PICK_ICON_REQUEST = 4;
+    private static final int PICK_STYLE_REQUEST = 5;
 
     private Integer appWidgetId;
 
@@ -132,6 +134,11 @@ public class WidgetPreferencesActivity extends Activity {
         startActivityForResult(intent, PICK_EVENTS_DATE_REQUEST);
     }
 
+    public void onIconButtonClick(View view) {
+        Intent intent = new Intent(getApplicationContext(), IconPickerActivity.class);
+        startActivityForResult(intent, PICK_ICON_REQUEST);
+    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -161,6 +168,12 @@ public class WidgetPreferencesActivity extends Activity {
                             this.view.setEventData(widgetCalendarEvent);
                         }
                     }
+                    break;
+
+                case PICK_ICON_REQUEST:
+                    int id = data.getIntExtra(IconPickerActivity.ID, IconData.NONE);
+                    this.view.setIcon(id);
+
                     break;
             }
         }
@@ -256,14 +269,8 @@ public class WidgetPreferencesActivity extends Activity {
             Time time = view.getTime();
             widgetOptions.timestamp = time.toMillis(false);
 
-            widgetOptions.countUp = view.getCountUp();
-
-            widgetOptions.enableSeconds = view.getCountSeconds();
-
             widgetOptions.enableTime = view.getEnableTime();
-
             widgetOptions.recurringInterval = view.getRecurringInterval();
-
             widgetOptions.notificationInterval = view.getNotificationInterval();
 
         } else {
@@ -275,13 +282,12 @@ public class WidgetPreferencesActivity extends Activity {
                 widgetOptions.timestamp = eventData.start;
             }
 
-            widgetOptions.enableSeconds = view.getCountSeconds();
-
-            widgetOptions.countUp = view.getCountUp();
-
         }
 
-
+        widgetOptions.enableSeconds = view.getCountSeconds();
+        widgetOptions.countUp = view.getCountUp();
+        widgetOptions.icon = view.getIcon();
+        widgetOptions.style = view.getStyle();
 
         Logger.i(TAG, "Widget Options: %s", widgetOptions);
 
@@ -339,11 +345,7 @@ public class WidgetPreferencesActivity extends Activity {
 
                 view.setDateTime(time);
 
-                view.setCountSeconds(widgetOptions.enableSeconds);
-
                 view.setEnableTime(widgetOptions.enableTime);
-
-                view.setCountUp(widgetOptions.countUp);
 
                 view.setRecurringInterval(widgetOptions.recurringInterval);
 
@@ -355,12 +357,15 @@ public class WidgetPreferencesActivity extends Activity {
                 EventData eventData = calendarManager.getEvent(widgetOptions.timestamp, widgetOptions.eventId);
 
                 view.setEventData(eventData);
-
-                view.setCountSeconds(widgetOptions.enableSeconds);
-
-                view.setCountUp(widgetOptions.countUp);
-
             }
+
+            view.setCountSeconds(widgetOptions.enableSeconds);
+
+            view.setCountUp(widgetOptions.countUp);
+
+            view.setIcon(widgetOptions.icon);
+
+            view.setStyle(widgetOptions.style);
         }
     }
 

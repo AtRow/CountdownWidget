@@ -8,7 +8,7 @@ import com.ovio.countdown.preferences.WidgetOptions;
  * Countdown
  * com.ovio.countdown.preferences
  */
-public class CalendarEvent implements Event {
+public class CalendarEvent extends AbstractEvent {
 
     private final static String TAG = Logger.PREFIX + "CalendarEvent";
 
@@ -16,12 +16,11 @@ public class CalendarEvent implements Event {
 
     private EventData eventData;
 
-    private final WidgetOptions options;
-
     private boolean isValid;
 
     public CalendarEvent(Context context, WidgetOptions options) {
-        this.options = options;
+        super(options);
+
         manager = CalendarManager.getInstance(context);
 
         if (options.eventId > 0) {
@@ -33,12 +32,6 @@ public class CalendarEvent implements Event {
         }
     }
 
-
-    @Override
-    public boolean isCountingUp() {
-        return options.countUp;
-    }
-
     @Override
     public long getTargetTimestamp() {
         return getFastForward();
@@ -47,11 +40,6 @@ public class CalendarEvent implements Event {
     @Override
     public String getTitle() {
         return eventData.title;
-    }
-
-    @Override
-    public boolean isCountingSeconds() {
-        return options.enableSeconds;
     }
 
     @Override

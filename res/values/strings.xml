@@ -65,4 +65,5 @@
     <string name="sub_hour">hours</string>
     <string name="sub_minute">mins</string>
     <string name="sub_second">sec.</string>
+    <string name="icon_button_prompt">Choose...</string>
 </resources>

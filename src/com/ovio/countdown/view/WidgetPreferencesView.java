@@ -10,6 +10,7 @@ import com.ovio.countdown.event.CalendarData;
 import com.ovio.countdown.event.CalendarManager;
 import com.ovio.countdown.event.EventData;
 import com.ovio.countdown.log.Logger;
+import com.ovio.countdown.prefs.IconData;
 import com.ovio.countdown.prefs.NotificationSpinnerData;
 import com.ovio.countdown.prefs.RecurringSpinnerData;
 
@@ -45,6 +46,10 @@ public class WidgetPreferencesView {
 
     private int currentNotificationId;
 
+    private int currentIcon;
+
+    private int currentStyle;
+
 
     private Button okButton;
 
@@ -72,13 +77,21 @@ public class WidgetPreferencesView {
 
     private Spinner notificationSpinner;
 
-    private Spinner iconSpinner;
+    private ImageView iconImageView;
 
-    private Spinner iconSpinnerG;
+    private ImageView iconImageViewG;
 
-    private Spinner styleSpinner;
+    private ImageView styleImageView;
 
-    private Spinner styleSpinnerG;
+    private ImageView styleImageViewG;
+
+    private Button iconButton;
+
+    private Button iconButtonG;
+
+    private Button styleButton;
+
+    private Button styleButtonG;
 
     private Spinner calendarSpinner;
 
@@ -87,7 +100,6 @@ public class WidgetPreferencesView {
     private LinearLayout calendarControlsLayout;
 
     private EventData eventData;
-
 
     public WidgetPreferencesView(Activity activity) {
         this.activity = activity;
@@ -274,17 +286,12 @@ public class WidgetPreferencesView {
     }
 
     public boolean getCountSeconds() {
-        boolean checked = secondsCheckBox.isChecked();
-        boolean checkedG = secondsCheckBoxG.isChecked();
 
-        if ((checked && checkedG) != (checked || checkedG)) {
-            // TODO
-            String msg = "secondsCheckBox UnSync Error";
-            Toast.makeText(activity, msg, Toast.LENGTH_LONG);
-            Logger.e(TAG, msg);
+        if (isManualTab) {
+            return secondsCheckBox.isChecked();
+        } else {
+            return secondsCheckBoxG.isChecked();
         }
-
-        return checked;
     }
 
     public void setEnableTime(boolean doSet) {
@@ -303,17 +310,11 @@ public class WidgetPreferencesView {
 
     public boolean getCountUp() {
 
-        boolean checked = countUpCheckBox.isChecked();
-        boolean checkedG = countUpCheckBoxG.isChecked();
-
-        if ((checked && checkedG) != (checked || checkedG)) {
-          // TODO
-            String msg = "countUpCheckBox UnSync Error";
-            Toast.makeText(activity, msg, Toast.LENGTH_LONG);
-            Logger.e(TAG, msg);
+        if (isManualTab) {
+            return countUpCheckBox.isChecked();
+        } else {
+            return countUpCheckBoxG.isChecked();
         }
-
-        return checked;
     }
 
     public void setRecurringInterval(long interval) {
@@ -341,6 +342,40 @@ public class WidgetPreferencesView {
         } else {
             timePicker.setVisibility(View.GONE);
         }
+    }
+
+
+    public EventData getEventData() {
+        return eventData;
+    }
+
+    public int getIcon() {
+        return currentIcon;
+    }
+
+    public int getStyle() {
+        return currentStyle;
+    }
+
+    public void setIcon(int icon) {
+        currentIcon = icon;
+
+        if (icon != IconData.NONE) {
+            int id = IconData.getInstance().getResource(icon);
+
+            iconImageView.setImageResource(id);
+            iconImageViewG.setImageResource(id);
+
+        } else {
+            iconImageView.setImageDrawable(null);
+            iconImageViewG.setImageDrawable(null);
+        }
+    }
+
+    public void setStyle(int style) {
+        currentStyle = style;
+
+        // TODO
     }
 
     private void initTabHost() {
@@ -394,13 +429,21 @@ public class WidgetPreferencesView {
 
         notificationSpinner = (Spinner) activity.findViewById(R.id.notifySpinner);
 
-        iconSpinner = (Spinner) activity.findViewById(R.id.iconSpinner);
+        iconImageView = (ImageView) activity.findViewById(R.id.iconImageView);
 
-        iconSpinnerG = (Spinner) activity.findViewById(R.id.iconSpinnerG);
+        iconImageViewG = (ImageView) activity.findViewById(R.id.iconImageViewG);
 
-        styleSpinner = (Spinner) activity.findViewById(R.id.styleSpinner);
+        styleImageView = (ImageView) activity.findViewById(R.id.styleImageView);
 
-        styleSpinnerG = (Spinner) activity.findViewById(R.id.styleSpinnerG);
+        styleImageViewG = (ImageView) activity.findViewById(R.id.styleImageViewG);
+
+        iconButton = (Button) activity.findViewById(R.id.iconButton);
+
+        iconButtonG = (Button) activity.findViewById(R.id.iconButtonG);
+
+        styleButton = (Button) activity.findViewById(R.id.styleButton);
+
+        styleButtonG = (Button) activity.findViewById(R.id.styleButtonG);
 
         calendarSpinner = (Spinner) activity.findViewById(R.id.calendarSpinner);
 
@@ -416,10 +459,6 @@ public class WidgetPreferencesView {
 
     public boolean isConfigManual() {
         return isManualTab;
-    }
-
-    public EventData getEventData() {
-        return eventData;
     }
 
     protected class TabListener implements TabHost.OnTabChangeListener {
@@ -447,8 +486,9 @@ public class WidgetPreferencesView {
         secondsCheckBox.setChecked(secondsCheckBoxG.isChecked());
         countUpCheckBox.setChecked(countUpCheckBoxG.isChecked());
 
-        iconSpinner.setSelection(iconSpinnerG.getSelectedItemPosition());
-        styleSpinner.setSelection(styleSpinnerG.getSelectedItemPosition());
+        // TODO: check
+        iconImageView.setImageDrawable(iconImageViewG.getDrawable());
+        styleImageView.setImageDrawable(styleImageViewG.getDrawable());
 
         isManualTab = true;
 
@@ -459,8 +499,9 @@ public class WidgetPreferencesView {
         secondsCheckBoxG.setChecked(secondsCheckBox.isChecked());
         countUpCheckBoxG.setChecked(countUpCheckBox.isChecked());
 
-        iconSpinnerG.setSelection(iconSpinner.getSelectedItemPosition());
-        styleSpinnerG.setSelection(styleSpinner.getSelectedItemPosition());
+        // TODO: check
+        iconImageViewG.setImageDrawable(iconImageView.getDrawable());
+        styleImageViewG.setImageDrawable(styleImageView.getDrawable());
 
         isManualTab = false;
 

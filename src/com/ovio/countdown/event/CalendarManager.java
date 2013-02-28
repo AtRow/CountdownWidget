@@ -52,7 +52,7 @@ public final class CalendarManager {
         Logger.d(TAG, "Instantiated CalendarManager");
         this.context = context;
 
-        getBaseUri();
+        obtainBaseUri();
     }
 
     public static synchronized CalendarManager getInstance(Context context) {
@@ -186,7 +186,7 @@ public final class CalendarManager {
         return list;
     }
 
-    private Uri getBaseUri() {
+    private Uri obtainBaseUri() {
         Logger.i(TAG, "Getting CalendarData Uri");
 
         if (baseUri == null) {
@@ -247,6 +247,10 @@ public final class CalendarManager {
         return baseUri;
     }
 
+    public Uri getBaseUri() {
+        return baseUri;
+    }
+
     public EventData getEvent(long timestamp, long eventId) {
 
         Logger.i(TAG, "Getting exact event for id: %s", eventId);
@@ -266,6 +270,62 @@ public final class CalendarManager {
         Logger.w(TAG, "Exact event not found");
         return null;
     }
+
+
+    public EventData getEventInstance(long timestamp, long eventId, long instanceId) {
+
+        Logger.i(TAG, "Getting exact Event Instance by eventId %s and instanceId %s", eventId, instanceId);
+
+        String[] projection = EventData.COLUMNS;
+        String selection = EventData.EVENT_ID + " = " + eventId + " AND Instances._id = " + instanceId;
+
+        for (int i = 0; i < QUERY_TIMESTAMP_ITERATIONS.length; i++) {
+
+            Logger.i(TAG, "Running %s search query iteration", i);
+            Logger.i(TAG, "Looking between %s and %s", timestamp - QUERY_TIMESTAMP_ITERATIONS[i], timestamp + QUERY_TIMESTAMP_ITERATIONS[i]);
+
+            Uri eventUri = getUriBetween(timestamp - QUERY_TIMESTAMP_ITERATIONS[i], timestamp + QUERY_TIMESTAMP_ITERATIONS[i]);
+            ArrayList<EventData> events = queryEvents(eventUri, projection, selection);
+            Logger.i(TAG, "Got %s events", events.size());
+
+            if (events.size() == 1) {
+                return events.get(0);
+            }
+        }
+
+        Logger.w(TAG, "Exact Event Instance not found");
+        Logger.w(TAG, "Trying to find nearest Event Instance only by eventId %s", eventId);
+
+        selection = EventData.EVENT_ID + " = " + eventId;
+
+        for (int i = 0; i < QUERY_TIMESTAMP_ITERATIONS.length; i++) {
+
+            Logger.i(TAG, "Running %s search query iteration", i);
+            Logger.i(TAG, "Looking between %s and %s", timestamp - QUERY_TIMESTAMP_ITERATIONS[i], timestamp + QUERY_TIMESTAMP_ITERATIONS[i]);
+
+            Uri eventUri = getUriBetween(timestamp - QUERY_TIMESTAMP_ITERATIONS[i], timestamp + QUERY_TIMESTAMP_ITERATIONS[i]);
+            ArrayList<EventData> events = queryEvents(eventUri, projection, selection);
+            Logger.i(TAG, "Got %s events", events.size());
+
+            if (!events.isEmpty()) {
+
+                int index = 0;
+                long diff = Math.abs(timestamp - events.get(0).start);
+                for (int j = 1; j < events.size(); j++) {
+                    long nextDiff = Math.abs(timestamp - events.get(j).start);
+                    if (nextDiff < diff) {
+                        diff = nextDiff;
+                        index = j;
+                    }
+                }
+                return events.get(index);
+            }
+        }
+
+        Logger.w(TAG, "Nearby Event not found");
+        return null;
+    }
+
 
     public EventData getNextEvent(long eventId, long after) {
 

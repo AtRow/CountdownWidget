@@ -25,4 +25,6 @@ public interface Event {
     int getIcon();
 
     int getStyle();
+
+    void reload();
 }

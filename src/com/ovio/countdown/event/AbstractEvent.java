@@ -15,6 +15,23 @@ public abstract class AbstractEvent implements Event {
     }
 
     @Override
+    public long getNotificationTimestamp() {
+        // No notifications
+        return 0;
+    }
+
+    @Override
+    public boolean isNotifying() {
+        // No notifications
+        return false;
+    }
+
+    @Override
+    public void reload() {
+        // No reloading capabilities by default
+    }
+
+    @Override
     public boolean isCountingSeconds() {
         return options.enableSeconds;
     }

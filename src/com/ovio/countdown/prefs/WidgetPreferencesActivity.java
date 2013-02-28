@@ -294,6 +294,7 @@ public class WidgetPreferencesActivity extends Activity {
             if (eventData != null) {
                 widgetOptions.eventId = eventData.eventId;
                 widgetOptions.timestamp = eventData.start;
+                widgetOptions.instanceId = eventData.id;
             }
 
         }

@@ -4,14 +4,17 @@ import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
 import android.content.Context;
 import android.content.Intent;
+import android.database.ContentObserver;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Bundle;
 import android.text.format.DateUtils;
 import android.text.format.Time;
 import android.widget.RemoteViews;
 import com.ovio.countdown.R;
 import com.ovio.countdown.date.TimeDifference;
+import com.ovio.countdown.event.CalendarManager;
 import com.ovio.countdown.event.Event;
 import com.ovio.countdown.log.Logger;
 import com.ovio.countdown.prefs.IconMapping;
@@ -76,8 +79,6 @@ public abstract class WidgetProxy implements Blinking, Notifying, SecondsCountin
 
     private Bitmap icon;
 
-    private int styleRes;
-
 
     public WidgetProxy(Context context, int layout, int widgetId, Event event) {
         Logger.d(TAG, "Instantiated WidgetProxy for widget %s, event '%s'", widgetId, event.getTitle());
@@ -92,16 +93,7 @@ public abstract class WidgetProxy implements Blinking, Notifying, SecondsCountin
         currentNotifyTimestamp = getNextNotifyTimestamp();
         currentTargetTimestamp = event.getTargetTimestamp();
 
-        int iconRes = IconMapping.getInstance().getResource(event.getIcon());
-        if (iconRes != IconMapping.NONE) {
-            icon = BitmapFactory.decodeResource(context.getResources(), iconRes);
-        }
-
-        styleRes = StyleMapping.getInstance().getResource(event.getStyle());
-
-        currentBitmap = getWidgetPainter().getNewBitmap(context, styleRes);
-        getWidgetPainter().drawHeader(currentBitmap, event.getTitle(), icon);
-
+        drawWidgetBase();
 
         isTargetReached();
 
@@ -109,6 +101,8 @@ public abstract class WidgetProxy implements Blinking, Notifying, SecondsCountin
         notifyScheduler = NotifyScheduler.getInstance(context);
         secondCounter = SecondCounter.getInstance(context);
         blinker = Blinker.getInstance(context);
+
+        registerCalendarObserver(observer);
     }
 
     public void onCreate() {
@@ -132,6 +126,8 @@ public abstract class WidgetProxy implements Blinking, Notifying, SecondsCountin
     }
 
     public void onDelete() {
+        unRegisterCalendarObserver(observer);
+
         scheduler.unRegister(widgetId);
         notifyScheduler.unRegister(widgetId);
         secondCounter.unRegister(widgetId);
@@ -228,7 +224,7 @@ public abstract class WidgetProxy implements Blinking, Notifying, SecondsCountin
             now = target;
         }
 
-        drawWidget(now, target);
+        drawTime(now, target);
     }
 
     private synchronized void updateWidget(long now) {
@@ -241,14 +237,26 @@ public abstract class WidgetProxy implements Blinking, Notifying, SecondsCountin
             now = target;
         }
 
-        drawWidget(now, target);
+        drawTime(now, target);
     }
 
     private void updateWidget() {
         updateWidget(System.currentTimeMillis());
     }
 
-    private synchronized void drawWidget(long now, long target) {
+    private synchronized void drawWidgetBase() {
+        int iconRes = IconMapping.getInstance().getResource(event.getIcon());
+        if (iconRes != IconMapping.NONE) {
+            icon = BitmapFactory.decodeResource(context.getResources(), iconRes);
+        }
+
+        int styleRes = StyleMapping.getInstance().getResource(event.getStyle());
+
+        currentBitmap = getWidgetPainter().getNewBitmap(context, styleRes);
+        getWidgetPainter().drawHeader(currentBitmap, event.getTitle(), icon);
+    }
+
+    private synchronized void drawTime(long now, long target) {
         Logger.i(TAG, "Px[%s]: Updating widget", widgetId);
 
         // I don't know why, but instantiating new RemoteViews works A LOT FASTER then reusing existing!
@@ -344,6 +352,43 @@ public abstract class WidgetProxy implements Blinking, Notifying, SecondsCountin
         prefIntent.putExtras(extras);
 
         return PendingIntent.getActivity(context, id, prefIntent, Intent.FLAG_ACTIVITY_NEW_TASK);
+    }
+
+    private void reloadEvent() {
+        Logger.i(TAG, "Px[%s]: Reloading Event data", widgetId);
+
+        event.reload();
+        drawWidgetBase();
+        updateWidget();
+    }
+
+    private ContentObserver observer = new ContentObserver(null) {
+        @Override
+        public void onChange(boolean selfChange) {
+            reloadEvent();
+        }
+    };
+
+    private void unRegisterCalendarObserver(ContentObserver observer) {
+        if (observer == null) {
+            return;
+        }
+
+        context.getContentResolver().unregisterContentObserver(observer);
+    }
+
+    private void registerCalendarObserver(ContentObserver observer) {
+        if (observer == null) {
+            return;
+        }
+
+        CalendarManager manager = CalendarManager.getInstance(context);
+
+        Uri calendarUri = manager.getBaseUri();
+        if (manager.isCompatible() && calendarUri != null) {
+            context.getContentResolver().registerContentObserver(calendarUri, true, observer);
+        }
+
     }
 
 }

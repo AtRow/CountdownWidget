@@ -11,6 +11,7 @@ public class WidgetOptions extends AbstractOptions {
     public static final Field WIDGET_ID = Field.get("widgetId", Integer.class);
     public static final Field EVENT_ID = Field.get("eventId", Long.class);
     public static final Field CALENDAR_ID = Field.get("calendarId", Long.class);
+    public static final Field INSTANCE_ID = Field.get("instanceId", Long.class);
     public static final Field CONCRETE_EVENT = Field.get("concreteEvent", Boolean.class);
     public static final Field TITLE = Field.get("title", String.class);
     public static final Field TIMESTAMP = Field.get("timestamp", Long.class);
@@ -24,6 +25,7 @@ public class WidgetOptions extends AbstractOptions {
             WIDGET_ID,
             EVENT_ID,
             CALENDAR_ID,
+            INSTANCE_ID,
             CONCRETE_EVENT,
             TITLE,
             TIMESTAMP,
@@ -41,6 +43,8 @@ public class WidgetOptions extends AbstractOptions {
     public long eventId;
 
     public long calendarId;
+
+    public long instanceId;
 
     public boolean concreteEvent;
 
@@ -80,6 +84,8 @@ public class WidgetOptions extends AbstractOptions {
 
         calendarId = bundle.getLong(CALENDAR_ID.name);
 
+        instanceId = bundle.getLong(INSTANCE_ID.name);
+
         concreteEvent = bundle.getBoolean(CONCRETE_EVENT.name);
 
         title = bundle.getString(TITLE.name);
@@ -110,6 +116,8 @@ public class WidgetOptions extends AbstractOptions {
         bundle.putLong(EVENT_ID.name, eventId);
 
         bundle.putLong(CALENDAR_ID.name, calendarId);
+
+        bundle.putLong(INSTANCE_ID.name, instanceId);
 
         bundle.putBoolean(CONCRETE_EVENT.name, concreteEvent);
 

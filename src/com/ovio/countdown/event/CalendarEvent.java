@@ -3,6 +3,7 @@ package com.ovio.countdown.event;
 import android.content.Context;
 import com.ovio.countdown.log.Logger;
 import com.ovio.countdown.preferences.WidgetOptions;
+import com.ovio.countdown.preferences.WidgetPreferencesManager;
 
 /**
  * Countdown
@@ -18,17 +19,22 @@ public class CalendarEvent extends AbstractEvent {
 
     private boolean isValid;
 
+    private final Context context;
+
     public CalendarEvent(Context context, WidgetOptions options) {
         super(options);
+
+        this.context = context;
 
         manager = CalendarManager.getInstance(context);
 
         if (options.eventId > 0) {
             eventData = manager.getEvent(options.timestamp, options.eventId);
-            isValid = true;
-        } else {
+        }
+
+        isValid = (eventData != null);
+        if (!isValid) {
             eventData = new EventData();
-            isValid = false;
         }
     }
 
@@ -39,7 +45,7 @@ public class CalendarEvent extends AbstractEvent {
 
     @Override
     public String getTitle() {
-        return eventData.title;
+        return (eventData.title == null) ? "" : eventData.title;
     }
 
     @Override
@@ -54,15 +60,17 @@ public class CalendarEvent extends AbstractEvent {
     }
 
     @Override
-    public long getNotificationTimestamp() {
-        // No notifications
-        return 0;
-    }
+    public void reload() {
 
-    @Override
-    public boolean isNotifying() {
-        // No notifications
-        return false;
+        EventData newData = manager.getEventInstance(options.timestamp, options.eventId, options.instanceId);
+        if (newData != null) {
+            eventData = newData;
+
+            options.instanceId = eventData.id;
+            options.timestamp = eventData.start;
+            WidgetPreferencesManager.getInstance(context).save(options);
+        }
+
     }
 
     private long getFastForward() {

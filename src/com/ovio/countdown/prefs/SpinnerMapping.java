@@ -8,7 +8,7 @@ import java.util.List;
  * Countdown
  * com.ovio.countdown.prefs
  */
-public abstract class SpinnerData <T> {
+public abstract class SpinnerMapping<T> {
 
     private List<Pair<Integer, T>> list = getList();
 

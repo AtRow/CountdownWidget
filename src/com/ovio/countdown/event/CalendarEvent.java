@@ -44,7 +44,7 @@ public class CalendarEvent extends AbstractEvent {
 
     @Override
     public boolean isRepeating() {
-        return ((eventData.duration != null) || (eventData.rdate != null) || (eventData.rrule != null));
+        return (!options.concreteEvent || (eventData.duration != null) || (eventData.rdate != null) || (eventData.rrule != null));
     }
 
     @Override
@@ -75,10 +75,18 @@ public class CalendarEvent extends AbstractEvent {
 
         EventData newData = null;
 
-        if (isCountingUp()) {
-            newData = getPreviousEvent(options.eventId, now);
+        if (options.concreteEvent) {
+            if (isCountingUp()) {
+                newData = getPreviousEvent(options.eventId, now);
+            } else {
+                newData = getNextEvent(options.eventId, now);
+            }
         } else {
-            newData = getNextEvent(options.eventId, now);
+            if (isCountingUp()) {
+                eventData = manager.getPreviousCalendarEvent(options.calendarId, now);
+            } else {
+                eventData = manager.getNextCalendarEvent(options.calendarId, now);
+            }
         }
 
         if (newData != null) {

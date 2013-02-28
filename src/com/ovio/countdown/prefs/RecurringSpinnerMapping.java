@@ -11,7 +11,7 @@ import java.util.List;
  * Countdown
  * com.ovio.countdown.prefs
  */
-public class RecurringSpinnerData extends SpinnerData<Long> {
+public class RecurringSpinnerMapping extends SpinnerMapping<Long> {
 
     @Override
     protected Pair<Integer, Long> getDefault() {

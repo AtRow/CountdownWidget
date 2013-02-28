@@ -1,6 +1,5 @@
 package com.ovio.countdown.view;
 
-import android.app.Activity;
 import android.text.format.DateFormat;
 import android.text.format.Time;
 import android.view.View;
@@ -10,10 +9,7 @@ import com.ovio.countdown.event.CalendarData;
 import com.ovio.countdown.event.CalendarManager;
 import com.ovio.countdown.event.EventData;
 import com.ovio.countdown.log.Logger;
-import com.ovio.countdown.prefs.IconData;
-import com.ovio.countdown.prefs.NotificationSpinnerData;
-import com.ovio.countdown.prefs.RecurringSpinnerData;
-import com.ovio.countdown.prefs.StyleData;
+import com.ovio.countdown.prefs.*;
 
 import java.util.List;
 
@@ -31,7 +27,7 @@ public class WidgetPreferencesView {
 
     private static final int DEFAULT_DAY_BEGIN_HOUR = 9;
 
-    private final Activity activity;
+    private final WidgetPreferencesActivity activity;
 
     private CalendarManager calendarManager;
 
@@ -39,9 +35,9 @@ public class WidgetPreferencesView {
 
     private boolean isManualTab = true;
 
-    RecurringSpinnerData recurringSpinnerData = new RecurringSpinnerData();
+    RecurringSpinnerMapping recurringSpinnerMapping = new RecurringSpinnerMapping();
 
-    NotificationSpinnerData notificationSpinnerData = new NotificationSpinnerData();
+    NotificationSpinnerMapping notificationSpinnerMapping = new NotificationSpinnerMapping();
 
     private int currentRecurringId;
 
@@ -50,6 +46,10 @@ public class WidgetPreferencesView {
     private int currentIconId;
 
     private int currentStyleId;
+
+    private long currentCalendarId = CalendarManager.NONE_CALENDARS;
+
+    boolean ignoringFirstAssignment = true;
 
 
     private Button okButton;
@@ -102,7 +102,7 @@ public class WidgetPreferencesView {
 
     private EventData eventData;
 
-    public WidgetPreferencesView(Activity activity) {
+    public WidgetPreferencesView(WidgetPreferencesActivity activity) {
         this.activity = activity;
 
         obtainFormElements();
@@ -117,11 +117,11 @@ public class WidgetPreferencesView {
 
     private void initNotificationSpinner() {
 
-        int size = notificationSpinnerData.getSize();
+        int size = notificationSpinnerMapping.getSize();
         String[] data = new String[size];
 
         for (int i = 0; i < size; i++) {
-            data[i] = activity.getString(notificationSpinnerData.getTextId(i));
+            data[i] = activity.getString(notificationSpinnerMapping.getTextId(i));
         }
 
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(activity, android.R.layout.simple_spinner_item, data);
@@ -144,11 +144,11 @@ public class WidgetPreferencesView {
 
     private void initRecurringSpinner() {
 
-        int size = recurringSpinnerData.getSize();
+        int size = recurringSpinnerMapping.getSize();
         String[] data = new String[size];
 
         for (int i = 0; i < size; i++) {
-            data[i] = activity.getString(recurringSpinnerData.getTextId(i));
+            data[i] = activity.getString(recurringSpinnerMapping.getTextId(i));
         }
 
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(activity, android.R.layout.simple_spinner_item, data);
@@ -188,28 +188,70 @@ public class WidgetPreferencesView {
 
         List<CalendarData> calendarDatas = calendarManager.getCalendars();
 
-        ArrayAdapter calendarAdapter = new ArrayAdapter<CalendarData>(activity, android.R.layout.simple_spinner_item, calendarDatas);
+        final ArrayAdapter calendarAdapter = new ArrayAdapter<CalendarData>(activity, android.R.layout.simple_spinner_item, calendarDatas);
         calendarAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
         calendarSpinner.setAdapter(calendarAdapter);
         calendarAdapter.notifyDataSetChanged();
 
-        Time time = new Time();
-        time.setToNow();
-        time.month--;
-        long start = time.toMillis(false);
+        countUpCheckBoxG.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                reloadCalendarEvent();
+            }
+        });
 
-        time.month += 2;
-        long end = time.toMillis(false);
+        ignoringFirstAssignment = true;
 
-        final List<EventData> calendarEvents = calendarManager.getEvents(start, end);
+        calendarSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int position, long l) {
+                EventData calendarEventData = null;
 
-        final ArrayAdapter eventAdapter = new ArrayAdapter<EventData>(activity, android.R.layout.simple_spinner_item, calendarEvents);
-        eventAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                if (ignoringFirstAssignment) {
+                    ignoringFirstAssignment = false;
 
-//        eventSpinner.setAdapter(eventAdapter);
-//        eventAdapter.notifyDataSetChanged();
+                } else {
 
+                    CalendarData calendarData = (CalendarData) calendarAdapter.getItem(position);
+                    currentCalendarId = calendarData.id;
+
+                    long now = System.currentTimeMillis();
+                    if (getCountUp()) {
+                        calendarEventData = calendarManager.getPreviousCalendarEvent(currentCalendarId, now);
+                    } else {
+                        calendarEventData = calendarManager.getNextCalendarEvent(currentCalendarId, now);
+                    }
+
+                    if (calendarEventData == null) {
+                        Toast.makeText(activity, R.string.event_picker_no_events_found, Toast.LENGTH_LONG).show();
+                    }
+
+                }
+                setEventData(calendarEventData);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+                // Do nothing
+            }
+        });
+
+    }
+
+    private void reloadCalendarEvent() {
+
+        if (currentCalendarId != CalendarManager.NONE_CALENDARS) {
+
+            List<CalendarData> calendars = calendarManager.getCalendars();
+
+            for (int i = 0; i < calendars.size(); i++) {
+                if (calendars.get(i).id == currentCalendarId) {
+                    calendarSpinner.setSelection(i);
+                    calendarSpinner.getOnItemSelectedListener().onItemSelected(null, null, i, 0L);
+                }
+            }
+        }
     }
 
     public void setEventData(EventData eventData) {
@@ -220,7 +262,7 @@ public class WidgetPreferencesView {
 
         if (eventData != null) {
             this.eventData = eventData;
-            // TODO
+            // TODO Human Text
             calendarInfoTextView.setText(eventData.toString());
         } else {
             calendarInfoTextView.setText(R.string.calendar_not_choosen_text);
@@ -319,21 +361,21 @@ public class WidgetPreferencesView {
     }
 
     public void setRecurringInterval(long interval) {
-        currentRecurringId = recurringSpinnerData.getIdForVal(interval);
+        currentRecurringId = recurringSpinnerMapping.getIdForVal(interval);
         recurringSpinner.setSelection(currentRecurringId);
     }
 
     public long getRecurringInterval() {
-        return recurringSpinnerData.getValueForId(currentRecurringId);
+        return recurringSpinnerMapping.getValueForId(currentRecurringId);
     }
 
     public void setNotificationInterval(long interval) {
-        currentNotificationId = notificationSpinnerData.getIdForVal(interval);
+        currentNotificationId = notificationSpinnerMapping.getIdForVal(interval);
         notificationSpinner.setSelection(currentNotificationId);
     }
 
     public long getNotificationInterval() {
-        return notificationSpinnerData.getValueForId(currentNotificationId);
+        return notificationSpinnerMapping.getValueForId(currentNotificationId);
     }
 
     public void onTimeCheckBoxClick(View view) {
@@ -354,15 +396,11 @@ public class WidgetPreferencesView {
         return currentIconId;
     }
 
-    public int getStyle() {
-        return currentStyleId;
-    }
-
     public void setIcon(int iconId) {
         currentIconId = iconId;
 
-        if (iconId != IconData.NONE) {
-            int resId = IconData.getInstance().getResource(iconId);
+        if (iconId != IconMapping.NONE) {
+            int resId = IconMapping.getInstance().getResource(iconId);
 
             iconImageView.setImageResource(resId);
             iconImageViewG.setImageResource(resId);
@@ -373,13 +411,26 @@ public class WidgetPreferencesView {
         }
     }
 
+    public int getStyle() {
+        return currentStyleId;
+    }
+
     public void setStyle(int styleId) {
         currentStyleId = styleId;
 
-        int resId = StyleData.getInstance().getResource(styleId);
+        int resId = StyleMapping.getInstance().getResource(styleId);
 
         styleImageView.setBackgroundResource(resId);
         styleImageViewG.setBackgroundResource(resId);
+    }
+
+    public long getCalendar() {
+        return currentCalendarId;
+    }
+
+    public void setCalendar(long calendarId) {
+        currentCalendarId = calendarId;
+        reloadCalendarEvent();
     }
 
     private void initTabHost() {

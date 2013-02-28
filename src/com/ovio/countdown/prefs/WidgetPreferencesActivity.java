@@ -171,18 +171,19 @@ public class WidgetPreferencesActivity extends Activity {
                         widgetCalendarEvent = (EventData) extras.getSerializable(EventPickerActivity.EVENT);
                         if (widgetCalendarEvent != null) {
                             this.view.setEventData(widgetCalendarEvent);
+                            this.view.setCalendar(CalendarManager.NONE_CALENDARS);
                         }
                     }
                     break;
 
                 case PICK_ICON_REQUEST:
-                    int iconId = data.getIntExtra(IconPickerActivity.ID, IconData.NONE);
+                    int iconId = data.getIntExtra(IconPickerActivity.ID, IconMapping.NONE);
                     this.view.setIcon(iconId);
 
                     break;
 
                 case PICK_STYLE_REQUEST:
-                    int styleId = data.getIntExtra(StylePickerActivity.ID, StyleData.DEFAULT);
+                    int styleId = data.getIntExtra(StylePickerActivity.ID, StyleMapping.DEFAULT);
                     this.view.setStyle(styleId);
 
                     break;
@@ -286,8 +287,10 @@ public class WidgetPreferencesActivity extends Activity {
 
         } else {
 
-            EventData eventData = view.getEventData();
+            widgetOptions.calendarId = view.getCalendar();
+            widgetOptions.concreteEvent = (widgetOptions.calendarId == CalendarManager.NONE_CALENDARS);
 
+            EventData eventData = view.getEventData();
             if (eventData != null) {
                 widgetOptions.eventId = eventData.eventId;
                 widgetOptions.timestamp = eventData.start;
@@ -364,10 +367,14 @@ public class WidgetPreferencesActivity extends Activity {
 
             } else {
 
-                CalendarManager calendarManager = CalendarManager.getInstance(getApplicationContext());
-                EventData eventData = calendarManager.getEvent(widgetOptions.timestamp, widgetOptions.eventId);
+                if (widgetOptions.concreteEvent) {
+                    CalendarManager calendarManager = CalendarManager.getInstance(getApplicationContext());
+                    EventData eventData = calendarManager.getEvent(widgetOptions.timestamp, widgetOptions.eventId);
+                    view.setEventData(eventData);
 
-                view.setEventData(eventData);
+                } else {
+                    view.setCalendar(widgetOptions.calendarId);
+                }
             }
 
             view.setCountSeconds(widgetOptions.enableSeconds);
@@ -379,7 +386,5 @@ public class WidgetPreferencesActivity extends Activity {
             view.setStyle(widgetOptions.style);
         }
     }
-
-
 
 }

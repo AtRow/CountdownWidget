@@ -71,4 +71,6 @@
     <string name="sub_hour_plu">час.</string>
     <string name="sub_minute">мин.</string>
     <string name="sub_second">сек.</string>
+    <string name="event_picker_no_events_found">Не найдено событий в выбранном календаре</string>
+    <string name="calendar_none_name">Не выбран</string>
 </resources>

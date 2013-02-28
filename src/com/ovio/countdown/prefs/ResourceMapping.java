@@ -6,7 +6,7 @@ import java.util.TreeMap;
  * Countdown
  * com.ovio.countdown.prefs
  */
-public class ResourceData {
+public class ResourceMapping {
 
     private TreeMap<Integer, Integer> idToResMap = new TreeMap<Integer, Integer>();
     private TreeMap<Integer, Integer> resToIdMap = new TreeMap<Integer, Integer>();

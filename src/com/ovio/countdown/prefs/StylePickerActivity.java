@@ -52,7 +52,7 @@ public class StylePickerActivity extends Activity {
 
     private BaseAdapter adapter = new BaseAdapter() {
 
-        private StyleData data = StyleData.getInstance();
+        private StyleMapping data = StyleMapping.getInstance();
 
         @Override
         public int getCount() {

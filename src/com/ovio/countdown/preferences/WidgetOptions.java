@@ -11,6 +11,7 @@ public class WidgetOptions extends AbstractOptions {
     public static final Field WIDGET_ID = Field.get("widgetId", Integer.class);
     public static final Field EVENT_ID = Field.get("eventId", Long.class);
     public static final Field CALENDAR_ID = Field.get("calendarId", Long.class);
+    public static final Field CONCRETE_EVENT = Field.get("concreteEvent", Boolean.class);
     public static final Field TITLE = Field.get("title", String.class);
     public static final Field TIMESTAMP = Field.get("timestamp", Long.class);
     public static final Field RECURRING_INTERVAL = Field.get("recurringInterval", Long.class);
@@ -23,6 +24,7 @@ public class WidgetOptions extends AbstractOptions {
             WIDGET_ID,
             EVENT_ID,
             CALENDAR_ID,
+            CONCRETE_EVENT,
             TITLE,
             TIMESTAMP,
             GeneralOptions.COUNT_UP,
@@ -39,6 +41,8 @@ public class WidgetOptions extends AbstractOptions {
     public long eventId;
 
     public long calendarId;
+
+    public boolean concreteEvent;
 
     public String title;
 
@@ -76,6 +80,8 @@ public class WidgetOptions extends AbstractOptions {
 
         calendarId = bundle.getLong(CALENDAR_ID.name);
 
+        concreteEvent = bundle.getBoolean(CONCRETE_EVENT.name);
+
         title = bundle.getString(TITLE.name);
 
         timestamp = bundle.getLong(TIMESTAMP.name);
@@ -104,6 +110,8 @@ public class WidgetOptions extends AbstractOptions {
         bundle.putLong(EVENT_ID.name, eventId);
 
         bundle.putLong(CALENDAR_ID.name, calendarId);
+
+        bundle.putBoolean(CONCRETE_EVENT.name, concreteEvent);
 
         bundle.putString(TITLE.name, title);
 

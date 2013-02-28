@@ -52,7 +52,7 @@ public class IconPickerActivity extends Activity {
 
     private BaseAdapter adapter = new BaseAdapter() {
 
-        private IconData data = IconData.getInstance();
+        private IconMapping data = IconMapping.getInstance();
 
         @Override
         public int getCount() {

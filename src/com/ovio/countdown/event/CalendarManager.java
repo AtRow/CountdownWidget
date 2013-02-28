@@ -39,10 +39,11 @@ public final class CalendarManager {
     private final Context context;
 
 
-
     private Uri baseUri;
 
     public static final int ALL_CALENDARS = -1;
+
+    public static final int NONE_CALENDARS = -2;
 
     public static final long NEAREST_EVENT = -1;
 
@@ -79,6 +80,12 @@ public final class CalendarManager {
         ContentResolver contentResolver = context.getContentResolver();
 
         List<CalendarData> list = new ArrayList<CalendarData>();
+
+        CalendarData noneCalendars = new CalendarData();
+        noneCalendars.id = NONE_CALENDARS;
+        noneCalendars.name = context.getString(R.string.calendar_none_name);
+        list.add(noneCalendars);
+
         CalendarData allCalendars = new CalendarData();
         allCalendars.id = ALL_CALENDARS;
         allCalendars.name = context.getString(R.string.calendar_all_name);
@@ -318,6 +325,74 @@ public final class CalendarManager {
         }
 
         Logger.w(TAG, "Previous Event not found");
+        return null;
+    }
+
+    public EventData getPreviousCalendarEvent(long calendarId, long before) {
+
+        if (Logger.DEBUG) {
+            Time time = new Time();
+            time.set(before);
+            Logger.i(TAG, "Getting previous event for Calendar id %s before %s", calendarId, time.format(Util.TF));
+        }
+
+        String[] projection = EventData.COLUMNS;
+
+        String selection = null;
+        if (calendarId != ALL_CALENDARS) {
+            selection = EventData.CALENDAR_ID + " = " + calendarId;
+        }
+        long end = before - 1000L;
+
+        for (int i = 0; i < QUERY_TIMESTAMP_ITERATIONS.length; i++) {
+
+            Logger.i(TAG, "Running %s search query iteration", i);
+            Logger.i(TAG, "Looking between %s and %s", end - QUERY_TIMESTAMP_ITERATIONS[i], end);
+
+            Uri eventUri = getUriBetween(end - QUERY_TIMESTAMP_ITERATIONS[i], end);
+            ArrayList<EventData> events = queryEvents(eventUri, projection, selection);
+            Logger.i(TAG, "Got %s events", events.size());
+
+            if (!events.isEmpty()) {
+                return events.get(events.size() - 1);
+            }
+        }
+
+        Logger.w(TAG, "Previous Calendar Event not found");
+        return null;
+    }
+
+    public EventData getNextCalendarEvent(long calendarId, long after) {
+
+        if (Logger.DEBUG) {
+            Time time = new Time();
+            time.set(after);
+            Logger.i(TAG, "Getting next event for Calendar id %s after %s", calendarId, time.format(Util.TF));
+        }
+
+        String[] projection = EventData.COLUMNS;
+
+        String selection = null;
+        if (calendarId != ALL_CALENDARS) {
+            selection = EventData.CALENDAR_ID + " = " + calendarId;
+        }
+        long start = after + 1000L;
+
+        for (int i = 0; i < QUERY_TIMESTAMP_ITERATIONS.length; i++) {
+
+            Logger.i(TAG, "Running %s search query iteration", i);
+            Logger.i(TAG, "Looking between %s and %s", start, start + QUERY_TIMESTAMP_ITERATIONS[i]);
+
+            Uri eventUri = getUriBetween(start, start + QUERY_TIMESTAMP_ITERATIONS[i]);
+            ArrayList<EventData> events = queryEvents(eventUri, projection, selection);
+            Logger.i(TAG, "Got %s events", events.size());
+
+            if (!events.isEmpty()) {
+                return events.get(0);
+            }
+        }
+
+        Logger.w(TAG, "Next Calendar Event not found");
         return null;
     }
 

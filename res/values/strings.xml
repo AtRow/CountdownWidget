@@ -71,4 +71,6 @@
     <string name="sub_hour_plu">hrs.</string>
     <string name="sub_minute">min.</string>
     <string name="sub_second">sec.</string>
+    <string name="event_picker_no_events_found">No Events found in this calendar</string>
+    <string name="calendar_none_name">Not selected</string>
 </resources>

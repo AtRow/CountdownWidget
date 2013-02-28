@@ -6,20 +6,20 @@ import com.ovio.countdown.R;
  * Countdown
  * com.ovio.countdown.prefs
  */
-public class IconData extends ResourceData {
+public class IconMapping extends ResourceMapping {
 
     public static final int NONE = 0;
 
-    private static IconData instance;
+    private static IconMapping instance;
 
-    public static synchronized IconData getInstance() {
+    public static synchronized IconMapping getInstance() {
         if (instance == null) {
-            instance = new IconData();
+            instance = new IconMapping();
         }
         return instance;
     }
 
-    private IconData() {
+    private IconMapping() {
         put(0, 0);
         put(1, R.drawable.icon_1);
         put(2, R.drawable.icon_2);

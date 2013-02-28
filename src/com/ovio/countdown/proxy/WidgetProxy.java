@@ -99,6 +99,10 @@ public abstract class WidgetProxy implements Blinking, Notifying, SecondsCountin
 
         styleRes = StyleData.getInstance().getResource(event.getStyle());
 
+        currentBitmap = getWidgetPainter().getNewBitmap(context, styleRes);
+        getWidgetPainter().drawHeader(currentBitmap, event.getTitle(), icon);
+
+
         isTargetReached();
 
         scheduler = Scheduler.getInstance(context);
@@ -224,7 +228,7 @@ public abstract class WidgetProxy implements Blinking, Notifying, SecondsCountin
             now = target;
         }
 
-        drawWidget(now, target, true);
+        drawWidget(now, target);
     }
 
     private synchronized void updateWidget(long now) {
@@ -237,18 +241,15 @@ public abstract class WidgetProxy implements Blinking, Notifying, SecondsCountin
             now = target;
         }
 
-        drawWidget(now, target, false);
+        drawWidget(now, target);
     }
 
     private void updateWidget() {
         updateWidget(System.currentTimeMillis());
     }
 
-    private synchronized void drawWidget(long now, long target, boolean timeOnly) {
+    private synchronized void drawWidget(long now, long target) {
         Logger.i(TAG, "Px[%s]: Updating widget", widgetId);
-        if (timeOnly) {
-            Logger.i(TAG, "Px[%s]: Time only", widgetId);
-        }
 
         // I don't know why, but instantiating new RemoteViews works A LOT FASTER then reusing existing!
         AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
@@ -259,17 +260,10 @@ public abstract class WidgetProxy implements Blinking, Notifying, SecondsCountin
         TimeDifference diff = TimeDifference.between(now, target);
         updateCounters(diff);
 
-        WidgetPainter widgetPainter = getWidgetPainter();
-
-        if ((currentBitmap == null) || !timeOnly) {
-            currentBitmap = widgetPainter.getNewBitmap(context, styleRes);
-            widgetPainter.drawHeader(currentBitmap, event.getTitle(), icon);
-        }
-
         Bitmap bitmap = currentBitmap.copy(currentBitmap.getConfig(), true);
 
         if (showText) {
-            widgetPainter.drawTime(bitmap, diff, maxCountingVal);
+            getWidgetPainter().drawTime(bitmap, diff, maxCountingVal);
         }
 
         views.setImageViewBitmap(R.id.imageView, bitmap);

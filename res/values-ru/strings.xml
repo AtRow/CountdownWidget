@@ -63,6 +63,7 @@
     <string name="sub_year_sin">год</string>
     <string name="sub_year_sem">года</string>
     <string name="sub_year_plu">лет</string>
+    <string name="sub_month">mon.</string>
     <string name="sub_day_sin">день</string>
     <string name="sub_day_sem">дня</string>
     <string name="sub_day_plu">дней</string>

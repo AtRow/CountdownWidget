@@ -206,29 +206,17 @@ public class WidgetPreferencesView {
         calendarSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int position, long l) {
-                EventData calendarEventData = null;
-
-                if (ignoringFirstAssignment) {
-                    ignoringFirstAssignment = false;
-
-                } else {
-
+                if (view != null) {
                     CalendarData calendarData = (CalendarData) calendarAdapter.getItem(position);
                     currentCalendarId = calendarData.id;
 
-                    long now = System.currentTimeMillis();
-                    if (getCountUp()) {
-                        calendarEventData = calendarManager.getPreviousCalendarEvent(currentCalendarId, now);
-                    } else {
-                        calendarEventData = calendarManager.getNextCalendarEvent(currentCalendarId, now);
-                    }
+                    loadNearestEvent();
 
-                    if (calendarEventData == null) {
+                    if (currentCalendarId != CalendarManager.NONE_CALENDARS && getEventData() == null) {
                         Toast.makeText(activity, R.string.event_picker_no_events_found, Toast.LENGTH_LONG).show();
                     }
-
                 }
-                setEventData(calendarEventData);
+
             }
 
             @Override
@@ -237,6 +225,23 @@ public class WidgetPreferencesView {
             }
         });
 
+    }
+
+    private void loadNearestEvent() {
+        EventData calendarEventData;
+
+        long now = System.currentTimeMillis();
+        if (getCountUp()) {
+            calendarEventData = calendarManager.getPreviousCalendarEvent(currentCalendarId, now);
+        } else {
+            calendarEventData = calendarManager.getNextCalendarEvent(currentCalendarId, now);
+        }
+
+        if (calendarEventData == null) {
+            Toast.makeText(activity, R.string.event_picker_no_events_found, Toast.LENGTH_LONG).show();
+        }
+
+        setEventData(calendarEventData);
     }
 
     private void reloadCalendarEvent() {
@@ -248,9 +253,10 @@ public class WidgetPreferencesView {
             for (int i = 0; i < calendars.size(); i++) {
                 if (calendars.get(i).id == currentCalendarId) {
                     calendarSpinner.setSelection(i);
-                    calendarSpinner.getOnItemSelectedListener().onItemSelected(null, null, i, 0L);
                 }
             }
+
+            loadNearestEvent();
         }
     }
 
@@ -259,9 +265,9 @@ public class WidgetPreferencesView {
         if (isManualTab) {
             tabHost.setCurrentTabByTag(TAB_GOOGLE);
         }
+        this.eventData = eventData;
 
         if (eventData != null) {
-            this.eventData = eventData;
             // TODO Human Text
             calendarInfoTextView.setText(eventData.toString());
         } else {

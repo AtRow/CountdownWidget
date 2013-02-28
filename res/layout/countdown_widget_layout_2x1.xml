@@ -1,30 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:orientation="vertical"
               android:layout_width="130dp"
               android:layout_height="72dp"
-              android:background="#6ec1ff"
-              android:id="@+id/widgetLayout">
+              android:id="@+id/widgetLayout"
+    >
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/titleTextView"
-                android:layout_gravity="center_horizontal|top"
-                android:visibility="visible"
-                android:text="Empty"
-                android:textColor="#ffffff"/>
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="319y 10m 26d"
-        android:id="@+id/counterTextView"
-        android:layout_gravity="center"
-        style="@style/TextWidgetTime2x1"
-        android:layout_margin="5dp"
-        android:textColor="#ffffff"
+    <ImageView
+        android:layout_width="130dp"
+        android:layout_height="72dp"
+        android:id="@+id/imageView"
         />
 
 </LinearLayout>

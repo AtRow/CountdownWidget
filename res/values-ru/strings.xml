@@ -59,11 +59,15 @@
     <string name="notification_24_hour">24 часа</string>
     <string name="notification_2_day">2 дня</string>
     <string name="notification_1_week">1 неделя</string>
-    <string name="sub_year">год</string>
-    <string name="sub_month">мес.</string>
-    <string name="sub_day">дней</string>
-    <string name="sub_hour">час.</string>
+    <string name="icon_button_prompt">Выбрать...</string>
+    <string name="sub_year_sin">год</string>
+    <string name="sub_year_sem">года</string>
+    <string name="sub_year_plu">лет</string>
+    <string name="sub_day_sin">день</string>
+    <string name="sub_day_sem">дня</string>
+    <string name="sub_day_plu">дней</string>
+    <string name="sub_hour_sin">час</string>
+    <string name="sub_hour_plu">час.</string>
     <string name="sub_minute">мин.</string>
     <string name="sub_second">сек.</string>
-    <string name="icon_button_prompt">Выбрать...</string>
 </resources>

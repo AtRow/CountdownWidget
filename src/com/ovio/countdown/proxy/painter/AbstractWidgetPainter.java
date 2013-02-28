@@ -32,36 +32,86 @@ public abstract class AbstractWidgetPainter implements WidgetPainter {
     }
 
     protected String getYearSub(int value) {
-        // TODO
-        return context.getString(R.string.sub_year);
+        /*
+        1 год
+        2-4 года
+        5-n лет
+        21-n l.d.
+        1 year
+        n years
+        */
+        int form = WordFormHelper.getWordForm(value);
+
+        switch (form) {
+            case WordFormHelper.SINGLE:
+                return context.getString(R.string.sub_year_sin);
+
+            case WordFormHelper.SEMI:
+                return context.getString(R.string.sub_year_sem);
+
+            default:
+                return context.getString(R.string.sub_year_plu);
+        }
     }
 
     protected String getMonthSub(int value) {
-        // TODO
+        /*
+        n мес.
+        n mon.
+         */
         return context.getString(R.string.sub_month);
     }
 
     protected String getDaySub(int value) {
-        // TODO
-        return context.getString(R.string.sub_day);
+        /*
+        1 день
+        2-4 дня
+        5-20 дней
+        21-n l.d.
+        1 day
+        n days
+         */
+        int form = WordFormHelper.getWordForm(value);
+
+        switch (form) {
+            case WordFormHelper.SINGLE:
+                return context.getString(R.string.sub_day_sin);
+
+            case WordFormHelper.SEMI:
+                return context.getString(R.string.sub_day_sem);
+
+            default:
+                return context.getString(R.string.sub_day_plu);
+        }
     }
 
     protected String getHourSub(int value) {
-        // TODO
-        return context.getString(R.string.sub_hour);
+        /*
+        1 час
+        n час.
+        1 hour
+        n hrs.
+         */
+        return (value == 1) ? context.getString(R.string.sub_hour_sin) : context.getString(R.string.sub_hour_plu);
     }
 
     protected String getMinuteSub(int value) {
-        // TODO
+        /*
+        n мин.
+        n min.
+         */
         return context.getString(R.string.sub_minute);
     }
 
     protected String getSecondSub(int value) {
-        // TODO
+        /*
+        n сек.
+        n sec.
+         */
         return context.getString(R.string.sub_second);
     }
 
-    protected String truncateText(String text, Paint paint, int width) {
+    protected String truncateText(String text, Paint paint, int width, boolean enableEllipsis) {
 
         if (paint.measureText(text) <= width) {
             return text;
@@ -72,13 +122,16 @@ public abstract class AbstractWidgetPainter implements WidgetPainter {
         }
 
         int pos = text.length() - 1;
-        float ellipsis = paint.measureText("...");
+        float ellipsis = (enableEllipsis) ? paint.measureText("...") : 0;
 
         do {
             pos--;
         } while (paint.measureText(text, 0, pos) + ellipsis >= width);
 
-        String truncatedText = text.substring(0, pos) + "...";
+        String truncatedText = text.substring(0, pos);
+        if (enableEllipsis) {
+            truncatedText += "...";
+        }
 
         if (truncatedMap.size() > 25) {
             truncatedMap.clear();

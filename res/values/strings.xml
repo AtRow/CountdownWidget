@@ -59,11 +59,16 @@
     <string name="notification_24_hour">24 hours</string>
     <string name="notification_2_day">2 days</string>
     <string name="notification_1_week">1 week</string>
-    <string name="sub_year">yrs.</string>
-    <string name="sub_month">mon.</string>
-    <string name="sub_day">days</string>
-    <string name="sub_hour">hours</string>
-    <string name="sub_minute">mins</string>
-    <string name="sub_second">sec.</string>
     <string name="icon_button_prompt">Choose...</string>
+    <string name="sub_year_sin">year</string>
+    <string name="sub_year_sem">yrs.</string>
+    <string name="sub_year_plu">yrs.</string>
+    <string name="sub_month">mon.</string>
+    <string name="sub_day_sin">day</string>
+    <string name="sub_day_sem">days</string>
+    <string name="sub_day_plu">days</string>
+    <string name="sub_hour_sin">hour</string>
+    <string name="sub_hour_plu">hrs.</string>
+    <string name="sub_minute">min.</string>
+    <string name="sub_second">sec.</string>
 </resources>

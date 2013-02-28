@@ -18,6 +18,7 @@ public class LargeWidgetPainter extends AbstractWidgetPainter {
     private static final int PLUS_SIZE = 33;
     private static final int DIGIT_SIZE = 50;
     private static final int TITLE_SIZE = 14;
+    private static final int SUB_SIZE = 11;
 
     private static final int PLUS_V_OFFSET = 59;
     private static final int DIGIT_V_OFFSET = 65;
@@ -32,8 +33,6 @@ public class LargeWidgetPainter extends AbstractWidgetPainter {
 
     private static final String PLUS_SYM = "+";
     private static final String OFFSET_DIGIT = "0";
-
-    private static final int SUB_SIZE = 11;
 
     private static final int PLUS_H_OFFSET = 10;
     private static final int FIRST_H_OFFSET = 80;
@@ -111,15 +110,15 @@ public class LargeWidgetPainter extends AbstractWidgetPainter {
 
                 drawDay(canvas, paint, diff.days, false, FIRST_H_OFFSET);
                 drawHour(canvas, paint, diff.hours, true, SECOND_H_OFFSET);
-                drawMinute(canvas, paint, diff.mins, THIRD_H_OFFSET);
+                drawMinute(canvas, paint, diff.mins, true, THIRD_H_OFFSET);
                 break;
 
             case Time.HOUR:
                 drawPlus(canvas, paint, diff.positive, diff.hours);
 
                 drawHour(canvas, paint, diff.hours, false, FIRST_H_OFFSET);
-                drawMinute(canvas, paint, diff.mins, SECOND_H_OFFSET);
-                drawSecond(canvas, paint, diff.secs, THIRD_H_OFFSET);
+                drawMinute(canvas, paint, diff.mins, true, SECOND_H_OFFSET);
+                drawSecond(canvas, paint, diff.secs, true, THIRD_H_OFFSET);
                 break;
         }
 
@@ -149,7 +148,7 @@ public class LargeWidgetPainter extends AbstractWidgetPainter {
             canvas.drawBitmap(scaledIcon, toPx(ICON_H_OFFSET), toPx(ICON_V_OFFSET), paint);
         }
 
-        String text = truncateText(title, paint, titleWidth);
+        String text = truncateText(title, paint, titleWidth, true);
         
         canvas.drawText(text, toPx(TITLE_H_OFFSET), toPx(TITLE_V_OFFSET), paint);
 
@@ -180,15 +179,15 @@ public class LargeWidgetPainter extends AbstractWidgetPainter {
         drawSub(canvas, paint, getHourSub(value), xOffset);
     }
 
-    private void drawMinute(Canvas canvas, Paint paint, int value, int xOffset) {
+    private void drawMinute(Canvas canvas, Paint paint, int value, boolean drawZero, int xOffset) {
 
-        drawDigit(canvas, paint, value, true, xOffset);
+        drawDigit(canvas, paint, value, drawZero, xOffset);
         drawSub(canvas, paint, getMinuteSub(value), xOffset);
     }
 
-    private void drawSecond(Canvas canvas, Paint paint, int value, int xOffset) {
+    private void drawSecond(Canvas canvas, Paint paint, int value, boolean drawZero, int xOffset) {
 
-        drawDigit(canvas, paint, value, true, xOffset);
+        drawDigit(canvas, paint, value, drawZero, xOffset);
         drawSub(canvas, paint, getSecondSub(value), xOffset);
     }
 

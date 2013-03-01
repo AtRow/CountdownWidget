@@ -72,8 +72,6 @@ public final class TimeDifference {
         Time tillTime = new Time();
         tillTime.set(till);
 
-        days = getDaysBetween(from, till);
-
         hours = tillTime.hour - fromTime.hour;
         mins = tillTime.minute - fromTime.minute;
         secs = tillTime.second - fromTime.second;
@@ -89,29 +87,30 @@ public final class TimeDifference {
         }
 
         if (hours < 0) {
-            days--;
+            //days--;
             hours += 24;
         }
 
-        years = 0;
-        Time time = new Time(fromTime);
+        days = getDaysBetween(from, till);
 
-        while (days - getDaysInYear(time.year) >= 0) {
-            days -= getDaysInYear(time.year);
-            time.year++;
-            years++;
-        }
+        //int daysTillMonthEnd = getDaysInMonth(fromTime.year, fromTime.month) - fromTime.monthDay;
+
+        int m = fromTime.month;
+        int y = fromTime.year;
 
         months = 0;
-        time = new Time(fromTime);
-
-        while (days - getDaysInMonth(time.year, time.month) >= 0) {
-            days -= getDaysInMonth(time.year, time.month);
-            time.month++;
-            time.normalize(true);
+        while (days - getDaysInMonth(y, m) >= 0) {
+            days -= getDaysInMonth(y, m);
+            m++;
+            if (m == 12) {
+                m = 0;
+                y++;
+            }
             months++;
         }
 
+        years = months / 12;
+        months -= years * 12;
     }
 
     // Copy-Pasted from android.text.format.Time to avoid new Time instances creation

@@ -60,7 +60,7 @@ public class CalendarEvent extends AbstractEvent {
     }
 
     @Override
-    public void reload() {
+    public synchronized void reload() {
 
         EventData newData = manager.getEventInstance(options.timestamp, options.eventId, options.instanceId);
         if (newData != null) {

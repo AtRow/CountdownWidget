@@ -1,5 +1,6 @@
 package com.ovio.countdown.date;
 
+import android.text.format.DateUtils;
 import android.text.format.Time;
 
 /**
@@ -71,22 +72,11 @@ public final class TimeDifference {
         Time tillTime = new Time();
         tillTime.set(till);
 
+        days = getDaysBetween(from, till);
 
-        years = tillTime.year - fromTime.year;
-        months = tillTime.month - fromTime.month;
-        days = tillTime.monthDay - fromTime.monthDay;
         hours = tillTime.hour - fromTime.hour;
         mins = tillTime.minute - fromTime.minute;
         secs = tillTime.second - fromTime.second;
-
-        // Leap year workaround
-        if (tillTime.year != fromTime.year) {
-            for (int y = fromTime.year; y <= tillTime.year; y++) {
-                if (isLeapYear(y)) {
-                    days++;
-                }
-            }
-        }
 
         if (secs < 0) {
             mins--;
@@ -103,15 +93,23 @@ public final class TimeDifference {
             hours += 24;
         }
 
-        if (days < 0) {
-            months--;
-            int mon = (tillTime.month == 0) ? 11 : tillTime.month - 1;
-            days += getDaysInMonth(tillTime.year, mon);
+        years = 0;
+        Time time = new Time(fromTime);
+
+        while (days - getDaysInYear(time.year) >= 0) {
+            days -= getDaysInYear(time.year);
+            time.year++;
+            years++;
         }
 
-        if (months < 0) {
-            years--;
-            months += 12;
+        months = 0;
+        time = new Time(fromTime);
+
+        while (days - getDaysInMonth(time.year, time.month) >= 0) {
+            days -= getDaysInMonth(time.year, time.month);
+            time.month++;
+            time.normalize(true);
+            months++;
         }
 
     }
@@ -133,4 +131,47 @@ public final class TimeDifference {
         }
     }
 
+    // Copy-Pasted from android.text.format.Time
+    private int getDaysInYear(int y) {
+        return ((y % 4) == 0 && ((y % 100) != 0 || (y % 400) == 0)) ? 366 : 365;
+    }
+
+    private int getDaysBetween(long from, long till) {
+        return (int) ((till - from) / DateUtils.DAY_IN_MILLIS);
+//
+//        Calendar cursor = Calendar.getInstance();
+//        cursor.setTimeInMillis(from);
+//
+//        cursor.add(Calendar.DAY_OF_YEAR, presumedDays);
+//        long instant = cursor.getTimeInMillis();
+//        if (instant == till) {
+//            return presumedDays;
+//        }
+//        final int step = (instant < till) ? 1 : -1;
+//        do {
+//            cursor.add(Calendar.DAY_OF_MONTH, step);
+//            presumedDays += step;
+//        } while (cursor.getTimeInMillis() != till);
+//
+//        return presumedDays;
+    }
+
+    private int getDaysBetween2(long from, long till) {
+
+        Time fromTime = new Time();
+        fromTime.set(from);
+        fromTime.normalize(false);
+
+        Time tillTime = new Time();
+        tillTime.set(till);
+        tillTime.normalize(false);
+
+        int daysBetween = 0;
+        while (fromTime.before(tillTime)) {
+            fromTime.monthDay++;
+            fromTime.normalize(false);
+            daysBetween++;
+        }
+        return daysBetween;
+    }
 }

@@ -282,7 +282,13 @@ public final class CalendarManager {
         for (int i = 0; i < QUERY_TIMESTAMP_ITERATIONS.length; i++) {
 
             Logger.i(TAG, "Running %s search query iteration", i);
-            Logger.i(TAG, "Looking between %s and %s", timestamp - QUERY_TIMESTAMP_ITERATIONS[i], timestamp + QUERY_TIMESTAMP_ITERATIONS[i]);
+            if (Logger.DEBUG) {
+                Time time1 = new Time();
+                time1.set(timestamp - QUERY_TIMESTAMP_ITERATIONS[i]);
+                Time time2 = new Time();
+                time2.set(timestamp + QUERY_TIMESTAMP_ITERATIONS[i]);
+                Logger.i(TAG, "Looking between %s and %s", time1.format(Util.TF), time2.format(Util.TF));
+            }
 
             Uri eventUri = getUriBetween(timestamp - QUERY_TIMESTAMP_ITERATIONS[i], timestamp + QUERY_TIMESTAMP_ITERATIONS[i]);
             ArrayList<EventData> events = queryEvents(eventUri, projection, selection);
@@ -301,7 +307,13 @@ public final class CalendarManager {
         for (int i = 0; i < QUERY_TIMESTAMP_ITERATIONS.length; i++) {
 
             Logger.i(TAG, "Running %s search query iteration", i);
-            Logger.i(TAG, "Looking between %s and %s", timestamp - QUERY_TIMESTAMP_ITERATIONS[i], timestamp + QUERY_TIMESTAMP_ITERATIONS[i]);
+            if (Logger.DEBUG) {
+                Time time1 = new Time();
+                time1.set(timestamp - QUERY_TIMESTAMP_ITERATIONS[i]);
+                Time time2 = new Time();
+                time2.set(timestamp + QUERY_TIMESTAMP_ITERATIONS[i]);
+                Logger.i(TAG, "Looking between %s and %s", time1.format(Util.TF), time2.format(Util.TF));
+            }
 
             Uri eventUri = getUriBetween(timestamp - QUERY_TIMESTAMP_ITERATIONS[i], timestamp + QUERY_TIMESTAMP_ITERATIONS[i]);
             ArrayList<EventData> events = queryEvents(eventUri, projection, selection);
@@ -342,7 +354,13 @@ public final class CalendarManager {
         for (int i = 0; i < QUERY_TIMESTAMP_ITERATIONS.length; i++) {
 
             Logger.i(TAG, "Running %s search query iteration", i);
-            Logger.i(TAG, "Looking between %s and %s", start, start + QUERY_TIMESTAMP_ITERATIONS[i]);
+            if (Logger.DEBUG) {
+                Time time1 = new Time();
+                time1.set(start);
+                Time time2 = new Time();
+                time2.set(start + QUERY_TIMESTAMP_ITERATIONS[i]);
+                Logger.i(TAG, "Looking between %s and %s", time1.format(Util.TF), time2.format(Util.TF));
+            }
 
             Uri eventUri = getUriBetween(start, start + QUERY_TIMESTAMP_ITERATIONS[i]);
             ArrayList<EventData> events = queryEvents(eventUri, projection, selection);
@@ -373,7 +391,13 @@ public final class CalendarManager {
         for (int i = 0; i < QUERY_TIMESTAMP_ITERATIONS.length; i++) {
 
             Logger.i(TAG, "Running %s search query iteration", i);
-            Logger.i(TAG, "Looking between %s and %s", end - QUERY_TIMESTAMP_ITERATIONS[i], end);
+            if (Logger.DEBUG) {
+                Time time1 = new Time();
+                time1.set(end - QUERY_TIMESTAMP_ITERATIONS[i]);
+                Time time2 = new Time();
+                time2.set(end);
+                Logger.i(TAG, "Looking between %s and %s", time1.format(Util.TF), time2.format(Util.TF));
+            }
 
             Uri eventUri = getUriBetween(end - QUERY_TIMESTAMP_ITERATIONS[i], end);
             ArrayList<EventData> events = queryEvents(eventUri, projection, selection);
@@ -407,7 +431,13 @@ public final class CalendarManager {
         for (int i = 0; i < QUERY_TIMESTAMP_ITERATIONS.length; i++) {
 
             Logger.i(TAG, "Running %s search query iteration", i);
-            Logger.i(TAG, "Looking between %s and %s", end - QUERY_TIMESTAMP_ITERATIONS[i], end);
+            if (Logger.DEBUG) {
+                Time time1 = new Time();
+                time1.set(end - QUERY_TIMESTAMP_ITERATIONS[i]);
+                Time time2 = new Time();
+                time2.set(end);
+                Logger.i(TAG, "Looking between %s and %s", time1.format(Util.TF), time2.format(Util.TF));
+            }
 
             Uri eventUri = getUriBetween(end - QUERY_TIMESTAMP_ITERATIONS[i], end);
             ArrayList<EventData> events = queryEvents(eventUri, projection, selection);
@@ -441,7 +471,13 @@ public final class CalendarManager {
         for (int i = 0; i < QUERY_TIMESTAMP_ITERATIONS.length; i++) {
 
             Logger.i(TAG, "Running %s search query iteration", i);
-            Logger.i(TAG, "Looking between %s and %s", start, start + QUERY_TIMESTAMP_ITERATIONS[i]);
+            if (Logger.DEBUG) {
+                Time time1 = new Time();
+                time1.set(start);
+                Time time2 = new Time();
+                time2.set(start + QUERY_TIMESTAMP_ITERATIONS[i]);
+                Logger.i(TAG, "Looking between %s and %s", time1.format(Util.TF), time2.format(Util.TF));
+            }
 
             Uri eventUri = getUriBetween(start, start + QUERY_TIMESTAMP_ITERATIONS[i]);
             ArrayList<EventData> events = queryEvents(eventUri, projection, selection);

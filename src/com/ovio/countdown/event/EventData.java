@@ -1,6 +1,7 @@
 package com.ovio.countdown.event;
 
 import android.text.format.Time;
+import com.ovio.countdown.log.Logger;
 import com.ovio.countdown.util.Util;
 
 import java.io.Serializable;
@@ -48,13 +49,19 @@ public class EventData implements Serializable {
     public String duration;
 
     public String toDebugString() {
+        String ts = Long.toString(start);
+        if (Logger.DEBUG) {
+            Time time = new Time();
+            time.set(start);
+            ts = time.format(Util.TF);
+        }
         return "CalendarEvent{" +
                 "id=" + id +
                 ", eventId=" + eventId +
                 ", calendarId=" + calendarId +
                 ", title='" + title + '\'' +
                 ", allDay=" + allDay +
-                ", start=" + start +
+                ", start=" + ts +
                 ", end=" + end +
                 ", timezone='" + timezone + '\'' +
                 ", rdate='" + rdate + '\'' +

@@ -253,7 +253,11 @@ public final class CalendarManager {
 
     public EventData getEvent(long timestamp, long eventId) {
 
-        Logger.i(TAG, "Getting exact event for id: %s", eventId);
+        if (Logger.DEBUG) {
+            Time time = new Time();
+            time.set(timestamp);
+            Logger.i(TAG, "Getting exact event with id %s and TS %s", eventId, time.format(Util.TF));
+        }
 
         Uri eventUri = getUriBetween(timestamp, timestamp);
 
@@ -339,30 +343,29 @@ public final class CalendarManager {
     }
 
 
-    public EventData getNextEvent(long eventId, long after) {
+    public EventData getNextEvent(long eventId, long base) {
 
         if (Logger.DEBUG) {
             Time time = new Time();
-            time.set(after);
+            time.set(base);
             Logger.i(TAG, "Getting next event with id %s after %s", eventId, time.format(Util.TF));
         }
 
         String[] projection = EventData.COLUMNS;
-        String selection = EventData.EVENT_ID + " = " + eventId;
-        long start = after + 1000L;
+        String selection = EventData.EVENT_ID + " = " + eventId + " AND " + EventData.DTSTART + " > " + base;
 
         for (int i = 0; i < QUERY_TIMESTAMP_ITERATIONS.length; i++) {
 
             Logger.i(TAG, "Running %s search query iteration", i);
             if (Logger.DEBUG) {
                 Time time1 = new Time();
-                time1.set(start);
+                time1.set(base - QUERY_TIMESTAMP_ITERATIONS[i]);
                 Time time2 = new Time();
-                time2.set(start + QUERY_TIMESTAMP_ITERATIONS[i]);
+                time2.set(base + QUERY_TIMESTAMP_ITERATIONS[i]);
                 Logger.i(TAG, "Looking between %s and %s", time1.format(Util.TF), time2.format(Util.TF));
             }
 
-            Uri eventUri = getUriBetween(start, start + QUERY_TIMESTAMP_ITERATIONS[i]);
+            Uri eventUri = getUriBetween(base - QUERY_TIMESTAMP_ITERATIONS[i], base + QUERY_TIMESTAMP_ITERATIONS[i]);
             ArrayList<EventData> events = queryEvents(eventUri, projection, selection);
             Logger.i(TAG, "Got %s events", events.size());
 
@@ -376,30 +379,29 @@ public final class CalendarManager {
     }
 
 
-    public EventData getPreviousEvent(long eventId, long before) {
+    public EventData getPreviousEvent(long eventId, long base) {
 
         if (Logger.DEBUG) {
             Time time = new Time();
-            time.set(before);
+            time.set(base);
             Logger.i(TAG, "Getting previous event with id %s before %s", eventId, time.format(Util.TF));
         }
 
         String[] projection = EventData.COLUMNS;
-        String selection = EventData.EVENT_ID + " = " + eventId;
-        long end = before - 1000L;
+        String selection = EventData.EVENT_ID + " = " + eventId + " AND " + EventData.DTSTART + " < " + base;
 
         for (int i = 0; i < QUERY_TIMESTAMP_ITERATIONS.length; i++) {
 
             Logger.i(TAG, "Running %s search query iteration", i);
             if (Logger.DEBUG) {
                 Time time1 = new Time();
-                time1.set(end - QUERY_TIMESTAMP_ITERATIONS[i]);
+                time1.set(base - QUERY_TIMESTAMP_ITERATIONS[i]);
                 Time time2 = new Time();
-                time2.set(end);
+                time2.set(base + QUERY_TIMESTAMP_ITERATIONS[i]);
                 Logger.i(TAG, "Looking between %s and %s", time1.format(Util.TF), time2.format(Util.TF));
             }
 
-            Uri eventUri = getUriBetween(end - QUERY_TIMESTAMP_ITERATIONS[i], end);
+            Uri eventUri = getUriBetween(base - QUERY_TIMESTAMP_ITERATIONS[i], base + QUERY_TIMESTAMP_ITERATIONS[i]);
             ArrayList<EventData> events = queryEvents(eventUri, projection, selection);
             Logger.i(TAG, "Got %s events", events.size());
 

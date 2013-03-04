@@ -72,6 +72,9 @@ public final class TimeDifference {
         Time tillTime = new Time();
         tillTime.set(till);
 
+        years = tillTime.year - fromTime.year;
+        months = tillTime.month - fromTime.month;
+        days = tillTime.monthDay - fromTime.monthDay;
         hours = tillTime.hour - fromTime.hour;
         mins = tillTime.minute - fromTime.minute;
         secs = tillTime.second - fromTime.second;
@@ -86,32 +89,54 @@ public final class TimeDifference {
             mins += 60;
         }
 
+        int d = 0;
         if (hours < 0) {
-            //days--;
+            days--;
+            d--;
             hours += 24;
         }
 
-        days = getDaysBetween(from, till);
+        //TODO
+        if (days < 0) {
+            months--;
 
-        //int daysTillMonthEnd = getDaysInMonth(fromTime.year, fromTime.month) - fromTime.monthDay;
 
-        int m = fromTime.month;
-        int y = fromTime.year;
+            int m = tillTime.month;
+            int y = tillTime.year;
 
-        months = 0;
-        while (days - getDaysInMonth(y, m) >= 0) {
-            days -= getDaysInMonth(y, m);
-            m++;
-            if (m == 12) {
-                m = 0;
-                y++;
+            m--;
+            if (m < 0) {
+                y--;
+                m = 11;
             }
+
+            int fromAdd = getDaysInMonth(y, m) - fromTime.monthDay;
+            if (fromAdd < 0) {
+                fromAdd += fromTime.monthDay - getDaysInMonth(y, m);
+            }
+
+            int tillAdd = tillTime.monthDay;
+
+            days = fromAdd + tillAdd + d;
+        }
+
+        int dim = getDaysInMonth(tillTime.year, tillTime.month);
+        if (days == dim && tillTime.monthDay == dim && d == 0) {
+            days = 0;
             months++;
         }
 
-        years = months / 12;
-        months -= years * 12;
+        if (months < 0) {
+            years--;
+            months += 12;
+        }
+
     }
+
+    /*
+Months doesn't match in compare From: 2013-07-30T16:05:38.000Z Till: 2013-09-30T15:35:58.000Z Period: 1month 30days  Time 23:30:20
+My: TimeDifference{years=0, months=2, days=0, hours=23, mins=30, secs=20} expected:<1> but was:<2>
+     */
 
     // Copy-Pasted from android.text.format.Time to avoid new Time instances creation
     private boolean isLeapYear(int y) {

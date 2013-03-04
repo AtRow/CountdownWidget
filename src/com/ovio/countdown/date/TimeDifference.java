@@ -1,6 +1,5 @@
 package com.ovio.countdown.date;
 
-import android.text.format.DateUtils;
 import android.text.format.Time;
 
 /**
@@ -133,11 +132,6 @@ public final class TimeDifference {
 
     }
 
-    /*
-Months doesn't match in compare From: 2013-07-30T16:05:38.000Z Till: 2013-09-30T15:35:58.000Z Period: 1month 30days  Time 23:30:20
-My: TimeDifference{years=0, months=2, days=0, hours=23, mins=30, secs=20} expected:<1> but was:<2>
-     */
-
     // Copy-Pasted from android.text.format.Time to avoid new Time instances creation
     private boolean isLeapYear(int y) {
         return (y % 4) == 0 && ((y % 100) != 0 || (y % 400) == 0);
@@ -153,49 +147,5 @@ My: TimeDifference{years=0, months=2, days=0, hours=23, mins=30, secs=20} expect
         } else {
             return isLeapYear(year) ? 29 : 28;
         }
-    }
-
-    // Copy-Pasted from android.text.format.Time
-    private int getDaysInYear(int y) {
-        return ((y % 4) == 0 && ((y % 100) != 0 || (y % 400) == 0)) ? 366 : 365;
-    }
-
-    private int getDaysBetween(long from, long till) {
-        return (int) ((till - from) / DateUtils.DAY_IN_MILLIS);
-//
-//        Calendar cursor = Calendar.getInstance();
-//        cursor.setTimeInMillis(from);
-//
-//        cursor.add(Calendar.DAY_OF_YEAR, presumedDays);
-//        long instant = cursor.getTimeInMillis();
-//        if (instant == till) {
-//            return presumedDays;
-//        }
-//        final int step = (instant < till) ? 1 : -1;
-//        do {
-//            cursor.add(Calendar.DAY_OF_MONTH, step);
-//            presumedDays += step;
-//        } while (cursor.getTimeInMillis() != till);
-//
-//        return presumedDays;
-    }
-
-    private int getDaysBetween2(long from, long till) {
-
-        Time fromTime = new Time();
-        fromTime.set(from);
-        fromTime.normalize(false);
-
-        Time tillTime = new Time();
-        tillTime.set(till);
-        tillTime.normalize(false);
-
-        int daysBetween = 0;
-        while (fromTime.before(tillTime)) {
-            fromTime.monthDay++;
-            fromTime.normalize(false);
-            daysBetween++;
-        }
-        return daysBetween;
     }
 }

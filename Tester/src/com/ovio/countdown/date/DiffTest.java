@@ -99,6 +99,8 @@ public class DiffTest extends AndroidTestCase{
 
         DateTimeZone tz = DateTimeZone.forTimeZone(TimeZone.getDefault());
 
+        tz = DateTimeZone.forID("Europe/Kiev");
+
         for (int i = 0; i < fromList.size(); i++) {
 
             long from = fromList.get(i);

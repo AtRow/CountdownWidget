@@ -71,10 +71,12 @@ public final class TimeDifference {
         Time tillTime = new Time();
         tillTime.set(till);
 
+        int shift = (int) (fromTime.gmtoff - tillTime.gmtoff) / (60 * 60);
+
         years = tillTime.year - fromTime.year;
         months = tillTime.month - fromTime.month;
         days = tillTime.monthDay - fromTime.monthDay;
-        hours = tillTime.hour - fromTime.hour;
+        hours = tillTime.hour - fromTime.hour + shift;
         mins = tillTime.minute - fromTime.minute;
         secs = tillTime.second - fromTime.second;
 
@@ -89,10 +91,15 @@ public final class TimeDifference {
         }
 
         int d = 0;
-        if (hours < 0) {
+        while (hours < 0) {
             days--;
             d--;
             hours += 24;
+        }
+        while (hours >= 24) {
+            d++;
+            days++;
+            hours -=24;
         }
 
         //TODO

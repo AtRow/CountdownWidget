@@ -58,8 +58,8 @@ public class DiffTest extends AndroidTestCase{
 
     private void generateTimesStraight() {
 
-        long start = Timestamp.valueOf("2012-01-01 00:00:00").getTime();
-        long end = Timestamp.valueOf("2012-06-01 00:00:00").getTime();
+        long start = Timestamp.valueOf("2012-03-29 00:00:00").getTime();
+        long end = Timestamp.valueOf("2012-04-04 00:00:00").getTime();
 
         Time startTime = new Time();
         startTime.set(start);
@@ -70,23 +70,23 @@ public class DiffTest extends AndroidTestCase{
         while (startTime.before(endTime)) {
             Time mediumTime = new Time(startTime);
             while (mediumTime.before(endTime)) {
-                mediumTime.monthDay += 1;
+                mediumTime.hour += 1;
                 mediumTime.normalize(false);
 
-                //if (!(mediumTime.month == 1 && mediumTime.monthDay > 28)) {
+                if (!(mediumTime.month == 1 && mediumTime.monthDay > 28)) {
                     fromList.add(startTime.toMillis(false));
                     tillList.add(mediumTime.toMillis(false));
-                //}
+                }
             }
-            startTime.monthDay += 1;
+            startTime.hour += 1;
             startTime.normalize(false);
         }
     }
 
     private void generateTimesSingle() {
-        //2013-07-30T16:05:38.000Z Till: 2013-09-30T15:35:58.000Z
-        long start = Timestamp.valueOf("2013-07-30 16:00:00").getTime();
-        long end = Timestamp.valueOf("2013-09-30 15:00:00").getTime();
+        //2012-12-29T00:03:55.000+03:00 Till: 2013-03-11T14:51:44.000+03:00
+        long start = Timestamp.valueOf("2012-12-28 21:03:55").getTime();
+        long end = Timestamp.valueOf("2013-03-11 11:51:44").getTime();
 
         fromList.add(start);
         tillList.add(end);
@@ -95,11 +95,9 @@ public class DiffTest extends AndroidTestCase{
 
     public void testNegativeDiff() {
 
-        //generateTimesStraight();
+        //generateTimes();
 
         DateTimeZone tz = DateTimeZone.forTimeZone(TimeZone.getDefault());
-
-        tz = DateTimeZone.forID("Europe/Kiev");
 
         for (int i = 0; i < fromList.size(); i++) {
 
@@ -129,7 +127,9 @@ public class DiffTest extends AndroidTestCase{
 
         generateTimes();
 
-        DateTimeZone tz = DateTimeZone.forTimeZone(TimeZone.getDefault());
+        DateTimeZone tz = DateTimeZone.forID(Time.getCurrentTimezone());
+
+        Log.e("TEST", "TimeZone:" + TimeZone.getDefault().getDisplayName());
 
         for (int i = 0; i < fromList.size(); i++) {
 
@@ -147,7 +147,7 @@ public class DiffTest extends AndroidTestCase{
 
             String datesCompared = "From: " + fromDt.toString() + " Till: " + tillDt.toString() + " Period: " + period.toString(fmt) + "\n My: " + diff.toString();
 
-            Log.w("TEST", "From: " + fromDt.toString() + " Till: " + tillDt.toString() + " Period: " + period.toString(fmt));
+            //Log.w("TEST", "From: " + fromDt.toString() + " Till: " + tillDt.toString() + " Period: " + period.toString(fmt));
 
             assertEquals("Years doesn't match in compare " + datesCompared, period.getYears(), diff.years);
 

@@ -20,6 +20,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.format.Time;
+import android.view.ViewGroup;
 import com.ovio.countdown.calendar.SwitcherCalendarView;
 
 
@@ -41,6 +42,8 @@ public class CalendarActivity extends Activity {
         }
 
 	    setContentView(switcherCalendarView);
+
+        getWindow().setLayout(ViewGroup.LayoutParams.FILL_PARENT, ViewGroup.LayoutParams.FILL_PARENT);
     }
 
 

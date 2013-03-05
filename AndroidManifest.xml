@@ -40,12 +40,8 @@
 
         <activity
             android:name=".prefs.CalendarActivity"
-            android:excludeFromRecents="true">
-
-            <!--
-            android:noHistory="true"
-            android:theme="@android:style/Theme.Dialog"
-            -->
+            android:excludeFromRecents="true"
+            android:theme="@android:style/Theme.Dialog">
 
         </activity>
 

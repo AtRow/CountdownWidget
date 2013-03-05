@@ -101,12 +101,14 @@ public final class HorizontalPager extends ViewGroup
 	        final int width = MeasureSpec.getSize(widthMeasureSpec);
 	        final int widthMode = MeasureSpec.getMode(widthMeasureSpec);
 	        if (widthMode != MeasureSpec.EXACTLY) {
-	            throw new IllegalStateException("HorizontalPager can only be used in EXACTLY mode.");
+                //Warning: This may be turned on after detaching Calendar to separate project
+	            //throw new IllegalStateException("HorizontalPager can only be used in EXACTLY mode.");
 	        }
 
 	        final int heightMode = MeasureSpec.getMode(heightMeasureSpec);
 	        if (heightMode != MeasureSpec.EXACTLY) {
-	            throw new IllegalStateException("HorizontalPager can only be used in EXACTLY mode.");
+                //Warning: This may be turned on after detaching Calendar to separate project
+	            //throw new IllegalStateException("HorizontalPager can only be used in EXACTLY mode.");
 	        }
 
 	        // The children are given the same width and height as the workspace

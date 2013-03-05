@@ -1,8 +1,11 @@
 package com.ovio.countdown.view;
 
+import android.content.Context;
 import android.text.format.DateFormat;
 import android.text.format.Time;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.*;
 import com.ovio.countdown.R;
 import com.ovio.countdown.event.CalendarData;
@@ -10,6 +13,7 @@ import com.ovio.countdown.event.CalendarManager;
 import com.ovio.countdown.event.EventData;
 import com.ovio.countdown.log.Logger;
 import com.ovio.countdown.prefs.*;
+import com.ovio.countdown.util.Util;
 
 import java.util.List;
 
@@ -96,11 +100,16 @@ public class WidgetPreferencesView {
 
     private Spinner calendarSpinner;
 
-    private TextView calendarInfoTextView;
+    private TextView calendarErrorTextView;
+
+    private TextView currentEventTextView;
 
     private LinearLayout calendarControlsLayout;
 
+    private FrameLayout currentEventFrameLayout;
+
     private EventData eventData;
+
 
     public WidgetPreferencesView(WidgetPreferencesActivity activity) {
         this.activity = activity;
@@ -237,55 +246,88 @@ public class WidgetPreferencesView {
             calendarEventData = calendarManager.getNextCalendarEvent(currentCalendarId, now);
         }
 
-        if (calendarEventData == null) {
-            Toast.makeText(activity, R.string.event_picker_no_events_found, Toast.LENGTH_LONG).show();
-        }
-
-        setEventData(calendarEventData);
+        setEventData(calendarEventData, false);
     }
 
     private void reloadCalendarEvent() {
 
         if (currentCalendarId != CalendarManager.NONE_CALENDARS) {
-
-            List<CalendarData> calendars = calendarManager.getCalendars();
-
-            for (int i = 0; i < calendars.size(); i++) {
-                if (calendars.get(i).id == currentCalendarId) {
-                    calendarSpinner.setSelection(i);
-                }
-            }
+            spinToCalendar(currentCalendarId);
 
             loadNearestEvent();
         }
     }
 
+    private void spinToCalendar(long calendarId) {
+        List<CalendarData> calendars = calendarManager.getCalendars();
+
+        for (int i = 0; i < calendars.size(); i++) {
+            if (calendars.get(i).id == calendarId) {
+                AdapterView.OnItemSelectedListener tmpListener = calendarSpinner.getOnItemSelectedListener();
+                //calendarSpinner.setSelection(i);
+                calendarSpinner.setSelection(i, false);
+            }
+        }
+    }
+
     public void setEventData(EventData eventData) {
+        setEventData(eventData, true);
+    }
+
+    public void setEventData(EventData eventData, boolean resetCalendar) {
+
+        if (resetCalendar) {
+            currentCalendarId = CalendarManager.NONE_CALENDARS;
+            spinToCalendar(currentCalendarId);
+        }
 
         if (isManualTab) {
             tabHost.setCurrentTabByTag(TAB_GOOGLE);
         }
         this.eventData = eventData;
 
-        if (eventData != null) {
-            // TODO Human Text
-            calendarInfoTextView.setText(eventData.toString());
-        } else {
-            calendarInfoTextView.setText(R.string.calendar_not_choosen_text);
-        }
+        renderEvent(eventData, currentEventFrameLayout);
         updateOkButton();
+    }
+
+    private void renderEvent(EventData eventData, ViewGroup parent) {
+
+        LayoutInflater li = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        ViewGroup view = (ViewGroup) li.inflate(R.layout.event_item, null);
+
+        TextView desc = (TextView) view.getChildAt(0);
+        TextView date = (TextView) view.getChildAt(1);
+
+        if (eventData != null) {
+            Time time = new Time();
+            time.set(eventData.start);
+
+            desc.setText(eventData.title);
+            date.setText(time.format(Util.TF));
+        } else {
+            desc.setText(R.string.event_not_choosen_text);
+            date.setVisibility(View.GONE);
+        }
+
+        parent.removeAllViews();
+        parent.addView(view);
     }
 
     private void setGoogleCalendarControlsEnabled(boolean enabled) {
 
         if (enabled) {
-            calendarInfoTextView.setText(R.string.calendar_not_choosen_text);
+            calendarErrorTextView.setVisibility(View.GONE);
             calendarControlsLayout.setVisibility(View.VISIBLE);
+            currentEventTextView.setVisibility(View.VISIBLE);
+            currentEventFrameLayout.setVisibility(View.VISIBLE);
             Logger.i(TAG, "Setting visibility to View.VISIBLE");
 
         } else {
-            calendarInfoTextView.setText(R.string.calendar_error_text);
+            calendarErrorTextView.setVisibility(View.VISIBLE);
+            calendarErrorTextView.setText(R.string.calendar_error_text);
             calendarControlsLayout.setVisibility(View.GONE);
+            currentEventTextView.setVisibility(View.GONE);
+            currentEventFrameLayout.setVisibility(View.GONE);
             Logger.i(TAG, "Setting visibility to View.GONE");
         }
     }
@@ -508,7 +550,11 @@ public class WidgetPreferencesView {
 
         calendarSpinner = (Spinner) activity.findViewById(R.id.calendarSpinner);
 
-        calendarInfoTextView = (TextView) activity.findViewById(R.id.calendarErrorTextView);
+        calendarErrorTextView = (TextView) activity.findViewById(R.id.calendarErrorTextView);
+
+        currentEventTextView = (TextView) activity.findViewById(R.id.currentEventTextView);
+
+        currentEventFrameLayout = (FrameLayout) activity.findViewById(R.id.currentEventFrameLayout);
 
         calendarControlsLayout = (LinearLayout) activity.findViewById(R.id.calendarControlsLayout);
 

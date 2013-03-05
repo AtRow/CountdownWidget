@@ -32,7 +32,7 @@
     <string name="calendar_error_text">К сожалению, календари не найдены на Вашем устройстве</string>
     <string name="calendar_all_name">Все</string>
     <string name="event_nearest_title">Ближайший</string>
-    <string name="calendar_not_choosen_text">Событие не выбрано</string>
+    <string name="event_not_choosen_text">Событие не выбрано</string>
     <string name="calendar_pick_event_prompt">Выбрать событие из календаря</string>
     <string name="calendar_pick_event_button">Выбрать</string>
     <string name="calendar_nearest_event_prompt">Ближайшее событие из календаря</string>
@@ -73,4 +73,5 @@
     <string name="sub_second">сек.</string>
     <string name="event_picker_no_events_found">Не найдено событий в выбранном календаре</string>
     <string name="calendar_none_name">Не выбран</string>
+    <string name="calendar_current_event">Выбранное событие</string>
 </resources>

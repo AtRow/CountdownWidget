@@ -277,12 +277,30 @@
                                         android:layout_height="fill_parent">
 
                                         <TextView
+                                            style="@style/TextSettings"
+                                            android:layout_width="fill_parent"
+                                            android:layout_height="wrap_content"
+                                            android:text="@string/calendar_current_event"
+                                            android:layout_marginTop="5dp"
+                                            android:layout_marginLeft="5dp"
+                                            android:layout_marginRight="5dp"
+                                            android:id="@+id/currentEventTextView"/>
+
+                                        <FrameLayout
+                                            android:layout_width="fill_parent"
+                                            android:layout_height="wrap_content"
+                                            android:longClickable="false"
+                                            android:id="@+id/currentEventFrameLayout"
+                                            android:layout_margin="10dp">
+                                        </FrameLayout>
+
+                                        <TextView
                                             android:layout_width="fill_parent"
                                             android:layout_height="wrap_content"
                                             android:text="@string/calendar_error_text"
                                             android:id="@+id/calendarErrorTextView"
                                             style="@style/TextSettings"
-                                            android:layout_margin="15dp"
+                                            android:layout_margin="10dp"
                                             android:textStyle="bold"/>
 
                                         <LinearLayout
@@ -291,16 +309,6 @@
                                             android:layout_height="fill_parent"
                                             android:longClickable="false"
                                             android:id="@+id/calendarControlsLayout">
-
-                                            <TextView
-                                                style="@style/TextSettings"
-                                                android:layout_width="fill_parent"
-                                                android:layout_height="wrap_content"
-                                                android:text="@string/calendar_pick_event_prompt"
-                                                android:layout_marginTop="5dp"
-                                                android:layout_marginLeft="5dp"
-                                                android:layout_marginRight="5dp"
-                                                android:id="@+id/textView1"/>
 
                                             <LinearLayout
                                                 android:orientation="horizontal"

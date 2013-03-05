@@ -171,7 +171,6 @@ public class WidgetPreferencesActivity extends Activity {
                         widgetCalendarEvent = (EventData) extras.getSerializable(EventPickerActivity.EVENT);
                         if (widgetCalendarEvent != null) {
                             this.view.setEventData(widgetCalendarEvent);
-                            this.view.setCalendar(CalendarManager.NONE_CALENDARS);
                         }
                     }
                     break;

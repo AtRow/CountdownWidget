@@ -18,7 +18,6 @@ public class WidgetOptions extends AbstractOptions {
     public static final Field RECURRING_INTERVAL = Field.get("recurringInterval", Long.class);
     public static final Field NOTIFICATION_INTERVAL = Field.get("notificationInterval", Long.class);
     public static final Field ICON = Field.get("icon", Integer.class);
-    public static final Field STYLE = Field.get("style", Integer.class);
 
 
     private final static Field[] fields = {
@@ -35,7 +34,7 @@ public class WidgetOptions extends AbstractOptions {
             RECURRING_INTERVAL,
             NOTIFICATION_INTERVAL,
             ICON,
-            STYLE
+            GeneralOptions.STYLE
     };
 
     public int widgetId;
@@ -104,7 +103,7 @@ public class WidgetOptions extends AbstractOptions {
 
         icon = bundle.getInt(ICON.name);
 
-        style = bundle.getInt(STYLE.name);
+        style = bundle.getInt(GeneralOptions.STYLE.name);
 
     }
 
@@ -137,7 +136,7 @@ public class WidgetOptions extends AbstractOptions {
 
         bundle.putInt(ICON.name, icon);
 
-        bundle.putInt(STYLE.name, style);
+        bundle.putInt(GeneralOptions.STYLE.name, style);
 
     }
 }

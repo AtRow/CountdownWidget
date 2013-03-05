@@ -320,7 +320,7 @@ public class WidgetPreferencesActivity extends Activity {
 
         options.enableSeconds = view.getCountSeconds();
         options.enableTime = view.getEnableTime();
-
+        options.style = view.getStyle();
 
         Logger.i(TAG, "Global Options: %s", options);
 
@@ -346,6 +346,7 @@ public class WidgetPreferencesActivity extends Activity {
         view.setCountSeconds(options.enableSeconds);
         view.setCountUp(options.countUp);
         view.setEnableTime(options.enableTime);
+        view.setStyle(options.style);
 
         // Then basically override
         if (widgetOptions.isValid()) {

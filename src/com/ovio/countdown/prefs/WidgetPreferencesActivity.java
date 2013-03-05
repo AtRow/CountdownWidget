@@ -70,6 +70,9 @@ public class WidgetPreferencesActivity extends Activity {
         prefManager = PreferencesManager.getInstance(self);
         widgetManager = WidgetPreferencesManager.getInstance(self);
 
+        // Preload Calendars
+        SwitcherCalendarViewContainer.getInstance(self);
+
         doForceRemoveOnCancel = true;
 
         appWidgetId = getAppWidgetId();

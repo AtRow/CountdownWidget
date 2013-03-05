@@ -41,13 +41,16 @@
         <activity
             android:name=".prefs.CalendarActivity"
             android:excludeFromRecents="true"
+            android:configChanges="keyboardHidden|orientation"
             android:theme="@android:style/Theme.Dialog">
 
         </activity>
 
         <activity
             android:name=".prefs.DayInfoCalendarActivity"
-            android:excludeFromRecents="true">
+            android:excludeFromRecents="true"
+            android:configChanges="keyboardHidden|orientation"
+            android:theme="@android:style/Theme.Dialog">
         </activity>
 
         <activity

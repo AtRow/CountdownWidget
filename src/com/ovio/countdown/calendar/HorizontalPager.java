@@ -117,10 +117,11 @@ public final class HorizontalPager extends ViewGroup
 	            getChildAt(i).measure(widthMeasureSpec, heightMeasureSpec);
 	        }
 
-	        if (mFirstLayout) {
+	        //if (mFirstLayout) {
+                //Warning: This may be turned on after detaching Calendar to separate project
 	            scrollTo(mCurrentScreen * width, 0);
-	            mFirstLayout = false;
-	        }
+	        //    mFirstLayout = false;
+	        //}
 	    }
 
 	    @Override

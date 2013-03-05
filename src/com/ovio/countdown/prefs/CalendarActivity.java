@@ -21,6 +21,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.format.Time;
 import android.view.ViewGroup;
+import android.view.Window;
 import com.ovio.countdown.calendar.SwitcherCalendarView;
 
 
@@ -29,12 +30,15 @@ public class CalendarActivity extends Activity {
 
     protected SwitcherCalendarView switcherCalendarView;
 
+    @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
 
-        switcherCalendarView = new SwitcherCalendarView(getApplicationContext());
+        switcherCalendarView = SwitcherCalendarViewContainer.getInstance(getApplicationContext()).getSwitcherCalendarView();
 
         switcherCalendarView.setOnDateSelectedListener(listener);
+        switcherCalendarView.setDayInfoFetcher(null);
 
         Time date = DateHelper.getDateFromIntent(getIntent());
         if (date != null) {
